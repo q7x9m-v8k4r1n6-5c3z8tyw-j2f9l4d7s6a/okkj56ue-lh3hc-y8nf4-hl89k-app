@@ -1,0 +1,1 @@
+export { UserProfileSummary } from './UserProfileSummary'

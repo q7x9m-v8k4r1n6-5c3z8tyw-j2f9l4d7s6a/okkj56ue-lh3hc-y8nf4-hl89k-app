@@ -15,6 +15,11 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
+    "paths": {
+      "@app/*": ["./src/*"],
+      "@core/*": ["./core/*"],
+      "@plugin/*": ["./plugin/*"]
+    },
 
     /* Linting */
     "noUnusedLocals": true,
@@ -22,5 +27,5 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["src", "core", "plugin"]
 }
