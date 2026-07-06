@@ -1,0 +1,18 @@
+.home-page {
+  display: grid;
+  min-height: 100vh;
+  padding: 2rem;
+  place-content: center;
+  text-align: center;
+}
+
+.home-page h1 {
+  margin: 0;
+  color: #111827;
+  font-size: clamp(2.5rem, 8vw, 5rem);
+}
+
+.home-page p {
+  margin: 0.75rem 0 0;
+  color: #64748b;
+}
