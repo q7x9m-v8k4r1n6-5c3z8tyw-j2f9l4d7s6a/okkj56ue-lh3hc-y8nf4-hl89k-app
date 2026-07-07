@@ -1,77 +1,39 @@
-# React + TypeScript + Vite
+# OVC-MOVE-APP
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Giới thiệu dự án
 
-Currently, two official plugins are available:
+OVC-MOVE-APP là ứng dụng frontend của hệ thống tính điểm, hỗ trợ vận hành vòng RACE trong chương trình MOVE.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Production: [https://move.oispvolunteerclub.com/](https://move.oispvolunteerclub.com/)
 
-## React Compiler
+## Công nghệ sử dụng
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+| Công nghệ | Phiên bản |
+| --- | --- |
+| Node.js | 24.16.0 |
+| npm | 11.13.0 |
+| React | 19.2.7 |
+| React DOM | 19.2.7 |
+| React Router DOM | 7.18.1 |
+| TypeScript | 6.0.3 |
+| Vite | 8.1.3 |
+| Tailwind CSS | 4.3.2 |
+| ESLint | 10.6.0 |
 
-Note: This will impact Vite dev & build performances.
+## Thông tin phiên bản
 
-## Expanding the ESLint configuration
+### Version 2016.1.0
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Ngày bắt đầu: 06-07-2026
+- Ngày kết thúc: Dự kiến cuối 09-2026
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Nhóm phát triển
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
+| Vai trò | Họ và tên | Email |
+| --- | --- | --- |
+| Project Manager | Khoa Đào Anh | khoa.dao23102006@hcmut.edu.vn |
+| Software Developer | Tân Nguyễn Nhật | tan.nguyennhat07@hcmut.edu.vn |
+| Software Developer | Hồ Minh Phúc | phuc0908061@gmail.com |
+| Software Developer | Đạt Lê Cẩm | dat.ledraco07@hcmut.edu.vn |
+| Software Developer | Hiếu Lê Lương Trung | hieu.le27@hcmut.edu.vn |
+| Software Developer | Hoàng Lương Thế | hoang.luong010206@hcmut.edu.vn |
