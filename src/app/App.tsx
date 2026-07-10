@@ -1,10 +1,11 @@
 import { Outlet } from 'react-router-dom'
+import { AppLayout } from '@core/shared'
 
 function App() {
   return (
-    <div className="min-h-svh bg-white text-ink">
+    <AppLayout>
       <Outlet />
-    </div>
+    </AppLayout>
   )
 }
 

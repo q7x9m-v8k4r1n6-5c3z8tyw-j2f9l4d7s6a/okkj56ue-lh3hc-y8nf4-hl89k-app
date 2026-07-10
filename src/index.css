@@ -1,1 +1,35 @@
 @import "tailwindcss";
+@import "@fontsource-variable/mona-sans";
+@import "@fontsource/montserrat-alternates/700.css";
+
+:root {
+  font-family: "Mona Sans Variable", "Mona Sans", sans-serif;
+  color: #1a1c1c;
+  background: #f9f9f9;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.move-logo {
+  font-family: "Montserrat Alternates", sans-serif;
+  font-style: normal;
+  font-weight: 700;
+}

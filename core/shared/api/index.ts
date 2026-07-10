@@ -1,4 +1,6 @@
 export type ApiResponse<TData> = {
-  data: TData
+  statusCode: number,
   message?: string
+  detailError?: string
+  data: TData
 }

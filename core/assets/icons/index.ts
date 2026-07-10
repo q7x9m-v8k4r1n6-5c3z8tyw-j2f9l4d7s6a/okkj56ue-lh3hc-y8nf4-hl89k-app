@@ -1,1 +1,5 @@
-export {}
+export { ChevronIcon } from './ChevronIcon'
+export { LogoutIcon } from './LogoutIcon'
+export { RaceIcon } from './RaceIcon'
+export { SettingsIcon } from './SettingsIcon'
+export { UsersIcon } from './UsersIcon'
