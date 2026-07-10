@@ -3,6 +3,7 @@ import { Move2026HomePage } from './pages/home'
 export { move2026LandingContent } from './features/showcase-move'
 export { Move2026HomePage } from './pages/home'
 export { Move2026Landing } from './widgets/landing'
+export { Move2026AppShell } from './widgets/app-shell'
 
 export const move2026Plugin = {
   name: 'move2026',

@@ -1,14 +1,27 @@
 import { createBrowserRouter } from 'react-router-dom'
+import { Move2026AppShell, Move2026HomePage } from '@plugin/move2026'
 import App from '../App'
-import LoginPage from '@core/pages'
 
 export const router = createBrowserRouter([
   {
     element: <App />,
     children: [
       {
-        path: '/',
-        element: <LoginPage />,
+        element: <Move2026AppShell />,
+        children: [
+          {
+            index: true,
+            element: <Move2026HomePage />,
+          },
+          {
+            path: 'users',
+            element: <section aria-label="Người dùng" className="min-h-[calc(100svh-61px)] bg-white" />,
+          },
+          {
+            path: 'settings',
+            element: <section aria-label="Cài đặt" className="min-h-[calc(100svh-61px)] bg-white" />,
+          },
+        ],
       },
     ],
   },
