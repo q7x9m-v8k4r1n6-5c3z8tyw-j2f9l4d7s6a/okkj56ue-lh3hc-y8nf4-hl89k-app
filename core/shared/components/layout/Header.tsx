@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
+import { defaultAvatarUrl } from '@core/assets/images'
 
 export type HeaderUser = {
+  avatarUrl?: string
   email: string
   name: string
   role: string
@@ -13,14 +15,8 @@ type HeaderProps = {
   user: HeaderUser
 }
 
-const UserAvatar = () => (
-  <span className="relative block size-[30px] overflow-hidden rounded-full bg-[linear-gradient(145deg,#d9eff0_0%,#efc9ae_55%,#704b3d_100%)]">
-    <svg aria-hidden="true" className="absolute inset-0 size-full" viewBox="0 0 30 30">
-      <circle cx="15" cy="11" fill="#edc4a6" r="6" />
-      <path d="M7 30c.6-7 3.2-10 8-10s7.4 3 8 10" fill="#4f6e78" />
-      <path d="M9.2 10.8c.2-5 2.3-7.5 6.2-7.5 3.4 0 5.4 2 5.8 6.1-2.7-.3-5.1-1.4-7-3.2-1 2.1-2.7 3.6-5 4.6Z" fill="#40332f" />
-    </svg>
-  </span>
+const UserAvatar = ({ src }: { src: string }) => (
+  <img alt="" className="block size-full rounded-full object-cover object-center" src={src} />
 )
 
 const ChevronDownIcon = ({ isOpen }: { isOpen: boolean }) => (
@@ -46,6 +42,7 @@ const LogoutIcon = () => (
 export const Header = ({ onLogout, onOpenNavigation, title, user }: HeaderProps) => {
   const [isProfileOpen, setIsProfileOpen] = useState(true)
   const profileRef = useRef<HTMLDivElement>(null)
+  const avatarUrl = user.avatarUrl ?? defaultAvatarUrl
 
   useEffect(() => {
     const closeProfile = (event: MouseEvent) => {
@@ -82,7 +79,7 @@ export const Header = ({ onLogout, onOpenNavigation, title, user }: HeaderProps)
             <path d="M2 4h18M2 10h18M2 16h18" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5" />
           </svg>
         </button>
-        <h1 className="truncate text-[22px] leading-[53px] tracking-[-0.5px] text-[#1a1c1c] sm:text-[28px] sm:tracking-[-0.96px]">
+        <h1 className="truncate font-sans text-[22px] font-normal not-italic leading-[52.8px] tracking-[-0.5px] text-[#1a1c1c] sm:text-[28px] sm:tracking-[-0.96px]">
           {title}
         </h1>
       </div>
@@ -96,8 +93,8 @@ export const Header = ({ onLogout, onOpenNavigation, title, user }: HeaderProps)
           onClick={() => setIsProfileOpen((isOpen) => !isOpen)}
           type="button"
         >
-          <span className="grid size-8 shrink-0 place-items-center overflow-hidden rounded-full border border-[#e2e2e2] p-px">
-            <UserAvatar />
+          <span className="block size-8 shrink-0 overflow-hidden rounded-full border border-[#e2e2e2]">
+            <UserAvatar src={avatarUrl} />
           </span>
           <ChevronDownIcon isOpen={isProfileOpen} />
         </button>
@@ -109,8 +106,8 @@ export const Header = ({ onLogout, onOpenNavigation, title, user }: HeaderProps)
             role="menu"
           >
             <div className="flex h-12 items-start gap-[10px] py-[5px]">
-              <span className="grid size-8 shrink-0 place-items-center overflow-hidden rounded-full border border-[#e2e2e2] p-px">
-                <UserAvatar />
+              <span className="block size-8 shrink-0 overflow-hidden rounded-full border border-[#e2e2e2]">
+                <UserAvatar src={avatarUrl} />
               </span>
               <div className="min-w-0 pt-px">
                 <div className="flex items-center gap-[5px]">
@@ -132,7 +129,7 @@ export const Header = ({ onLogout, onOpenNavigation, title, user }: HeaderProps)
             </div>
 
             <button
-              className="flex h-[29px] w-full items-center gap-[9px] rounded-md pl-[3px] pr-[10px] text-left text-xs leading-6 text-[#de3336] hover:bg-[#fff5f5]"
+              className="font-action flex h-[29px] w-full items-center gap-[9px] rounded-md pl-[3px] pr-[10px] text-left text-xs leading-6 text-[#de3336] hover:bg-[#fff5f5]"
               onClick={onLogout}
               role="menuitem"
               type="button"

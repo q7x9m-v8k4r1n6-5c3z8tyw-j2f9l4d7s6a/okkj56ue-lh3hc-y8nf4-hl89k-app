@@ -1,5 +1,9 @@
-import type { ReactNode } from 'react'
 import { NavLink } from 'react-router-dom'
+import {
+  raceNavigationIconUrl,
+  settingsNavigationIconUrl,
+  usersNavigationIconUrl,
+} from '@core/assets/icons'
 
 export type SidebarNavigationIcon = 'race' | 'settings' | 'users'
 
@@ -17,38 +21,23 @@ type SidebarProps = {
   onClose: () => void
 }
 
-const RaceIcon = () => (
-  <svg aria-hidden="true" fill="none" height="16" viewBox="0 0 14 16" width="14">
-    <path d="M2 15V1m0 1h9l-1.7 2L11 6H2" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.4" />
-    <path d="M3.7 2v4M6 2v4M8.3 2v4" stroke="currentColor" strokeDasharray="1.2 1.2" strokeWidth="1.2" />
-  </svg>
-)
-
-const UsersIcon = () => (
-  <svg aria-hidden="true" fill="none" height="16" viewBox="0 0 22 16" width="22">
-    <circle cx="8" cy="5" r="3" stroke="currentColor" strokeWidth="1.4" />
-    <path d="M2.5 14c.4-3 2.3-4.5 5.5-4.5s5.1 1.5 5.5 4.5" stroke="currentColor" strokeLinecap="round" strokeWidth="1.4" />
-    <path d="M14 3.2a2.6 2.6 0 0 1 0 4.8m1.8 2c2.2.4 3.4 1.7 3.7 4" stroke="currentColor" strokeLinecap="round" strokeWidth="1.4" />
-  </svg>
-)
-
-const SettingsIcon = () => (
-  <svg aria-hidden="true" fill="none" height="21" viewBox="0 0 21 21" width="21">
-    <path d="m8.8 2 .5-1h2.4l.5 1 .3 1.3 1.2.5 1.1-.7 1.7 1.7-.7 1.1.5 1.2 1.3.3 1 .5v2.4l-1 .5-1.3.3-.5 1.2.7 1.1-1.7 1.7-1.1-.7-1.2.5-.3 1.3-.5 1H9.3l-.5-1-.3-1.3-1.2-.5-1.1.7-1.7-1.7.7-1.1-.5-1.2-1.3-.3-1-.5V8.3l1-.5 1.3-.3.5-1.2-.7-1.1 1.7-1.7 1.1.7 1.2-.5L8.8 2Z" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.3" />
-    <circle cx="10.5" cy="10.5" r="3" stroke="currentColor" strokeWidth="1.3" />
-  </svg>
-)
-
-const iconByName: Record<SidebarNavigationIcon, ReactNode> = {
-  race: <RaceIcon />,
-  settings: <SettingsIcon />,
-  users: <UsersIcon />,
+const iconByName: Record<SidebarNavigationIcon, { height: number; url: string; width: number }> = {
+  race: { height: 16, url: raceNavigationIconUrl, width: 26 },
+  settings: { height: 20, url: settingsNavigationIconUrl, width: 32.1 },
+  users: { height: 16, url: usersNavigationIconUrl, width: 34 },
 }
 
-const iconWidthByName: Record<SidebarNavigationIcon, string> = {
-  race: 'w-[26px]',
-  settings: 'w-[32px]',
-  users: 'w-[34px]',
+const NavigationIcon = ({ name }: { name: SidebarNavigationIcon }) => {
+  const icon = iconByName[name]
+  const mask = `url("${icon.url}") center / 100% 100% no-repeat`
+
+  return (
+    <span
+      aria-hidden="true"
+      className="block shrink-0 bg-current"
+      style={{ height: icon.height, mask, WebkitMask: mask, width: icon.width }}
+    />
+  )
 }
 
 export const Sidebar = ({ brand, isOpen, items, onClose }: SidebarProps) => {
@@ -60,7 +49,7 @@ export const Sidebar = ({ brand, isOpen, items, onClose }: SidebarProps) => {
       }`}
     >
       <div className="flex h-[62px] shrink-0 items-start justify-center px-5 pb-[30px]">
-        <span className="font-sans text-[40px] font-extrabold not-italic leading-[32px] tracking-[-1.1px] text-[#040000]">
+        <span className="font-brand text-[40px] font-bold not-italic leading-[31.2px] tracking-[-0.24px] text-[#040000]">
           {brand}
         </span>
         <button
@@ -90,9 +79,7 @@ export const Sidebar = ({ brand, isOpen, items, onClose }: SidebarProps) => {
               onClick={onClose}
               to={item.to}
             >
-              <span className={`flex shrink-0 items-center ${iconWidthByName[item.icon]}`}>
-                {iconByName[item.icon]}
-              </span>
+              <NavigationIcon name={item.icon} />
               <span>{item.label}</span>
             </NavLink>
           </div>
