@@ -4,18 +4,19 @@ import {
   ChevronIcon,
   LogoutIcon,
   userProfileAvatarUrl,
-} from '../../../assets'
-import { useCurrentUser } from '../../../features/auth'
-import { navigationConfig } from '../../config'
+} from '@/core/assets'
+import { useCurrentUser } from '@/core/features/auth'
+import { navigationConfig } from '@/core/shared/config'
 
-const navigationItems = Object.values(navigationConfig)
+const pageItems = Object.values(navigationConfig)
+const navigationItems = pageItems.filter(({ hidden }) => !hidden)
 
 export const AppLayout = ({ children }: PropsWithChildren) => {
   const location = useLocation()
   const { data: user } = useCurrentUser()
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
-  const title = navigationItems.find(({ to }) => to === location.pathname)?.title ?? 'Move'
+  const title = pageItems.find(({ to }) => to === location.pathname)?.title ?? 'Move'
 
   /**
    * Close the profile dropdown when clicking outside of it

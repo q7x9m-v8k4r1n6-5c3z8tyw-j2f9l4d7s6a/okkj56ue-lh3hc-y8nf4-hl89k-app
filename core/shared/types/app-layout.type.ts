@@ -10,4 +10,5 @@ export type NavigationItem = {
   to: string
   icon: ComponentType<IconProps>
   iconClassName: string
+  hidden?: boolean
 }

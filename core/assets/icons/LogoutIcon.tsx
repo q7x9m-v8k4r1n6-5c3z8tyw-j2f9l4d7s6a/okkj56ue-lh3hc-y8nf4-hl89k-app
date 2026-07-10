@@ -1,4 +1,4 @@
-import type { IconProps } from '../../shared/types'
+import type { IconProps } from '@/core/shared/types'
 
 export const LogoutIcon = ({ className }: IconProps) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">

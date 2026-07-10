@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { PropsWithChildren } from 'react'
+import { ToastProvider } from '@/core/shared'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -11,5 +12,7 @@ const queryClient = new QueryClient({
 })
 
 export const AppProviders = ({ children }: PropsWithChildren) => (
-  <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  <QueryClientProvider client={queryClient}>
+    <ToastProvider>{children}</ToastProvider>
+  </QueryClientProvider>
 )

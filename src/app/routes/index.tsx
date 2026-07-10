@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom'
-import App from '../App'
-import { RaceListPage, SettingsPage, UserPage } from '@core/pages'
+import App from '@/src/app/App'
+import { PrototypePage, RaceListPage, SettingsPage, UserPage } from '@/core/pages'
 
 export const router = createBrowserRouter([
   {
@@ -17,6 +17,10 @@ export const router = createBrowserRouter([
       {
         path: 'settings',
         element: <SettingsPage />,
+      },
+      {
+        path: 'prototype',
+        element: <PrototypePage />,
       },
     ],
   },

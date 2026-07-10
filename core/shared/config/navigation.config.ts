@@ -1,7 +1,7 @@
-import { RaceIcon, SettingsIcon, UsersIcon } from '../../assets'
-import type { NavigationItem } from '../types'
+import { RaceIcon, SettingsIcon, UsersIcon } from '@/core/assets'
+import type { NavigationItem } from '@/core/shared/types'
 
-export const navigationConfig = {
+export const navigationConfig: Record<string, NavigationItem> = {
   raceList: {
     label: 'Danh sách trận đấu',
     title: 'Danh sách trận đấu',
@@ -23,4 +23,12 @@ export const navigationConfig = {
     icon: SettingsIcon,
     iconClassName: 'size-[18px]',
   },
-} satisfies Record<string, NavigationItem>
+  prototype: {
+    label: 'Common UI Prototype',
+    title: 'Common UI Prototype',
+    to: '/prototype',
+    icon: SettingsIcon,
+    iconClassName: 'size-[18px]',
+    hidden: true,
+  },
+}

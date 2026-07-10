@@ -1,4 +1,4 @@
-import type { User } from '../model'
+import type { User } from '@/core/entities/user/model'
 
 type UserCardProps = {
   user: User

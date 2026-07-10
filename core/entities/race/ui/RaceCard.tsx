@@ -1,4 +1,4 @@
-import type { Race } from '../model'
+import type { Race } from '@/core/entities/race/model'
 
 type RaceCardProps = {
   race: Race
