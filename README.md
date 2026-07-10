@@ -31,9 +31,9 @@ Production: [https://move.oispvolunteerclub.com/](https://move.oispvolunteerclub
 
 | Vai trò | Họ và tên | Email |
 | --- | --- | --- |
-| Project Manager | Khoa Đào Anh | khoa.dao23102006@hcmut.edu.vn |
-| Software Developer | Tân Nguyễn Nhật | tan.nguyennhat07@hcmut.edu.vn |
+| Project Manager | Đào Anh Khoa | khoa.dao23102006@hcmut.edu.vn |
+| Software Developer | Nguyễn Nhật Tân | tan.nguyennhat07@hcmut.edu.vn |
 | Software Developer | Hồ Minh Phúc | phuc0908061@gmail.com |
-| Software Developer | Đạt Lê Cẩm | dat.ledraco07@hcmut.edu.vn |
-| Software Developer | Hiếu Lê Lương Trung | hieu.le27@hcmut.edu.vn |
-| Software Developer | Hoàng Lương Thế | hoang.luong010206@hcmut.edu.vn |
+| Software Developer | Lê Cẩm Đạt | dat.ledraco07@hcmut.edu.vn |
+| Software Developer | Lê Lương Trung Hiếu | hieu.le27@hcmut.edu.vn |
+| Software Developer | Lương Thế Hoàng | hoang.luong010206@hcmut.edu.vn |
