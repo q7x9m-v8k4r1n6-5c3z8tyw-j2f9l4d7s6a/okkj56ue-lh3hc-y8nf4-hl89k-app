@@ -1,4 +1,4 @@
-import { Button, MoveStatusBadge } from '@/core/shared'
+import { MoveButton, MoveStatusBadge } from '@/core/shared'
 import type { MoveRaceRecord } from '@/core/shared/lib'
 
 type RaceCardProps = {
@@ -59,8 +59,8 @@ export const RaceCard = ({ onEdit, onView, race }: RaceCardProps) => {
         </div>
 
         <div className="flex items-start justify-end gap-2 md:flex-col">
-          <Button variant="secondary" size="xs" onClick={onView}>Chi tiết</Button>
-          <Button size="xs" onClick={onEdit}>Chỉnh sửa</Button>
+          <MoveButton variant="secondary" size="xs" onClick={onView}>Chi tiết</MoveButton>
+          <MoveButton size="xs" onClick={onEdit}>Chỉnh sửa</MoveButton>
         </div>
       </div>
     </article>

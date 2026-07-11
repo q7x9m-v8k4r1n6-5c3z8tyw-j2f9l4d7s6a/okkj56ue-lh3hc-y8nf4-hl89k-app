@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { CloseIcon } from '@/core/assets'
-import { Button, MoveIconButton, MovePanel } from '@/core/shared'
+import { MoveButton, MoveIconButton, MovePanel } from '@/core/shared'
 import {
   MOVE_DEFAULT_PASSWORD,
   buildStaffIdentityFromEmail,
@@ -33,6 +33,24 @@ export const UserFormPage = ({ category, mode }: UserFormPageProps) => {
   const [password, setPassword] = useState(existingRow?.password ?? MOVE_DEFAULT_PASSWORD)
   const [hint, setHint] = useState('')
   const [error, setError] = useState('')
+
+  if (mode === 'edit' && !existingRow) {
+    return (
+      <main className="flex-1 px-4 py-4 sm:px-6 sm:py-4">
+        <section className="w-full max-w-[32rem]">
+          <MovePanel className="p-6">
+            <h2 className="text-lg font-semibold text-[#1f1f22]">Không tìm thấy dữ liệu</h2>
+            <p className="mt-2 text-sm text-[#8b8580]">
+              Người dùng cần chỉnh sửa không còn tồn tại hoặc đường dẫn không hợp lệ.
+            </p>
+            <div className="mt-4">
+              <MoveButton variant="secondary" onClick={() => navigate(getReturnPath(), { state: { activeTab: category } })}>Quay lại</MoveButton>
+            </div>
+          </MovePanel>
+        </section>
+      </main>
+    )
+  }
 
   const title = category === 'staff'
     ? mode === 'edit' ? 'Chỉnh sửa Ban Tổ chức' : 'Thêm mới Ban Tổ chức'
@@ -186,7 +204,7 @@ export const UserFormPage = ({ category, mode }: UserFormPageProps) => {
               ) : null}
 
               {mode === 'edit' && category !== 'staff' ? (
-                <Button
+                <MoveButton
                   type="button"
                   variant="danger"
                   size="lg"
@@ -198,7 +216,7 @@ export const UserFormPage = ({ category, mode }: UserFormPageProps) => {
                   }}
                 >
                   Cấp lại mật khẩu mới
-                </Button>
+                </MoveButton>
               ) : null}
 
               {hint ? <p className="rounded-xl border border-[#f0e7d7] bg-[#fff9eb] px-4 py-3 text-sm text-[#8a6b21]">{hint}</p> : null}
@@ -206,8 +224,8 @@ export const UserFormPage = ({ category, mode }: UserFormPageProps) => {
             </div>
 
             <div className="mt-6 flex items-center justify-end gap-3 border-t border-[#f1ebe8] pt-4">
-              <Button type="button" variant="secondary" size="md" onClick={() => navigate(getReturnPath(), { state: { activeTab: category } })}>Hủy</Button>
-              <Button type="submit" size="md">Lưu</Button>
+              <MoveButton type="button" variant="secondary" size="md" onClick={() => navigate(getReturnPath(), { state: { activeTab: category } })}>Hủy</MoveButton>
+              <MoveButton type="submit" size="md">Lưu</MoveButton>
             </div>
           </form>
         </MovePanel>

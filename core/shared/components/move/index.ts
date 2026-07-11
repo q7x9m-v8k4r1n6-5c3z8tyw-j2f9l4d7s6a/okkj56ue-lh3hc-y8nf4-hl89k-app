@@ -1,3 +1,4 @@
+export { MoveButton } from './MoveButton'
 export { MoveDotStatus, MoveStatusBadge } from './MoveStatusBadge'
 export { MoveIconButton } from './MoveIconButton'
 export { MovePagination } from './MovePagination'

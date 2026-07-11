@@ -1,5 +1,5 @@
 import { ArrowLeftIcon, ArrowRightIcon } from '@/core/assets'
-import { Button } from '@/core/shared/components/ui/Button'
+import { MoveButton } from './MoveButton'
 
 type MovePaginationProps = {
   page: number
@@ -38,7 +38,7 @@ export const MovePagination = ({ onChange, page, pageSize, totalItems, totalPage
       <p className="text-xs text-[#a19a95]">Hiển thị {startDisplay}-{endDisplay} / {totalItems}</p>
 
       <div className="flex items-center justify-between gap-3 sm:justify-end">
-        <Button
+        <MoveButton
           variant="secondary"
           size="sm"
           disabled={safePage === 1}
@@ -46,7 +46,7 @@ export const MovePagination = ({ onChange, page, pageSize, totalItems, totalPage
           onClick={() => onChange(safePage - 1)}
         >
           Previous
-        </Button>
+        </MoveButton>
 
         <div className="flex items-center gap-2 text-xs font-medium text-[#8d8782]">
           {buildPaginationItems(safePage, safeTotalPages).map((item, index) => item === 'ellipsis' ? (
@@ -64,7 +64,7 @@ export const MovePagination = ({ onChange, page, pageSize, totalItems, totalPage
           ))}
         </div>
 
-        <Button
+        <MoveButton
           variant="secondary"
           size="sm"
           disabled={safePage === safeTotalPages}
@@ -72,7 +72,7 @@ export const MovePagination = ({ onChange, page, pageSize, totalItems, totalPage
           onClick={() => onChange(safePage + 1)}
         >
           Next
-        </Button>
+        </MoveButton>
       </div>
     </div>
   )

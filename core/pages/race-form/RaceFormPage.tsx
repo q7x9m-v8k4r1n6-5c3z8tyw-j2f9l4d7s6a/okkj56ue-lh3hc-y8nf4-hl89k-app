@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState, type Dispatch, type FormEvent, type SetStateAction } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { TrashIcon } from '@/core/assets'
-import { Button, MoveIconButton, MovePanel, MoveProgressBar } from '@/core/shared'
+import { MoveButton, MoveIconButton, MovePanel, MoveProgressBar } from '@/core/shared'
 import {
   createDefaultRaceDraft,
   formatDateTimeForStorage,
@@ -51,6 +51,24 @@ export const RaceFormPage = ({ mode }: RaceFormPageProps) => {
   const [organizerDraft, setOrganizerDraft] = useState<MoveNameMissionRow>({ name: '', mission: '' })
   const [settingDraft, setSettingDraft] = useState<MoveNameMissionRow>({ name: '', mission: '' })
   const [error, setError] = useState('')
+
+  if (mode === 'edit' && !existingRow) {
+    return (
+      <main className="flex-1 px-4 py-4 sm:px-6 sm:py-4">
+        <section className="w-full">
+          <MovePanel className="p-6">
+            <h2 className="text-lg font-semibold text-[#1f1f22]">Không tìm thấy dữ liệu</h2>
+            <p className="mt-2 text-sm text-[#8b8580]">
+              Trận đấu cần chỉnh sửa không còn tồn tại hoặc đường dẫn không hợp lệ.
+            </p>
+            <div className="mt-4">
+              <MoveButton variant="secondary" onClick={() => navigate('/')}>Quay lại danh sách</MoveButton>
+            </div>
+          </MovePanel>
+        </section>
+      </main>
+    )
+  }
 
   const meta = STEP_META[currentStep]
 
@@ -208,9 +226,9 @@ export const RaceFormPage = ({ mode }: RaceFormPageProps) => {
                     <label className="block">
                       <span className="mb-2 block text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-[#7f7772]">Ảnh bìa (*)</span>
                       <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={(event) => setImageName(event.target.files?.[0]?.name ?? '')} />
-                      <Button type="button" variant="muted" size="lg" className="w-full justify-start text-[#4b5563]" onClick={() => imageInputRef.current?.click()}>
+                      <MoveButton type="button" variant="muted" size="lg" className="w-full justify-start text-[#4b5563]" onClick={() => imageInputRef.current?.click()}>
                         <span>{imageName || 'Upload file ảnh bìa tại đây'}</span>
-                      </Button>
+                      </MoveButton>
                     </label>
 
                     <label className="block">
@@ -261,7 +279,7 @@ export const RaceFormPage = ({ mode }: RaceFormPageProps) => {
                       <input value={stationDraft.location} onChange={(event) => setStationDraft((current) => ({ ...current, location: event.target.value }))} placeholder="Nhập địa điểm" className="rounded-lg border border-[#ebe4e0] bg-white px-4 py-3 text-sm text-[#403c39] outline-none transition focus:border-[#f4b3b3] focus:ring-2 focus:ring-[#ef4444]/10" />
                       <input value={stationDraft.manager} onChange={(event) => setStationDraft((current) => ({ ...current, manager: event.target.value }))} placeholder="Nhập họ tên" className="rounded-lg border border-[#ebe4e0] bg-white px-4 py-3 text-sm text-[#403c39] outline-none transition focus:border-[#f4b3b3] focus:ring-2 focus:ring-[#ef4444]/10" />
                       <input value={stationDraft.points} onChange={(event) => setStationDraft((current) => ({ ...current, points: event.target.value }))} type="number" min="0" step="1" placeholder="Nhập điểm" className="rounded-lg border border-[#ebe4e0] bg-white px-4 py-3 text-sm text-[#403c39] outline-none transition focus:border-[#f4b3b3] focus:ring-2 focus:ring-[#ef4444]/10" />
-                      <Button type="button" variant="muted" size="lg" onClick={addStation}>Thêm</Button>
+                      <MoveButton type="button" variant="muted" size="lg" onClick={addStation}>Thêm</MoveButton>
                     </div>
                   </div>
                 </div>
@@ -317,9 +335,9 @@ export const RaceFormPage = ({ mode }: RaceFormPageProps) => {
             </div>
 
             <div className="flex items-center justify-end gap-3 border-t border-[#f1ebe8] px-5 py-4">
-              <Button type="button" variant="secondary" size="md" onClick={() => navigate('/')}>Hủy</Button>
-              {currentStep !== 'basic' ? <Button type="button" variant="secondary" size="md" onClick={previousStep}>Quay lại</Button> : null}
-              <Button type="submit" size="md">{currentStep === 'final' ? 'Lưu' : 'Tiếp tục'}</Button>
+              <MoveButton type="button" variant="secondary" size="md" onClick={() => navigate('/')}>Hủy</MoveButton>
+              {currentStep !== 'basic' ? <MoveButton type="button" variant="secondary" size="md" onClick={previousStep}>Quay lại</MoveButton> : null}
+              <MoveButton type="submit" size="md">{currentStep === 'final' ? 'Lưu' : 'Tiếp tục'}</MoveButton>
             </div>
           </form>
         </MovePanel>
@@ -387,7 +405,7 @@ const SimpleCollectionSection = ({
       <div className="grid gap-3 border-t border-[#f3eeeb] px-4 py-4 md:grid-cols-[1fr_2fr_auto]">
         <input value={draft.name} onChange={(event) => onChange({ ...draft, name: event.target.value })} placeholder={firstPlaceholder} className="rounded-lg border border-[#ebe4e0] bg-white px-4 py-3 text-sm text-[#403c39] outline-none transition focus:border-[#f4b3b3] focus:ring-2 focus:ring-[#ef4444]/10" />
         <input value={draft.mission} onChange={(event) => onChange({ ...draft, mission: event.target.value })} placeholder={secondPlaceholder} className="rounded-lg border border-[#ebe4e0] bg-white px-4 py-3 text-sm text-[#403c39] outline-none transition focus:border-[#f4b3b3] focus:ring-2 focus:ring-[#ef4444]/10" />
-        <Button type="button" variant="muted" size="lg" onClick={onAdd}>{addButtonLabel}</Button>
+        <MoveButton type="button" variant="muted" size="lg" onClick={onAdd}>{addButtonLabel}</MoveButton>
       </div>
     </div>
   </div>

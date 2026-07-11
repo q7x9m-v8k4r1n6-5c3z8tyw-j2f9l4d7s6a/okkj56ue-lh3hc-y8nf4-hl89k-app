@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { EditIcon, PlusIcon, SearchIcon, TrashIcon } from '@/core/assets'
-import { Button, MoveDotStatus, MoveIconButton, MovePagination, MovePanel, useToast } from '@/core/shared'
+import { MoveButton, MoveDotStatus, MoveIconButton, MovePagination, MovePanel, useToast } from '@/core/shared'
 import { deleteUserRecord, getUserRecords, type UserCategory } from '@/core/shared/lib'
 
 type PageState = {
@@ -123,13 +123,13 @@ export const UserPage = () => {
                   </span>
                 </label>
 
-                <Button
+                <MoveButton
                   size="sm"
                   leadingIcon={<PlusIcon className="h-4 w-4" />}
                   onClick={() => navigate(tab === 'staff' ? '/users/staff/new' : '/users/teams/new')}
                 >
                   {getCreateLabel(tab)}
-                </Button>
+                </MoveButton>
               </div>
             </div>
           </div>

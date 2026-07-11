@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Button, MovePanel, MoveProgressBar, MoveStatusBadge } from '@/core/shared'
+import { MoveButton, MovePanel, MoveProgressBar, MoveStatusBadge } from '@/core/shared'
 import { getRaceProgress, getRaceRecord } from '@/core/shared/lib'
 
 export const RaceDetailPage = () => {
@@ -16,7 +16,7 @@ export const RaceDetailPage = () => {
             <div>
               <h1 className="text-[2rem] font-semibold tracking-tight text-[#1f1f22]">Không tìm thấy trận đấu</h1>
             </div>
-            <Button variant="secondary" size="md" onClick={() => navigate('/')}>Quay lại danh sách</Button>
+            <MoveButton variant="secondary" size="md" onClick={() => navigate('/')}>Quay lại danh sách</MoveButton>
           </div>
 
           <MovePanel className="px-5 py-8 text-sm text-[#8b8580]">Không tìm thấy dữ liệu trận đấu.</MovePanel>
@@ -34,7 +34,7 @@ export const RaceDetailPage = () => {
           <div>
             <h1 className="text-[2rem] font-semibold tracking-tight text-[#1f1f22]">{row.name}</h1>
           </div>
-          <Button variant="secondary" size="md" onClick={() => navigate('/')}>Quay lại danh sách</Button>
+          <MoveButton variant="secondary" size="md" onClick={() => navigate('/')}>Quay lại danh sách</MoveButton>
         </div>
 
         <div className="space-y-5">

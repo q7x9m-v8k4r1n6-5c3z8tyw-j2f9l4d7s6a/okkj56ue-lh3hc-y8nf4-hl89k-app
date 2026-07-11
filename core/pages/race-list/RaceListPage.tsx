@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { PlusIcon } from '@/core/assets'
 import { RaceCard } from '@/core/entities/race'
-import { Button, MovePagination, MovePanel, useToast } from '@/core/shared'
+import { MoveButton, MovePagination, MovePanel, useToast } from '@/core/shared'
 import { getRaceRecords } from '@/core/shared/lib'
 
 type PageState = {
@@ -44,9 +44,9 @@ export const RaceListPage = () => {
         <MovePanel>
           <div className="border-b border-[#f1ebe8] px-5 py-4">
             <div className="flex items-center justify-end">
-              <Button size="sm" leadingIcon={<PlusIcon className="h-4 w-4" />} onClick={() => navigate('/races/new')}>
+              <MoveButton size="sm" leadingIcon={<PlusIcon className="h-4 w-4" />} onClick={() => navigate('/races/new')}>
                 Tạo trận đấu mới
-              </Button>
+              </MoveButton>
             </div>
           </div>
 
