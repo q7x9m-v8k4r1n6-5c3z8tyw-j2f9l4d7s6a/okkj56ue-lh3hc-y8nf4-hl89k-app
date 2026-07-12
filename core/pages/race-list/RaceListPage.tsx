@@ -1,10 +1,3 @@
-<<<<<<< Updated upstream
-export const RaceListPage = () => (
-  <main className="p-6">
-
-  </main>
-)
-=======
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { PlusIcon } from '@/core/assets'
@@ -215,4 +208,3 @@ const SummaryCard = ({ label, tone, value }: { label: string; value: string; ton
     </div>
   )
 }
->>>>>>> Stashed changes

@@ -3,6 +3,8 @@ import App from '@/src/app/App'
 import {
   NotFoundPage,
   PrototypePage,
+  RaceDetailPage,
+  RaceFormPage,
   RaceListPage,
   SettingsPage,
   UserPage,
@@ -15,6 +17,18 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <RaceListPage />,
+      },
+      {
+        path: 'races/new',
+        element: <RaceFormPage mode="create" />,
+      },
+      {
+        path: 'races/:raceId',
+        element: <RaceDetailPage />,
+      },
+      {
+        path: 'races/:raceId/edit',
+        element: <RaceFormPage mode="edit" />,
       },
       {
         path: 'users',
