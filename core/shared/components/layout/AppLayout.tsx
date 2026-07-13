@@ -5,7 +5,7 @@ import {
   LogoutIcon,
   userProfileAvatarUrl,
 } from '@/core/assets'
-import { useCurrentUser } from '@/core/features/auth'
+import { useCurrentUser } from '@/core'
 import { navigationConfig } from '@/core/shared/config'
 
 const pageItems = Object.values(navigationConfig)

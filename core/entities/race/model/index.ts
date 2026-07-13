@@ -1,4 +1,1 @@
-export type Race = {
-  id: string
-  name: string
-}
+export * from './race.type'

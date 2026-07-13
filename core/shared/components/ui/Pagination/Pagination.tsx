@@ -13,6 +13,10 @@ type PageItem = number | 'ellipsis'
 const getPageItems = (page: number, totalPages: number, siblingCount: number): PageItem[] => {
   if (totalPages <= 7) return Array.from({ length: totalPages }, (_, index) => index + 1)
 
+  if (page <= 4) return [1, 2, 3, 'ellipsis', totalPages - 2, totalPages - 1, totalPages]
+
+  if (page >= totalPages - 3) return [1, 'ellipsis', totalPages - 3, totalPages - 2, totalPages - 1, totalPages]
+
   const items = new Set([1, totalPages])
   for (let value = page - siblingCount; value <= page + siblingCount; value += 1) {
     if (value > 1 && value < totalPages) items.add(value)
@@ -31,26 +35,26 @@ export const Pagination = ({ onChange, page, siblingCount = 1, totalPages }: Pag
   const items = getPageItems(page, totalPages, siblingCount)
 
   return (
-    <nav className="flex flex-wrap items-center justify-between gap-4 px-6 py-3" aria-label="Phân trang">
-      <Button variant="secondary" disabled={page <= 1} leadingIcon={<ArrowLeftIcon className="size-5" />} onClick={() => onChange(page - 1)}>
+    <nav className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-4 py-10" aria-label="Phân trang">
+      <Button className="h-[34px] min-h-0 justify-self-start px-3 py-0 text-sm font-normal" variant="secondary" disabled={page <= 1} leadingIcon={<ArrowLeftIcon className="size-4" />} onClick={() => onChange(page - 1)}>
         Previous
       </Button>
       <div className="flex items-center gap-0.5">
         {items.map((item, index) => item === 'ellipsis' ? (
-          <span className="grid size-10 place-items-center text-sm text-[#737373]" key={`ellipsis-${index}`}>...</span>
+          <span className="grid size-9 place-items-center text-sm text-[#737373]" key={`ellipsis-${index}`}>...</span>
         ) : (
           <button
             key={item}
             type="button"
             aria-current={item === page ? 'page' : undefined}
-            className={`size-10 rounded-lg text-sm font-medium transition-colors ${item === page ? 'bg-[#fce0e0] text-[#de3336]' : 'text-[#737373] hover:bg-[#fafafa]'}`}
+            className={`size-9 rounded-lg text-sm font-medium transition-colors ${item === page ? 'bg-[#fce0e0] text-[#de3336]' : 'text-[#737373] hover:bg-[#fafafa]'}`}
             onClick={() => onChange(item)}
           >
             {item}
           </button>
         ))}
       </div>
-      <Button variant="secondary" disabled={page >= totalPages} trailingIcon={<ArrowRightIcon className="size-5" />} onClick={() => onChange(page + 1)}>
+      <Button className="h-[34px] min-h-0 justify-self-end px-3 py-0 text-sm font-normal" variant="secondary" disabled={page >= totalPages} trailingIcon={<ArrowRightIcon className="size-4" />} onClick={() => onChange(page + 1)}>
         Next
       </Button>
     </nav>
