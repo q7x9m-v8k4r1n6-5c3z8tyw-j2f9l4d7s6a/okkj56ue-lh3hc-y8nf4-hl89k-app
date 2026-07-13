@@ -6,6 +6,7 @@ import {
   RaceListPage,
   SettingsPage,
   UserPage,
+  CreatePageRace,
 } from '@/core/pages'
 
 export const router = createBrowserRouter([
@@ -27,6 +28,10 @@ export const router = createBrowserRouter([
       {
         path: 'prototype',
         element: <PrototypePage />,
+      },
+      {
+        path: 'create-race',
+        element: <CreatePageRace />,
       },
     ],
   },
