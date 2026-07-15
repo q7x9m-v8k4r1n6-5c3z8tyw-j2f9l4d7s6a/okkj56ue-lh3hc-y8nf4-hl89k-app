@@ -1,12 +1,13 @@
 import type { PropsWithChildren } from 'react'
 
-export type BadgeVariant = 'success' | 'warning' | 'neutral' | 'danger'
+export type BadgeVariant = 'success' | 'warning' | 'neutral' | 'danger' | 'primary'
 
 const classes: Record<BadgeVariant, string> = {
   success: 'bg-[#f0fdf4] text-[#15803d] before:bg-[#22c55e]',
   warning: 'bg-[#fffbeb] text-[#b45309] before:bg-[#f59e0b]',
   neutral: 'bg-[#f5f5f5] text-[#525252] before:bg-[#a3a3a3]',
   danger: 'bg-[#fef2f2] text-[#b91c1c] before:bg-[#ef4444]',
+  primary: 'bg-[#eff6ff] text-[#1d4ed8] before:bg-[#3b82f6]',
 }
 
 export const Badge = ({ children, variant = 'success' }: PropsWithChildren<{ variant?: BadgeVariant }>) => (

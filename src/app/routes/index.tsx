@@ -3,10 +3,9 @@ import App from '@/src/app/App'
 import {
   NotFoundPage,
   PrototypePage,
+  CreateRacePage,
   RaceListPage,
-  SettingsPage,
-  UserPage,
-  CreatePageRace,
+  UserListPage,
 } from '@/core/pages'
 
 export const router = createBrowserRouter([
@@ -16,22 +15,22 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <RaceListPage />,
+        handle: { title: 'Danh sách trận đấu' },
+      },
+      {
+        path: 'races/new',
+        element: <CreateRacePage />,
+        handle: { title: 'Tạo trận đấu mới' },
       },
       {
         path: 'users',
-        element: <UserPage />,
-      },
-      {
-        path: 'settings',
-        element: <SettingsPage />,
+        element: <UserListPage />,
+        handle: { title: 'Người dùng' },
       },
       {
         path: 'prototype',
         element: <PrototypePage />,
-      },
-      {
-        path: 'create-race',
-        element: <CreatePageRace />,
+        handle: { title: 'Common UI Prototype' },
       },
     ],
   },

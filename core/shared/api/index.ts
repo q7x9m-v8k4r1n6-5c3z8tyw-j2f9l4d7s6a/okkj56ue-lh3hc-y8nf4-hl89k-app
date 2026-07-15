@@ -4,3 +4,5 @@ export type ApiResponse<TData> = {
   detailError?: string
   data: TData
 }
+
+export * from './interceptor'

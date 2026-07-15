@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState, type PropsWithChildren } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink, useLocation, useMatches } from 'react-router-dom'
 import {
   ChevronIcon,
   LogoutIcon,
   userProfileAvatarUrl,
 } from '@/core/assets'
-import { useCurrentUser } from '@/core/features/auth'
+import { useCurrentUser } from '@/core'
 import { navigationConfig } from '@/core/shared/config'
 
 const pageItems = Object.values(navigationConfig)
@@ -13,10 +13,14 @@ const navigationItems = pageItems.filter(({ hidden }) => !hidden)
 
 export const AppLayout = ({ children }: PropsWithChildren) => {
   const location = useLocation()
+  const matches = useMatches()
   const { data: user } = useCurrentUser()
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
-  const title = pageItems.find(({ to }) => to === location.pathname)?.title ?? 'Move'
+  const matchTitle = [...matches].reverse()
+    .map((match) => (match.handle as { title?: string } | undefined)?.title)
+    .find(Boolean)
+  const title = matchTitle ?? pageItems.find(({ to }) => to === location.pathname)?.title ?? 'Move'
 
   /**
    * Close the profile dropdown when clicking outside of it

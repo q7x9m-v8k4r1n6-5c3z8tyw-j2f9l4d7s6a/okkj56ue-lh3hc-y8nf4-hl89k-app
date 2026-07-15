@@ -1,4 +1,4 @@
-import { useId, type InputHTMLAttributes, type ReactNode } from 'react'
+import { forwardRef, useId, type InputHTMLAttributes, type ReactNode } from 'react'
 
 export type InputProps = InputHTMLAttributes<HTMLInputElement> & {
   label?: string
@@ -8,7 +8,7 @@ export type InputProps = InputHTMLAttributes<HTMLInputElement> & {
   requiredMark?: boolean
 }
 
-export const Input = ({
+export const Input = forwardRef<HTMLInputElement, InputProps>(({
   className = '',
   error,
   hint,
@@ -17,7 +17,7 @@ export const Input = ({
   leadingIcon,
   requiredMark,
   ...props
-}: InputProps) => {
+}, ref) => {
   const generatedId = useId()
   const inputId = id ?? generatedId
   const descriptionId = error || hint ? `${inputId}-description` : undefined
@@ -35,7 +35,8 @@ export const Input = ({
           id={inputId}
           aria-describedby={descriptionId}
           aria-invalid={Boolean(error)}
-          className={`h-12 w-full rounded-lg border bg-white px-4 text-sm text-[#171717] outline-none transition placeholder:text-[#9ca3af] focus:border-[#de3336] focus:ring-2 focus:ring-[#de3336]/10 disabled:cursor-not-allowed disabled:border-[#e5e5e5] disabled:bg-[#f5f5f5] disabled:text-[#a3a3a3] disabled:placeholder:text-[#b8b8b8] disabled:focus:ring-0 ${leadingIcon ? 'pl-11' : ''} ${error ? 'border-[#de3336]' : 'border-[#e2e2e2]'} ${className}`}
+          className={`h-10 w-full rounded-lg border bg-white px-4 text-sm text-[#171717] outline-none transition placeholder:text-[#9ca3af] focus:border-[#de3336] focus:ring-2 focus:ring-[#de3336]/10 disabled:cursor-not-allowed disabled:border-[#e5e5e5] disabled:bg-[#f5f5f5] disabled:text-[#a3a3a3] disabled:placeholder:text-[#b8b8b8] disabled:focus:ring-0 ${leadingIcon ? 'pl-11' : ''} ${error ? 'border-[#de3336]' : 'border-[#e2e2e2]'} ${className}`}
+          ref={ref}
           {...props}
         />
       </span>
@@ -46,4 +47,6 @@ export const Input = ({
       ) : null}
     </label>
   )
-}
+})
+
+Input.displayName = 'Input'

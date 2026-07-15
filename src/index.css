@@ -21,10 +21,6 @@ body {
 }
 
 button {
-  font: inherit;
-}
-
-button {
   cursor: pointer;
 }
 
@@ -39,6 +35,7 @@ button {
     opacity: 0;
     transform: translateX(24px) scale(0.98);
   }
+
   to {
     opacity: 1;
     transform: translateX(0) scale(1);
@@ -46,8 +43,13 @@ button {
 }
 
 @keyframes toast-progress {
-  from { transform: scaleX(1); }
-  to { transform: scaleX(0); }
+  from {
+    transform: scaleX(1);
+  }
+
+  to {
+    transform: scaleX(0);
+  }
 }
 
 .toast-enter {

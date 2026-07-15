@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { CloseIcon, SearchIcon } from '@/core/assets'
 
 export type SearchOption = {
@@ -14,15 +15,37 @@ export type SearchBoxProps = {
   placeholder?: string
   emptyText?: string
   defaultOptionIcon?: ReactNode
+  inputClassName?: string
+  rootClassName?: string
+  selectedContent?: ReactNode
+  clearOnSelect?: boolean
   onSelect: (option: SearchOption) => void
 }
 
-export const SearchBox = ({ defaultOptionIcon, emptyText = 'Không tìm thấy kết quả', onSelect, options, placeholder = 'Tìm kiếm...' }: SearchBoxProps) => {
+type DropdownPosition = {
+  top: number
+  left: number
+  width: number
+}
+
+export const SearchBox = ({
+  clearOnSelect = false,
+  defaultOptionIcon,
+  emptyText = 'Không tìm thấy kết quả',
+  inputClassName = '',
+  onSelect,
+  options,
+  placeholder = 'Tìm kiếm...',
+  rootClassName = '',
+  selectedContent,
+}: SearchBoxProps) => {
   const rootRef = useRef<HTMLDivElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(0)
+  const [dropdownPosition, setDropdownPosition] = useState<DropdownPosition | null>(null)
 
   const filteredOptions = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase('vi')
@@ -34,28 +57,53 @@ export const SearchBox = ({ defaultOptionIcon, emptyText = 'Không tìm thấy k
 
   useEffect(() => {
     if (!open) return
-    const handlePointerDown = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false)
+
+    const updateDropdownPosition = () => {
+      const rect = rootRef.current?.getBoundingClientRect()
+      if (!rect) return
+      setDropdownPosition({
+        top: rect.bottom + 8,
+        left: rect.left,
+        width: rect.width,
+      })
     }
+
+    updateDropdownPosition()
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as Node
+      if (!rootRef.current?.contains(target) && !dropdownRef.current?.contains(target)) setOpen(false)
+    }
+
+    const handleViewportChange = () => updateDropdownPosition()
+
     document.addEventListener('pointerdown', handlePointerDown)
-    return () => document.removeEventListener('pointerdown', handlePointerDown)
+    window.addEventListener('resize', handleViewportChange)
+    window.addEventListener('scroll', handleViewportChange, true)
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+      window.removeEventListener('resize', handleViewportChange)
+      window.removeEventListener('scroll', handleViewportChange, true)
+    }
   }, [open])
 
   const selectOption = (option: SearchOption) => {
-    setQuery(option.label)
+    setQuery(clearOnSelect ? '' : option.label)
     setOpen(false)
     onSelect(option)
   }
 
   return (
-    <div className="relative w-full" ref={rootRef}>
-      <div className={`flex h-12 items-center gap-3 rounded-lg border bg-white px-4 transition ${open ? 'border-[#de3336] shadow-[0_0_0_2px_rgba(222,51,54,0.10)]' : 'border-[#e2e2e2] hover:border-[#d4d4d4]'}`}>
+    <div className={`relative w-full ${rootClassName}`} ref={rootRef}>
+      <div className={`flex min-h-10 flex-wrap items-center gap-2 rounded-lg border bg-white px-3 transition ${open ? 'border-[#de3336] shadow-[0_0_0_2px_rgba(222,51,54,0.10)]' : 'border-[#e2e2e2] hover:border-[#d4d4d4]'} ${inputClassName}`}>
         <SearchIcon className="size-5 shrink-0 text-[#737373]" />
+        {selectedContent}
         <input
           ref={inputRef}
           value={query}
           placeholder={placeholder}
-          className="min-w-0 flex-1 bg-transparent text-sm text-[#171717] outline-none placeholder:text-[#9ca3af]"
+          className="h-10 min-w-[96px] flex-1 bg-transparent text-sm leading-5 text-[#171717] outline-none placeholder:text-sm placeholder:leading-5 placeholder:text-[#9ca3af]"
           role="combobox"
           aria-expanded={open}
           aria-autocomplete="list"
@@ -88,8 +136,12 @@ export const SearchBox = ({ defaultOptionIcon, emptyText = 'Không tìm thấy k
           </button>
         ) : null}
       </div>
-      {open ? (
-        <div className="absolute z-30 mt-2 w-full overflow-hidden rounded-2xl border border-[#e5e5e5] bg-white py-2 shadow-[0_12px_30px_rgba(0,0,0,0.14)]">
+      {open && dropdownPosition ? createPortal((
+        <div
+          ref={dropdownRef}
+          className="z-[120] overflow-hidden rounded-2xl border border-[#e5e5e5] bg-white py-2 shadow-[0_12px_30px_rgba(0,0,0,0.14)]"
+          style={{ left: dropdownPosition.left, position: 'fixed', top: dropdownPosition.top, width: dropdownPosition.width }}
+        >
           <ul className="max-h-64 overflow-y-auto px-2" role="listbox">
             {filteredOptions.length ? filteredOptions.map((option, index) => (
               <li key={option.id}>
@@ -112,7 +164,7 @@ export const SearchBox = ({ defaultOptionIcon, emptyText = 'Không tìm thấy k
             )) : <li className="px-4 py-8 text-center text-sm text-[#737373]">{emptyText}</li>}
           </ul>
         </div>
-      ) : null}
+      ), document.body) : null}
     </div>
   )
 }
