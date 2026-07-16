@@ -7,7 +7,7 @@ import { client } from '@core/shared/api/interceptor'
  */
 export const getOrganizers = async (): Promise<OrganizerModel[]> => {
 return client.request<OrganizerModel[]>({
-    path: '/api/v1/Organizer', // Đường dẫn endpoint lấy danh sách ban tổ chức của Backend
+    path: '/api/v1/Organizer', 
     method: 'GET',
   })
 }

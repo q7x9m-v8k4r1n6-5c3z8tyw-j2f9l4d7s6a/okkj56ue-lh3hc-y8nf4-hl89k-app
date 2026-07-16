@@ -1,13 +1,15 @@
 import { client } from '@/core/shared/api/interceptor'
+import type { ApiResponseModel } from '@/core/shared/types/api-types' 
 import type { BackendCreateRaceRequest } from '../helpers/mapToBackendRequest'
 
 export const createNewRace = async (backendPayload: BackendCreateRaceRequest): Promise<string> => {
-
-  return client.request<string, BackendCreateRaceRequest>({
+  const response = await client.request<ApiResponseModel<string>, BackendCreateRaceRequest>({
     path: '/api/v1/Race',
     method: 'POST',
     body: backendPayload,
   })
+  
+  return response.data ?? ''
 }
 
 /**
@@ -17,11 +19,13 @@ export const createNewRace = async (backendPayload: BackendCreateRaceRequest): P
  */
 export const uploadRaceCoverImage = async (file: File): Promise<string> => {
   const formData = new FormData()
-  formData.append('file', file)
+  formData.append('file', file) 
 
-  return client.request<string, FormData>({
+  const response = await client.request<ApiResponseModel<string | null>>({
     path: '/api/v1/Image/upload',
     method: 'POST',
     body: formData,
-  })
+  } as Parameters<typeof client.request>[0] & { body: unknown }) 
+
+  return response.data ?? ''
 }

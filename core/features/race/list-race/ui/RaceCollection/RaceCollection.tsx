@@ -5,16 +5,17 @@ import { Pagination } from '@/core/shared'
 
 export const RaceCollection = () => {
   const racesQuery = useListRacesMutation()
-  const races = racesQuery.data ?? []
+  const rawRaces = racesQuery.data ?? []
 
   const {
+    races: paginatedRaces,
     page,
     totalPages,
     totalItems,
     startItem,
     endItem,
     setPage
-  } = useRaceCollection(races)
+  } = useRaceCollection(rawRaces)
 
   return (
     <section className="flex min-h-0 flex-1 flex-col" aria-label="Danh sách trận đấu">
@@ -23,9 +24,10 @@ export const RaceCollection = () => {
           <div className="rounded-xl border border-dashed border-[#eeeeee] px-4 py-10 text-center text-sm text-[#737373]">Đang tải danh sách trận đấu...</div>
         ) : racesQuery.isError ? (
           <div className="rounded-xl border border-dashed border-[#eeeeee] px-4 py-10 text-center text-sm text-[#737373]">{racesQuery.error instanceof Error ? racesQuery.error.message : 'Không thể tải danh sách trận đấu.'}</div>
-        ) : races.length ? (
+        ) : paginatedRaces.length ? (
           <div className="space-y-[42px]">
-            {races.map((race) => (
+            {/* 🔌 LIÊN KẾT LINH KIỆN: Duyệt qua mảng dữ liệu đã được tối ưu hóa trạng thái */}
+            {paginatedRaces.map((race) => (
               <RaceCard key={race.id} race={race} />
             ))}
           </div>

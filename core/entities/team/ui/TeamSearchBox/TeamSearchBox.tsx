@@ -1,8 +1,7 @@
 import { SearchBox } from '@/core/shared'
-import { useQuery } from '@tanstack/react-query'
+import { useTeamQuery } from '../../hooks'
 import type { TeamModel, TeamSearchMode } from '../../models'
 import { useTeamSearchBox } from './useTeamSearchBox'
-import { getTeams } from '../..'
 
 type TeamSearchBoxProps = {
     type?: TeamSearchMode
@@ -20,14 +19,11 @@ export const TeamSearchBox = ({
     value = [],
 }: TeamSearchBoxProps) => {
     const {
-        data: teams = [],
+        data: teams,
         isLoading,
         isError,
         error: queryError,
-    } = useQuery({
-        queryKey: ['getTeams'],
-        queryFn: getTeams, 
-    })
+    } = useTeamQuery()
 
     const {
         hasValue,
@@ -35,7 +31,12 @@ export const TeamSearchBox = ({
         removeTeam,
         selectedKey,
         selectTeam,
-    } = useTeamSearchBox({ data: teams, onChange, type, value })
+    } = useTeamSearchBox({ 
+        data: teams,
+        onChange, 
+        type, 
+        value 
+    })
 
     return (
         <div className="min-w-0">

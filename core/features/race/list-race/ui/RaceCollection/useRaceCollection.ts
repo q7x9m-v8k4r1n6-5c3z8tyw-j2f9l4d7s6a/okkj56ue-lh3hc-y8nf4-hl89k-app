@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useToast } from '@/core/shared'
 import type { ListRacesResponse } from '../../models'
+// 🔌 HÀN ĐƯỜNG TRUYỀN CHUẨN: Kết nối sang thư mục helpers của create-race
+import { getRaceLifecycleStatus } from '../../../create-race/helpers'
 
 type PageState = {
     toastMessage?: string
@@ -31,14 +33,19 @@ export const useRaceCollection = (races: ListRacesResponse) => {
 
     const visibleRows = useMemo(() => {
         const startIndex = (safePage - 1) * PAGE_SIZE
-        return races.slice(startIndex, startIndex + PAGE_SIZE)
+        const slicedRaces = races.slice(startIndex, startIndex + PAGE_SIZE)
+        
+        return slicedRaces.map((race) => ({
+            ...race,
+            status: getRaceLifecycleStatus(race.timeStart, race.timeEnd)
+        }))
     }, [races, safePage])
 
     const startItem = totalItems === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1
     const endItem = Math.min(totalItems, safePage * PAGE_SIZE)
 
     return {
-        races: visibleRows,
+        races: visibleRows, 
         page: safePage,
         totalPages,
         totalItems,

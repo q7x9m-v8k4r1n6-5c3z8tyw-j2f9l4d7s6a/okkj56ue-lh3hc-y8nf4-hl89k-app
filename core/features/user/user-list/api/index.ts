@@ -1,13 +1,6 @@
 import { client } from '@/core/shared/api/interceptor'
 import type { ListOrganizersByFilterRequest, ListTeamsByFilterRequest } from '../models'
-
-export interface PagedResult<T> {
-    items: T[];
-    pageNumber: number;
-    pageSize: number;
-    totalItems: number;
-    totalPages: number;
-}
+import type { PagedResult } from '@core/shared'
 
 export const getAllTeamsByFilter = async (payload: ListTeamsByFilterRequest = {}, signal?: AbortSignal): Promise<PagedResult<any>> => {
     return client.request<PagedResult<any>, ListTeamsByFilterRequest>({

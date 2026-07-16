@@ -1,9 +1,8 @@
 import { useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector, useToast } from '@/core/shared'
-import { validateBasicStep, validateStationStep } from '../../helpers';
+import { validateBasicStep, validateStationStep, buildCreateRaceRequest } from '../../helpers'; // 🔌 Đấu nối hàm build chuẩn từ helpers chung
 import { createRaceActions } from '../../stores/createRaceSlice';
 import { useCreateRaceMutation } from '../../hooks/useCreateRaceMutation';
-import { mapToBackendRequest } from '../../helpers/mapToBackendRequest';
 
 export const useCreateRaceNavigation = () => {
   const navigate = useNavigate()
@@ -36,10 +35,18 @@ export const useCreateRaceNavigation = () => {
 
   const submit = async () => {
     try {
-      // Gửi toàn bộ state (không chỉ CreateRaceRequest thu gọn), để
-      // mapToBackendRequest tự đóng gói đúng field và gửi đủ danh sách
-      // organizer 
-      const backendPayload = mapToBackendRequest(state);
+      // 📊 QUE ĐO 1: Kiểm tra xem dữ liệu người dùng gõ từ UI đã vào đến Redux Store chưa
+      console.log("=== 🔌 KIỂM TRA REDUX STORE (Bước 1: basic) ===");
+      console.log("Dữ liệu hiện tại trong store:", state.basic);
+
+      // Thực hiện đóng gói dữ liệu dựa trên state hiện tại
+      const backendPayload = buildCreateRaceRequest(state);
+
+      // 📊 QUE ĐO 2: Kiểm tra cấu trúc gói tin sau khi chạy qua hàm dịch (Mapping)
+      console.log("=== 📦 KIỂM TRA PAYLOAD SAU MAPPING ===");
+      console.log("Gói tin sẽ gửi lên Backend:", backendPayload);
+
+      // Kích hoạt truyền tải tín hiệu qua API
       const raceId = await createRace.mutateAsync(backendPayload);
 
       toast({ title: 'Đã tạo trận đấu thành công.', variant: 'success' })

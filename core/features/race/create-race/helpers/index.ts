@@ -22,21 +22,31 @@ export const hasStationContent = (station: Partial<Omit<StationDraft, 'id'>>) =>
  * @returns request body for create race API
  */
 export const buildCreateRaceRequest = (state: CreateRaceState): CreateRaceRequest => ({
-  raceName: state.basic.name.trim(),
-  place: state.basic.location.trim(),
-  startTime: toIsoString(state.basic.startAt),
-  endTime: toIsoString(state.basic.endAt),
-  coverUrl: undefined,
-  organizerId: state.organizers[0]?.id ?? '',
-  raceTeams: state.teams.length ? state.teams.map((team) => ({ teamId: team.id })) : undefined,
-  raceBooths: state.stations
+  raceName: state.basic?.name?.trim() ?? '',
+  place: state.basic?.location?.trim() ?? '',
+  
+  timeStart: state.basic?.startAt ? toIsoString(state.basic.startAt) : new Date().toISOString(),
+  timeEnd: state.basic?.endAt ? toIsoString(state.basic.endAt) : new Date().toISOString(),
+  
+  isToggledLeaderboard: state.settings?.disableLeaderboard ?? false,
+  isHiddenPoint: state.settings?.hideScores ?? false,
+  
+  coverUrl: state.basic?.coverUrl || undefined,
+  
+  organizerId: state.organizers?.map((o) => o.id) || [],
+  
+  raceTeam: state.teams?.map((t) => ({ teamID: t.id })) || [],
+  
+  booth: (state.stations || [])
     .filter(hasStationContent)
     .map((station) => ({
-      boothId: station.id,
-      name: station.name.trim(),
-      location: station.location.trim(),
+      name: station.name?.trim() ?? '',
+      
+      place: station.location?.trim() ?? '',
+      
       description: station.description || undefined,
-      managerIds: station.managers.length ? station.managers.map((manager) => manager.id) : undefined,
+      
+      organizerID: station.managers?.map((manager) => manager.id).join('|') || '',
     })),
 })
 
@@ -90,3 +100,30 @@ export const validateStationStep = (stations: StationDraft[]): StationValidation
 
   return errors
 }
+export type RaceLifecycleStatus = 'upcoming' | 'ongoing' | 'completed';
+
+/**
+ * Bộ so sánh thời gian thực tế đã được bọc bộ lọc an toàn cho trị số undefined
+ * @param timeStart Có thể là chuỗi ISO hoặc undefined
+ * @param timeEnd Có thể là chuỗi ISO hoặc undefined
+ */
+export const getRaceLifecycleStatus = (
+  timeStart?: string, 
+  timeEnd?: string
+): RaceLifecycleStatus => {
+  if (!timeStart || !timeEnd) {
+    return 'upcoming'; 
+  }
+
+  const now = new Date().getTime();
+  const start = new Date(timeStart).getTime();
+  const end = new Date(timeEnd).getTime();
+
+  if (now < start) {
+    return 'upcoming';
+  }
+  if (now >= start && now <= end) {
+    return 'ongoing'; // 
+  }
+  return 'completed';
+};

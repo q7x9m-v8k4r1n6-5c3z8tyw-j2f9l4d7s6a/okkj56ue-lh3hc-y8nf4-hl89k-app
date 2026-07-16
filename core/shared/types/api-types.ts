@@ -4,3 +4,10 @@ export type ApiResponseModel<T> = {
     detailError: string
     data: T | null
 }
+export interface PagedResult<T> {
+  items: T[]
+  pageNumber: number
+  pageSize: number
+  totalItems: number
+  totalPages: number
+}
