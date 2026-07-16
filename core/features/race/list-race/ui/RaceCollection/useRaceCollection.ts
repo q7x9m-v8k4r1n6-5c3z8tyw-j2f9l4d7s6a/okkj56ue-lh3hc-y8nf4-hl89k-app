@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useToast } from '@/core/shared'
+import { getRaceLifecycleStatus } from '@/core/entities/race'
 import type { ListRacesResponse } from '../../models'
-// 🔌 HÀN ĐƯỜNG TRUYỀN CHUẨN: Kết nối sang thư mục helpers của create-race
-import { getRaceLifecycleStatus } from '../../../create-race/helpers'
 
 type PageState = {
     toastMessage?: string

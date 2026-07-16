@@ -1,9 +1,11 @@
+import { useNavigate } from 'react-router-dom'
 import { RaceCard } from '@/core/entities/race'
 import { useRaceCollection } from './useRaceCollection'
 import { useListRacesMutation } from '../../hooks/useListRacesMutation'
 import { Pagination } from '@/core/shared'
 
 export const RaceCollection = () => {
+  const navigate = useNavigate()
   const racesQuery = useListRacesMutation()
   const rawRaces = racesQuery.data ?? []
 
@@ -26,9 +28,8 @@ export const RaceCollection = () => {
           <div className="rounded-xl border border-dashed border-[#eeeeee] px-4 py-10 text-center text-sm text-[#737373]">{racesQuery.error instanceof Error ? racesQuery.error.message : 'Không thể tải danh sách trận đấu.'}</div>
         ) : paginatedRaces.length ? (
           <div className="space-y-[42px]">
-            {/* 🔌 LIÊN KẾT LINH KIỆN: Duyệt qua mảng dữ liệu đã được tối ưu hóa trạng thái */}
             {paginatedRaces.map((race) => (
-              <RaceCard key={race.id} race={race} />
+              <RaceCard key={race.id} race={race} onEdit={() => navigate(`/races/${race.id}/edit`)} />
             ))}
           </div>
         ) : (

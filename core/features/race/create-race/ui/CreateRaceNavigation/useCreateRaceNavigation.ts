@@ -1,15 +1,26 @@
 import { useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector, useToast } from '@/core/shared'
-import { validateBasicStep, validateStationStep, buildCreateRaceRequest } from '../../helpers'; // 🔌 Đấu nối hàm build chuẩn từ helpers chung
-import { createRaceActions } from '../../stores/createRaceSlice';
-import { useCreateRaceMutation } from '../../hooks/useCreateRaceMutation';
+import { useEditRaceMutation } from '@/core/features/race/edit-race'
+import { validateBasicStep, validateStationStep, buildCreateRaceRequest } from '../../helpers'
+import { createRaceActions } from '../../stores/createRaceSlice'
+import { useCreateRaceMutation } from '../../hooks/useCreateRaceMutation'
 
-export const useCreateRaceNavigation = () => {
+export type RaceFormMode = 'create' | 'edit'
+
+type UseCreateRaceNavigationOptions = {
+  mode?: RaceFormMode
+  raceId?: string
+}
+
+export const useCreateRaceNavigation = ({ mode = 'create', raceId = '' }: UseCreateRaceNavigationOptions = {}) => {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const { toast } = useToast()
   const state = useAppSelector((store) => store.createRace)
   const createRace = useCreateRaceMutation()
+  const editRace = useEditRaceMutation(raceId)
+  const isEditMode = mode === 'edit'
+  const isSubmitting = createRace.isPending || editRace.isPending
 
   const continueToNextStep = () => {
     const hasValidationErrors = (errors: object) => Object.keys(errors).length > 0
@@ -35,27 +46,29 @@ export const useCreateRaceNavigation = () => {
 
   const submit = async () => {
     try {
-      // 📊 QUE ĐO 1: Kiểm tra xem dữ liệu người dùng gõ từ UI đã vào đến Redux Store chưa
-      console.log("=== 🔌 KIỂM TRA REDUX STORE (Bước 1: basic) ===");
-      console.log("Dữ liệu hiện tại trong store:", state.basic);
+      const backendPayload = buildCreateRaceRequest(state)
 
-      // Thực hiện đóng gói dữ liệu dựa trên state hiện tại
-      const backendPayload = buildCreateRaceRequest(state);
+      if (isEditMode) {
+        const savedRace = await editRace.mutateAsync(backendPayload)
+        toast({ title: 'Cập nhật thông tin giải đấu thành công!', variant: 'success' })
+        dispatch(createRaceActions.resetCreateRace())
 
-      // 📊 QUE ĐO 2: Kiểm tra cấu trúc gói tin sau khi chạy qua hàm dịch (Mapping)
-      console.log("=== 📦 KIỂM TRA PAYLOAD SAU MAPPING ===");
-      console.log("Gói tin sẽ gửi lên Backend:", backendPayload);
+        navigate(`/races/${savedRace.id ?? raceId}`, {
+          state: {
+            toastMessage: 'Cập nhật thông tin giải đấu thành công!',
+          },
+        })
+        return
+      }
 
-      // Kích hoạt truyền tải tín hiệu qua API
-      const raceId = await createRace.mutateAsync(backendPayload);
-
+      const newRaceId = await createRace.mutateAsync(backendPayload)
       toast({ title: 'Đã tạo trận đấu thành công.', variant: 'success' })
       dispatch(createRaceActions.resetCreateRace())
 
       navigate('/', {
         state: {
           toastMessage: `Đã tạo trận đấu "${state.basic.name}" thành công!`,
-          newRaceId: raceId,
+          newRaceId,
         },
       })
     } catch (error) {
@@ -68,10 +81,11 @@ export const useCreateRaceNavigation = () => {
   }
 
   return {
-    isSubmitting: createRace.isPending,
+    isSubmitting,
+    mode,
     step: state.step,
     goBack: () => dispatch(createRaceActions.setStep(state.step - 1)),
-    cancel: () => navigate('/'),
+    cancel: () => isEditMode ? navigate(-1) : navigate('/'),
     continueToNextStep,
     submit,
   }

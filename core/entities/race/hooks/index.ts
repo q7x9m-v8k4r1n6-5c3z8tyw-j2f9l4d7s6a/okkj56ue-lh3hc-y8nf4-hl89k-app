@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 
+export * from './useRaceDetailQuery'
+
 export const useRaceHooks = () => {
     const navigate = useNavigate()
 

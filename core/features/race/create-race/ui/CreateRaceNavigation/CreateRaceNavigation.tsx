@@ -1,8 +1,14 @@
 import { Button } from '@/core/shared'
-import { useCreateRaceNavigation } from './useCreateRaceNavigation'
+import { useCreateRaceNavigation, type RaceFormMode } from './useCreateRaceNavigation'
 
-export const CreateRaceNavigation = () => {
-    const { cancel, continueToNextStep, goBack, isSubmitting, step, submit } = useCreateRaceNavigation()
+type CreateRaceNavigationProps = {
+    mode?: RaceFormMode
+    raceId?: string
+}
+
+export const CreateRaceNavigation = ({ mode = 'create', raceId }: CreateRaceNavigationProps) => {
+    const { cancel, continueToNextStep, goBack, isSubmitting, step, submit } = useCreateRaceNavigation({ mode, raceId })
+    const submitLabel = mode === 'edit' ? 'Lưu' : 'Tạo trận đấu'
 
     return (
         <div className="flex min-h-[85px] items-center justify-end gap-4 border-t border-[#e5e5e5]">
@@ -14,7 +20,7 @@ export const CreateRaceNavigation = () => {
                 </Button> : null}
             <Button className="min-w-32"
                 disabled={isSubmitting}
-                onClick={() => step === 5 ? void submit() : continueToNextStep()}>{step === 5 ? 'Tạo trận đấu' : 'Tiếp tục'}
+                onClick={() => step === 5 ? void submit() : continueToNextStep()}>{step === 5 ? submitLabel : 'Tiếp tục'}
             </Button>
         </div>
     );

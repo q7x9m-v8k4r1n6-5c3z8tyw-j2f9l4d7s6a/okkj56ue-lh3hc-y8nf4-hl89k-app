@@ -1,4 +1,4 @@
-import { Badge, TableCard } from '@/core/shared'
+import { Badge, Button, TableCard } from '@/core/shared'
 import { DefaultCoverImage } from '@/core/assets'
 import { useRaceHooks } from '../hooks'
 import type { RaceModel } from '../model'
@@ -15,14 +15,29 @@ const statusMeta = {
 export type RaceCardRecord = RaceModel
 export type RaceCardStatus = keyof typeof statusMeta
 
-export const RaceCard = ({ race }: { race: RaceModel }) => {
+type RaceCardProps = {
+  race: RaceModel
+  onEdit?: (race: RaceModel) => void
+}
+
+export const RaceCard = ({ onEdit, race }: RaceCardProps) => {
   const rawStatus = (race.status ?? 'draft').toLowerCase()
   const status = statusMeta[rawStatus as RaceCardStatus] ?? statusMeta['active']
   const { onDetailRaceView } = useRaceHooks()
+  const canEdit = rawStatus === 'upcoming'
+  const openDetail = () => onDetailRaceView(race.id)
 
   return (
     <TableCard className="transition-shadow hover:shadow-[0_4px_10px_rgba(0,0,0,0.08)]">
-      <button type="button" className="grid w-full text-left md:grid-cols-[162px_minmax(0,1fr)]" onClick={() => onDetailRaceView(race.id)}>
+      <div
+        className="grid w-full cursor-pointer text-left md:grid-cols-[162px_minmax(0,1fr)]"
+        role="button"
+        tabIndex={0}
+        onClick={openDetail}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') openDetail()
+        }}
+      >
         <img src={DefaultCoverImage()} alt={`Cover ${race.name}`} className="h-[194px] w-full object-cover" />
 
         <div className="min-w-0 px-6 py-4">
@@ -36,13 +51,25 @@ export const RaceCard = ({ race }: { race: RaceModel }) => {
           </div>
 
           <div className="mt-[18px] border-t-2 border-[#eeeeee] pt-[18px]">
-            <div className="flex items-center gap-4 text-sm text-[#666666]">
-              <span>Trạng thái:</span>
-              <Badge variant={status.variant}>{status.label}</Badge>
+            <div className="flex flex-wrap items-center justify-between gap-4 text-sm text-[#666666]">
+              <div className="flex items-center gap-4">
+                <span>Trạng thái:</span>
+                <Badge variant={status.variant}>{status.label}</Badge>
+              </div>
+              {canEdit && onEdit ? (
+                <Button
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    onEdit(race)
+                  }}
+                >
+                  Chỉnh sửa
+                </Button>
+              ) : null}
             </div>
           </div>
         </div>
-      </button>
+      </div>
     </TableCard>
   )
 }
