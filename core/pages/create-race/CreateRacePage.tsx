@@ -3,13 +3,21 @@ import { BasicInformationStep, BoothInformationStep, OrganizerInformationStep, S
 import { TableCard, useAppDispatch, useAppSelector } from '@/core/shared'
 import { useEffect } from 'react'
 import { createRaceActions } from '@/core/features/race/create-race/stores/createRaceSlice'
+import type { RaceFormMode } from '@/core/features/race/create-race/ui/CreateRaceNavigation/useCreateRaceNavigation'
 
-export const CreateRacePage = () => {
+type CreateRacePageProps = {
+    mode?: RaceFormMode
+    raceId?: string
+    resetOnMount?: boolean
+}
+
+export const CreateRacePage = ({ mode = 'create', raceId, resetOnMount = true }: CreateRacePageProps) => {
     const dispatch = useAppDispatch()
     const step = useAppSelector((state) => state.createRace.step)
     useEffect(() => {
+        if (!resetOnMount) return
         dispatch(createRaceActions.resetCreateRace())
-    }, [dispatch])
+    }, [dispatch, resetOnMount])
 
     const steps = [
         <BasicInformationStep />,
@@ -23,7 +31,7 @@ export const CreateRacePage = () => {
         <TableCard className="flex min-h-0 flex-1 rounded-[20px] border-[#dde2e5] px-[43px] shadow-none">
             <div className="flex min-h-0 flex-1 flex-col">
                 <div className="flex-1 overflow-y-auto py-[30px]">{steps[step - 1]}</div>
-                <CreateRaceNavigation />
+                <CreateRaceNavigation mode={mode} raceId={raceId} />
             </div>
         </TableCard>
     </main>

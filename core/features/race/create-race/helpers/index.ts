@@ -100,30 +100,3 @@ export const validateStationStep = (stations: StationDraft[]): StationValidation
 
   return errors
 }
-export type RaceLifecycleStatus = 'upcoming' | 'ongoing' | 'completed';
-
-/**
- * Bộ so sánh thời gian thực tế đã được bọc bộ lọc an toàn cho trị số undefined
- * @param timeStart Có thể là chuỗi ISO hoặc undefined
- * @param timeEnd Có thể là chuỗi ISO hoặc undefined
- */
-export const getRaceLifecycleStatus = (
-  timeStart?: string, 
-  timeEnd?: string
-): RaceLifecycleStatus => {
-  if (!timeStart || !timeEnd) {
-    return 'upcoming'; 
-  }
-
-  const now = new Date().getTime();
-  const start = new Date(timeStart).getTime();
-  const end = new Date(timeEnd).getTime();
-
-  if (now < start) {
-    return 'upcoming';
-  }
-  if (now >= start && now <= end) {
-    return 'ongoing'; // 
-  }
-  return 'completed';
-};

@@ -37,6 +37,8 @@ export type CreateRaceState = {
   settings: { disableLeaderboard: boolean; hideScores: boolean }
 }
 
+export type RaceDraftPayload = Pick<CreateRaceState, 'basic' | 'stations' | 'teams' | 'organizers' | 'settings'>
+
 const initialState: CreateRaceState = {
   step: 1,
   basic: { name: '', startAt: '', endAt: '', imageName: '', coverUrl: '', location: '' },
@@ -76,6 +78,13 @@ const createRaceSlice = createSlice({
     addOrganizer: (state, action: PayloadAction<OrganizerDraft>) => { state.organizers.push(action.payload) },
     removeOrganizer: (state, action: PayloadAction<string>) => { state.organizers = state.organizers.filter((row) => row.id !== action.payload) },
     updateSettings: (state, action: PayloadAction<Partial<CreateRaceState['settings']>>) => { Object.assign(state.settings, action.payload) },
+    loadRaceDraft: (_state, action: PayloadAction<RaceDraftPayload>) => ({
+      ...initialState,
+      ...action.payload,
+      step: 1,
+      basicErrors: {},
+      stationErrors: {},
+    }),
     resetCreateRace: () => initialState,
   },
 })

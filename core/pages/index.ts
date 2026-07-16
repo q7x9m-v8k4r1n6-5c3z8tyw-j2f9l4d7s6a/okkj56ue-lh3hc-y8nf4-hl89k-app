@@ -1,5 +1,7 @@
 export { NotFoundPage } from './not-found'
 export { RaceListPage } from './race-list'
+export { RaceDetailPage } from './race-detail'
 export { PrototypePage } from './prototype'
 export { UserListPage } from './user-list'
 export { CreateRacePage } from './create-race'
+export { EditRacePage } from './edit-race'

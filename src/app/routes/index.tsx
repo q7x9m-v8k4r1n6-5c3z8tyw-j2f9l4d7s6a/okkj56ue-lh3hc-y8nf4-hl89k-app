@@ -4,6 +4,8 @@ import {
   NotFoundPage,
   PrototypePage,
   CreateRacePage,
+  EditRacePage,
+  RaceDetailPage,
   RaceListPage,
   UserListPage,
 } from '@/core/pages'
@@ -21,6 +23,16 @@ export const router = createBrowserRouter([
         path: 'races/new',
         element: <CreateRacePage />,
         handle: { title: 'Tạo trận đấu mới' },
+      },
+      {
+        path: 'races/:raceId',
+        element: <RaceDetailPage />,
+        handle: { title: 'Chi tiết giải đấu' },
+      },
+      {
+        path: 'races/:raceId/edit',
+        element: <EditRacePage />,
+        handle: { title: 'Chỉnh sửa giải đấu' },
       },
       {
         path: 'users',
