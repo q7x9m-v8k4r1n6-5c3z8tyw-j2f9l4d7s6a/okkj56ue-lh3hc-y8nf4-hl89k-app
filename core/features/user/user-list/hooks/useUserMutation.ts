@@ -6,17 +6,19 @@ import { userQueryKey } from '../../constants'
 import type { ListOrganizersByFilterRequest, ListTeamsByFilterRequest } from '../models'
 import { deleteOrganizer, deleteTeam, getAllOrganizersByFilter, getAllTeamsByFilter } from '../api'
 
-export const useTeamMutation = (payload: ListTeamsByFilterRequest = {}) => {
+export const useTeamMutation = (payload: ListTeamsByFilterRequest = {}, enabled = true) => {
     return useQuery({
         queryKey: [...userQueryKey, 'teams', payload],
         queryFn: ({ signal }) => getAllTeamsByFilter(payload, signal),
+        enabled, 
     })
 }
 
-export const useOrganizerMutation = (payload: ListOrganizersByFilterRequest = {}) => {
+export const useOrganizerMutation = (payload: ListOrganizersByFilterRequest = {}, enabled = true) => {
     return useQuery({
         queryKey: [...userQueryKey, 'organizers', payload],
         queryFn: ({ signal }) => getAllOrganizersByFilter(payload, signal),
+        enabled, 
     })
 }
 
@@ -27,8 +29,8 @@ type UseUserMutationParams = {
 
 export const useUserMutation = ({ payload, tab }: UseUserMutationParams) => {
     const queryClient = useQueryClient()
-    const teamsQuery = useTeamMutation(payload)
-    const organizersQuery = useOrganizerMutation(payload)
+    const teamsQuery = useTeamMutation(payload, tab === 'team')
+    const organizersQuery = useOrganizerMutation(payload, tab === 'staff')
     const activeQuery = tab === 'team' ? teamsQuery : organizersQuery
 
     const visibleRows = useMemo(() => {

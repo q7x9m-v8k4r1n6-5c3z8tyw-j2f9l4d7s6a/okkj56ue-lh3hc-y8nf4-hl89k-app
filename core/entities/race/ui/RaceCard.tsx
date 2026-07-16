@@ -4,6 +4,7 @@ import { useRaceHooks } from '../hooks'
 import type { RaceModel } from '../model'
 
 const statusMeta = {
+  active: { label: 'Active', variant: 'primary' },
   draft: { label: 'In progress', variant: 'success' },
   upcoming: { label: 'Upcoming', variant: 'warning' },
   ongoing: { label: 'Ongoing', variant: 'primary' },
@@ -15,7 +16,8 @@ export type RaceCardRecord = RaceModel
 export type RaceCardStatus = keyof typeof statusMeta
 
 export const RaceCard = ({ race }: { race: RaceModel }) => {
-  const status = statusMeta[race.status ?? 'draft']
+  const rawStatus = (race.status ?? 'draft').toLowerCase()
+  const status = statusMeta[rawStatus as RaceCardStatus] ?? statusMeta['active']
   const { onDetailRaceView } = useRaceHooks()
 
   return (

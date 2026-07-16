@@ -14,7 +14,7 @@ import type {
 
 export const getTeamDetail = async (teamId: number, signal?: AbortSignal): Promise<TeamDetailResponse> => {
   return client.request<TeamDetailResponse>({
-    path: `/teams/${teamId}`,
+    path: `/api/v1/Team/${teamId}`,
     method: 'GET',
     signal,
   })
@@ -22,7 +22,7 @@ export const getTeamDetail = async (teamId: number, signal?: AbortSignal): Promi
 
 export const getOrganizerDetail = async (organizerId: number, signal?: AbortSignal): Promise<OrganizerDetailResponse> => {
   return client.request<OrganizerDetailResponse>({
-    path: `/organizers/${organizerId}`,
+    path: `/api/v1/Organizer/${organizerId}`,
     method: 'GET',
     signal,
   })
@@ -30,7 +30,7 @@ export const getOrganizerDetail = async (organizerId: number, signal?: AbortSign
 
 export const createTeam = async (payload: CreateTeamRequest, signal?: AbortSignal): Promise<CreateTeamResponse> => {
   return client.request<CreateTeamResponse, CreateTeamRequest>({
-    path: '/teams',
+    path: '/api/v1/Team',
     method: 'POST',
     body: payload,
     signal,
@@ -39,7 +39,7 @@ export const createTeam = async (payload: CreateTeamRequest, signal?: AbortSigna
 
 export const createOrganizer = async (payload: CreateOrganizerRequest, signal?: AbortSignal): Promise<CreateOrganizerResponse> => {
   return client.request<CreateOrganizerResponse, CreateOrganizerRequest>({
-    path: '/organizers',
+    path: '/api/v1/Organizer',
     method: 'POST',
     body: payload,
     signal,
@@ -48,7 +48,7 @@ export const createOrganizer = async (payload: CreateOrganizerRequest, signal?: 
 
 export const updateTeam = async (payload: UpdateTeamRequest, signal?: AbortSignal): Promise<UpdateTeamResponse> => {
   return client.request<UpdateTeamResponse, UpdateTeamRequest>({
-    path: `/teams/${payload.id}`,
+    path: `/api/v1/Team/${payload.id}`,
     method: 'PUT',
     body: payload,
     signal,
@@ -57,7 +57,7 @@ export const updateTeam = async (payload: UpdateTeamRequest, signal?: AbortSigna
 
 export const updateOrganizer = async (payload: UpdateOrganizerRequest, signal?: AbortSignal): Promise<UpdateOrganizerResponse> => {
   return client.request<UpdateOrganizerResponse, UpdateOrganizerRequest>({
-    path: `/organizers/${payload.id}`,
+    path: `/api/v1/Organizer/${payload.id}`,
     method: 'PUT',
     body: payload,
     signal,

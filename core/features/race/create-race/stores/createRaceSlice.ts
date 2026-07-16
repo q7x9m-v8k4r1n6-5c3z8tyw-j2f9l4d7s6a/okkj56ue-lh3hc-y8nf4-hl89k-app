@@ -19,7 +19,7 @@ export type OrganizerDraft = { id: string; name: string; email: string }
 /**
  * [Local state]: basic information in create new race feature
  */
-export type BasicDraft = { name: string; startAt: string; endAt: string; imageName: string; location: string }
+export type BasicDraft = { name: string; startAt: string; endAt: string; imageName: string; coverUrl: string; location: string }
 
 //#region ============== Validation Errors ==============
 export type BasicValidationErrors = Partial<Record<keyof BasicDraft, string>>
@@ -39,7 +39,7 @@ export type CreateRaceState = {
 
 const initialState: CreateRaceState = {
   step: 1,
-  basic: { name: '', startAt: '', endAt: '', imageName: '', location: '' },
+  basic: { name: '', startAt: '', endAt: '', imageName: '', coverUrl: '', location: '' },
   basicErrors: {},
   stationErrors: {},
   stations: [],

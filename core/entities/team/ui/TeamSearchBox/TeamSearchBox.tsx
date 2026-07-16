@@ -1,5 +1,5 @@
 import { SearchBox } from '@/core/shared'
-import { useTeamMutation } from '../../hooks'
+import { useTeamQuery } from '../../hooks'
 import type { TeamModel, TeamSearchMode } from '../../models'
 import { useTeamSearchBox } from './useTeamSearchBox'
 
@@ -19,11 +19,11 @@ export const TeamSearchBox = ({
     value = [],
 }: TeamSearchBoxProps) => {
     const {
-        data: teams = [],
+        data: teams,
         isLoading,
         isError,
         error: queryError,
-    } = useTeamMutation()
+    } = useTeamQuery()
 
     const {
         hasValue,
@@ -31,7 +31,12 @@ export const TeamSearchBox = ({
         removeTeam,
         selectedKey,
         selectTeam,
-    } = useTeamSearchBox({ data: teams, onChange, type, value })
+    } = useTeamSearchBox({ 
+        data: teams,
+        onChange, 
+        type, 
+        value 
+    })
 
     return (
         <div className="min-w-0">

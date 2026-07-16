@@ -1,7 +1,8 @@
 import { SearchBox } from '@/core/shared'
-import { useOrganizerMutation } from '@/core/entities/organizer/hooks'
 import type { OrganizerModel, OrganizerSearchMode } from '../../models'
 import { useOrganizerSearchBox } from './useOrganizerSearchBox'
+import { useOrganizerQuery } from '../../hooks'
+
 
 type OrganizerSearchBoxProps = {
     type?: OrganizerSearchMode
@@ -19,21 +20,27 @@ export const OrganizerSearchBox = ({
     value = [],
 }: OrganizerSearchBoxProps) => {
 
+   
     const {
-        data: organizers = [],
+        data: organizers, 
         isLoading,
         isError,
         error: queryError,
-    } = useOrganizerMutation()
+    } = useOrganizerQuery() // <-- Xóa bỏ hoàn toàn các ký tự bọc Generic phức tạp!
 
+    // 2. Truyền trực tiếp biến dữ liệu dynamic qua lõi xử lý, không bọc lót, không hard code số "1"
     const {
         hasValue,
         options,
         removeOrganizer,
         selectedKey,
         selectOrganizer
-    } = useOrganizerSearchBox({ data: organizers, onChange, type, value, })
-
+    } = useOrganizerSearchBox({ 
+        data: organizers, // <-- Truyền thẳng mảng/đối tượng nhận từ API Backend vào đây
+        onChange, 
+        type, 
+        value 
+    })
     return (
         <div className="min-w-0">
             <SearchBox
