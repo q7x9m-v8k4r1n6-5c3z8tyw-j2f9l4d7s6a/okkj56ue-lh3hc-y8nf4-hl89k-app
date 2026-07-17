@@ -20,7 +20,7 @@ export const BasicInformationStep = () => {
                 <div className="md:col-span-2"><Input label="Tên trận đấu" requiredMark placeholder="Nhập tên trận đấu" value={value.name} error={errors.name} onChange={(e) => update('name', e.target.value)} /></div>
                 <Input type="datetime-local" label="Thời gian bắt đầu" requiredMark value={value.startAt} error={errors.startAt} onChange={(e) => update('startAt', e.target.value)} />
                 <Input type="datetime-local" label="Thời gian kết thúc" requiredMark value={value.endAt} error={errors.endAt} onChange={(e) => update('endAt', e.target.value)} />
-                <div className="md:col-span-2">
+                <div>
                     <span className="mb-2 block text-xs font-semibold uppercase leading-[14px] tracking-[0.15px] text-[#1a1c1c]">Ảnh bìa</span>
                     <input
                         ref={imageInputRef}
@@ -38,18 +38,17 @@ export const BasicInformationStep = () => {
                     {uploadError ? (
                         <p className="mt-1.5 text-xs text-[#de3336]">{uploadError}</p>
                     ) : null}
-
-                    {value.coverUrl ? (
-                        <div className="mt-3">
-                            <img
-                                src={value.coverUrl}
-                                alt="Xem trước ảnh bìa"
-                                className="h-48 w-full rounded-lg border border-[#e5e5e5] object-cover"
-                            />
-                        </div>
-                    ) : null}
                 </div>
                 <Input label="Địa điểm" requiredMark placeholder="Nhập địa điểm trận đấu" value={value.location} error={errors.location} onChange={(e) => update('location', e.target.value)} />
+                {value.coverUrl ? (
+                    <div className="md:col-span-2">
+                        <img
+                            src={value.coverUrl}
+                            alt="Xem trước ảnh bìa"
+                            className="h-48 w-full rounded-lg border border-[#e5e5e5] object-cover"
+                        />
+                    </div>
+                ) : null}
             </div>
         </CreateRaceStepLayout>
     );
