@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useToast } from '@/core/shared'
 import type { ListRacesResponse } from '../../models'
-// 🔌 HÀN ĐƯỜNG TRUYỀN CHUẨN: Kết nối sang thư mục helpers của create-race
 import { getRaceLifecycleStatus } from '../../../create-race/helpers'
 
 type PageState = {
@@ -23,7 +22,9 @@ export const useRaceCollection = (races: ListRacesResponse) => {
         navigate(location.pathname, { replace: true, state: {} })
     }, [location.pathname, locationState, navigate, toast])
 
-    const totalItems = races.length
+    const raceList = Array.isArray(races) ? races : ((races as any)?.items ?? []);
+
+    const totalItems = raceList.length
     const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE))
     const safePage = Math.min(page, totalPages)
 
@@ -33,13 +34,13 @@ export const useRaceCollection = (races: ListRacesResponse) => {
 
     const visibleRows = useMemo(() => {
         const startIndex = (safePage - 1) * PAGE_SIZE
-        const slicedRaces = races.slice(startIndex, startIndex + PAGE_SIZE)
+        const slicedRaces = raceList.slice(startIndex, startIndex + PAGE_SIZE)
         
-        return slicedRaces.map((race) => ({
+        return slicedRaces.map((race: any) => ({
             ...race,
             status: getRaceLifecycleStatus(race.timeStart, race.timeEnd)
         }))
-    }, [races, safePage])
+    }, [raceList, safePage])
 
     const startItem = totalItems === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1
     const endItem = Math.min(totalItems, safePage * PAGE_SIZE)

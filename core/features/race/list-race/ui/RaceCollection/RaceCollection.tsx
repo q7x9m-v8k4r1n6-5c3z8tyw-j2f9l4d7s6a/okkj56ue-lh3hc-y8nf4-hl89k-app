@@ -26,8 +26,7 @@ export const RaceCollection = () => {
           <div className="rounded-xl border border-dashed border-[#eeeeee] px-4 py-10 text-center text-sm text-[#737373]">{racesQuery.error instanceof Error ? racesQuery.error.message : 'Không thể tải danh sách trận đấu.'}</div>
         ) : paginatedRaces.length ? (
           <div className="space-y-[42px]">
-            {/* 🔌 LIÊN KẾT LINH KIỆN: Duyệt qua mảng dữ liệu đã được tối ưu hóa trạng thái */}
-            {paginatedRaces.map((race) => (
+            {paginatedRaces.map((race: any) => (
               <RaceCard key={race.id} race={race} />
             ))}
           </div>
