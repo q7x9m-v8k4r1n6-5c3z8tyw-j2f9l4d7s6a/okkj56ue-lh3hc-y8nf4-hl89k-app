@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type PropsWithChildren } from 'react'
-import { NavLink, useLocation, useMatches } from 'react-router-dom'
+import { NavLink, useLocation, useMatches, useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
 import {
   ChevronIcon,
   LogoutIcon,
@@ -7,6 +8,9 @@ import {
 } from '@/core/assets'
 import { useCurrentUser } from '@/core'
 import { navigationConfig } from '@/core/shared/config'
+import { authApi } from '@/core/features/auth/api'
+import { logout } from '@/core/features/auth/stores/authSlice'
+import { setAuthToken } from '@/core/shared/api'
 
 const pageItems = Object.values(navigationConfig)
 const navigationItems = pageItems.filter(({ hidden }) => !hidden)
@@ -17,14 +21,16 @@ export const AppLayout = ({ children }: PropsWithChildren) => {
   const { data: user } = useCurrentUser()
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
+  
+  // Bổ sung hook điều hướng và dispatch
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+
   const matchTitle = [...matches].reverse()
     .map((match) => (match.handle as { title?: string } | undefined)?.title)
     .find(Boolean)
   const title = matchTitle ?? pageItems.find(({ to }) => to === location.pathname)?.title ?? 'Move'
 
-  /**
-   * Close the profile dropdown when clicking outside of it
-   */
   useEffect(() => {
     if (!isProfileOpen) return
 
@@ -35,9 +41,31 @@ export const AppLayout = ({ children }: PropsWithChildren) => {
     }
 
     document.addEventListener('pointerdown', handlePointerDown)
-
     return () => document.removeEventListener('pointerdown', handlePointerDown)
   }, [isProfileOpen])
+
+  // Hàm xử lý Đăng xuất
+  const handleLogout = async () => {
+  try {
+    // 1. Gọi Backend để xóa Refresh Token dưới Cookie
+    await authApi.logout()
+  } catch (error) {
+    console.error('Lỗi khi gọi API logout:', error)
+  } finally {
+    // DÙ API CÓ LỖI HAY KHÔNG, VẪN PHẢI DỌN DẸP TRÊN FRONTEND (RAM)
+
+    // 2. Xóa Access Token trong biến cục bộ của Axios
+    setAuthToken(null)
+
+    // 3. Xóa sạch State trong Redux (Đưa isAuthenticated về false)
+    dispatch(logout())
+
+    // 4. Chuyển hướng về Login. 
+    // THUỘC TÍNH QUAN TRỌNG: replace: true giúp ghi đè lịch sử trình duyệt, 
+    // cắt đứt hoàn toàn khả năng bấm Back quay lại trang cũ.
+    navigate('/login', { replace: true })
+  }
+}
 
   return (
     <div className="min-h-svh bg-[#f9f9f9] text-[#1a1c1c]">
@@ -121,7 +149,7 @@ export const AppLayout = ({ children }: PropsWithChildren) => {
                 <button
                   type="button"
                   className="flex items-center gap-[10px] pb-[5px] pl-[3px] pr-[10px] text-left text-xs text-[#de3336]"
-                  onClick={() => setIsProfileOpen(false)}
+                  onClick={handleLogout} /* Gắn hàm vào đây */
                 >
                   <LogoutIcon className="size-6 shrink-0" />
                   <span className="leading-6">Đăng xuất</span>

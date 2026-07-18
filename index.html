@@ -7,6 +7,31 @@
     <title>ovc-move-app</title>
   </head>
   <body>
+    <!-- ========================================== -->
+    <!-- TRẠM TEST GOOGLE LOGIN (Xóa đi khi lên Production) -->
+    <!-- ========================================== -->
+    
+    <!-- 1. Tải bộ SDK của Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <!-- 2. Hàm hứng Token sau khi bạn đăng nhập thành công -->
+    <script>
+      function handleCredentialResponse(response) {
+        console.log("====================================");
+        console.log("ĐÂY LÀ ID TOKEN CỦA BẠN. HÃY COPY NÓ:");
+        console.log(response.credential);
+        console.log("====================================");
+        alert("Đăng nhập Google thành công! Bấm F12 mở tab Console để copy IdToken nhé.");
+      }
+    </script>
+    
+    <!-- 3. Cấu hình Client ID (Lấy từ file .env của Backend) -->
+    <div id="g_id_onload"
+         data-client_id="479709162900-8e356ovgtt5n7sm1c38kn55rno35u7mo.apps.googleusercontent.com"
+         data-callback="handleCredentialResponse"
+         data-auto_prompt="false">
+    </div>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

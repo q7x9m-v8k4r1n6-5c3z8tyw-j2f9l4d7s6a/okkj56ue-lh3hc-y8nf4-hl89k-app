@@ -4,11 +4,14 @@ import { RouterProvider } from 'react-router-dom'
 import './index.css'
 import { router } from './app/routes'
 import { AppProviders } from './app/providers'
+import { AuthInitializer } from '@/core/features/auth/components/AuthInitializer'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AppProviders>
-      <RouterProvider router={router} />
+      <AuthInitializer>
+        <RouterProvider router={router} />
+      </AuthInitializer>
     </AppProviders>
   </StrictMode>,
 )

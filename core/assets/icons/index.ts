@@ -13,3 +13,7 @@ export { TrashIcon } from './TrashIcon'
 export { UsersIcon } from './UsersIcon'
 export { TrashGlyph } from './TrashGlyph'
 export { SearchGlyph } from './SearchGlyph'
+
+export { GoogleIcon} from './GoogleIcon'
+export { LockIcon} from './LockIcon'
+export { UserIcon} from './UserIcon'
