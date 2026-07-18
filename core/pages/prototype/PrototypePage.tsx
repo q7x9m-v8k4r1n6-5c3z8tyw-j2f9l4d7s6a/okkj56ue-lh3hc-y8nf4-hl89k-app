@@ -26,6 +26,9 @@ import {
   type SearchOption,
 } from '@/core/shared'
 
+// Import toàn bộ icons để preview
+import * as Icons from '@/core/assets/icons';
+
 const roleOptions = [
   { value: 'admin', label: 'Quản trị viên', description: 'Toàn quyền quản lý giải đấu' },
   { value: 'organizer', label: 'Ban Tổ chức', description: 'Quản lý đội chơi và trận đấu' },
@@ -159,6 +162,36 @@ export const PrototypePage = () => {
           />
           <div className="py-8 text-sm text-[#525252]">Nội dung tab: <strong>{tab === 'teams' ? 'Đội chơi' : 'Ban tổ chức'}</strong></div>
         </section>
+
+        {/* THÊM PHẦN ICON GALLERY PREVIEW VÀO ĐÂY */}
+        <section className="rounded-xl border border-[#eeeeee] bg-white p-6">
+          <h3 className="mb-6 text-lg font-semibold text-gray-800">Icon Gallery Preview</h3>
+          
+          {/* Lưới hiển thị các Icon */}
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {Object.entries(Icons).map(([iconName, IconComponent]) => {
+              // Bỏ qua nếu có export nào đó không phải là React Component hợp lệ
+              if (typeof IconComponent !== 'function') return null;
+
+              return (
+                <div 
+                  key={iconName} 
+                  className="flex flex-col items-center justify-center p-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:border-[#de3336] transition-all cursor-pointer"
+                  title={iconName}
+                >
+                  {/* Render Component Icon, truyền class để set kích thước và màu sắc mặc định */}
+                  <IconComponent className="size-8 text-gray-700" />
+                  
+                  {/* Tên của Icon để dễ copy */}
+                  <span className="mt-3 text-xs font-medium text-gray-500 text-center break-all">
+                    {iconName}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+        
       </div>
 
       <Modal

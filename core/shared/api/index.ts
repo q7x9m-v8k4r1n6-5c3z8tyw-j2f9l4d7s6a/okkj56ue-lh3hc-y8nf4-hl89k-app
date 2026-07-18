@@ -5,4 +5,6 @@ export type ApiResponse<TData> = {
   data: TData
 }
 
+// Gom các module lại và export ra ngoài cho toàn app sử dụng
 export * from './interceptor'
+export * from './auth-interceptor'

@@ -1,22 +1,17 @@
-import axios, { type AxiosError } from 'axios'
+import axios from 'axios'
 import type { ApiResponseModel } from '../types/api-types'
+import { setupAuthInterceptors } from './auth-interceptor'
 
 const apiClient = () => {
   const instance = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
+    withCredentials: true,
   })
 
-  instance.interceptors.response.use(
-    (response) => response,
-    (error: AxiosError) => {
-      return Promise.reject({
-        status: error.response?.status,
-        message: error.message,
-        data: error.response?.data,
-      })
-    }
-  )
+  // Cắm module Auth vào Axios
+  setupAuthInterceptors(instance)
 
+  // Wrapper chuẩn hóa đầu ra
   async function request<TData, TBody = unknown>(config: {
     path: string
     method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
@@ -33,13 +28,11 @@ const apiClient = () => {
       headers: config.headers,
       signal: config.signal,
     })
-
+    
     const api = res.data
-
     if (api.statusCode !== 200) {
       throw new Error(api.detailError || api.message)
     }
-
     return api.data as TData
   }
 
