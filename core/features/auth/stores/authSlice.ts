@@ -7,6 +7,7 @@ export interface UserInfo {
   email: string;
   role: string;
   displayName: string | null;
+  avatarUrl?: string | null;
 }
 
 export interface AuthState {

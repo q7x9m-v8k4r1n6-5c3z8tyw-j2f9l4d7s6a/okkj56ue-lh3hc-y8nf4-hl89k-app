@@ -10,6 +10,7 @@ import { authApi } from '@/core/features/auth/api'
 import { logout } from '@/core/features/auth/stores/authSlice'
 import { setAuthToken } from '@/core/shared/api'
 import type { RootState } from '@/src/app/store'
+import { clearGoogleProfile } from '@/core/features/auth/utils/google-profile'
 
 const pageItems = Object.values(navigationConfig)
 const navigationItems = pageItems.filter(({ hidden }) => !hidden)
@@ -20,7 +21,7 @@ const roleLabels: Record<string, string> = {
   team: 'Đội chơi',
 }
 
-const ProfileAvatar = ({ name }: { name: string }) => {
+const ProfileAvatar = ({ name, src }: { name: string; src?: string | null }) => {
   const initials = name
     .split(/\s+/)
     .filter(Boolean)
@@ -30,9 +31,13 @@ const ProfileAvatar = ({ name }: { name: string }) => {
     .toUpperCase()
 
   return (
-    <span className="flex size-full items-center justify-center rounded-full bg-[#fde5e5] text-xs font-semibold text-[#8f1c1e]" aria-hidden="true">
-      {initials || 'U'}
-    </span>
+    src ? (
+      <img src={src} alt="" className="size-full rounded-full object-cover" referrerPolicy="no-referrer" />
+    ) : (
+      <span className="flex size-full items-center justify-center rounded-full bg-[#fde5e5] text-xs font-semibold text-[#8f1c1e]" aria-hidden="true">
+        {initials || 'U'}
+      </span>
+    )
   )
 }
 
@@ -79,6 +84,7 @@ export const AppLayout = ({ children }: PropsWithChildren) => {
 
     // 2. Xóa Access Token trong biến cục bộ của Axios
     setAuthToken(null)
+    clearGoogleProfile()
 
     // 3. Xóa sạch State trong Redux (Đưa isAuthenticated về false)
     dispatch(logout())
@@ -139,7 +145,7 @@ export const AppLayout = ({ children }: PropsWithChildren) => {
               onClick={() => setIsProfileOpen((open) => !open)}
             >
               <span className="size-8 overflow-hidden rounded-full border border-[#e2e2e2] p-px">
-                <ProfileAvatar name={displayName} />
+                <ProfileAvatar name={displayName} src={user?.avatarUrl} />
               </span>
               <ChevronIcon className={`h-[7.4px] w-3 text-[#1a1c1c] transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} />
             </button>
@@ -148,7 +154,7 @@ export const AppLayout = ({ children }: PropsWithChildren) => {
               <section className="absolute right-0 top-[52px] flex w-[245px] flex-col gap-1 rounded-lg bg-white p-[10px] shadow-[0_4px_2.8px_rgba(0,0,0,0.08)]" aria-label="Thông tin tài khoản">
                 <div className="flex items-start gap-[10px] py-[5px]">
                   <span className="size-8 shrink-0 overflow-hidden rounded-full border border-[#e2e2e2] p-px">
-                    <ProfileAvatar name={displayName} />
+                    <ProfileAvatar name={displayName} src={user?.avatarUrl} />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex h-4 items-center gap-[5px]">

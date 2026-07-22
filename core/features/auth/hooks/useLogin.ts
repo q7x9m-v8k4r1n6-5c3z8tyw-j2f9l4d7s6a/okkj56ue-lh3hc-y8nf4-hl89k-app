@@ -8,6 +8,11 @@ import { setCredentials } from '../stores/authSlice'
 import { setAuthToken } from '@/core/shared/api'
 import { GOOGLE_CLIENT_ID } from '../constants'
 import { getErrorMessage } from '../utils'
+import {
+  getGoogleProfileFromCredential,
+  saveGoogleProfile,
+} from '../utils/google-profile'
+import type { UserInfo } from '../stores/authSlice'
 
 let googleIdentityInitialized = false
 
@@ -21,10 +26,24 @@ export const useLogin = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
-  const processLoginSuccess = async (loginData: { accessToken: string }) => {
+  const processLoginSuccess = async (
+    loginData: { accessToken: string },
+    googleProfile?: Pick<UserInfo, 'email' | 'displayName' | 'avatarUrl'> | null,
+  ) => {
     try {
       setAuthToken(loginData.accessToken)
-      const user = await authApi.getMe()
+      const apiUser = await authApi.getMe()
+      const user = googleProfile && googleProfile.email === apiUser.email
+        ? {
+            ...apiUser,
+            displayName: apiUser.displayName?.trim() || googleProfile.displayName,
+            avatarUrl: googleProfile.avatarUrl,
+          }
+        : apiUser
+
+      if (googleProfile && googleProfile.email === apiUser.email) {
+        saveGoogleProfile(googleProfile)
+      }
       
       dispatch(setCredentials({ user, accessToken: loginData.accessToken }))
       navigate('/', { replace: true })
@@ -107,7 +126,10 @@ export const useLogin = () => {
             setIsLoading(true)
             setGlobalError('')
             const apiRes = await authApi.googleLogin(response.credential)
-            await processLoginSuccess(apiRes)
+            await processLoginSuccess(
+              apiRes,
+              getGoogleProfileFromCredential(response.credential),
+            )
           } catch (err) {
             setGlobalError(getErrorMessage(err, 'Đăng nhập Google thất bại.'))
             setIsLoading(false)

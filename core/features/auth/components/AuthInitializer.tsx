@@ -5,6 +5,7 @@ import { setCredentials, logout, setInitialized } from '../stores/authSlice';
 import type { UserInfo } from '../stores/authSlice';
 import type { RootState } from '@/src/app/store';
 import { LoadingScreen } from '@/core/shared';
+import { restoreGoogleProfile } from '../utils/google-profile';
 
 let initializationPromise: Promise<{ accessToken: string; user: UserInfo }> | null = null;
 
@@ -13,7 +14,7 @@ const restoreSession = () => {
     initializationPromise = (async () => {
       const res = await authApi.refreshToken();
       const user = await authApi.getMe();
-      return { accessToken: res.accessToken, user };
+      return { accessToken: res.accessToken, user: restoreGoogleProfile(user) };
     })().finally(() => {
       initializationPromise = null;
     });
