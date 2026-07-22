@@ -1,21 +1,23 @@
+import { useState } from 'react'
 import { RaceCard } from '@/core/entities/race'
 import { useRaceCollection } from './useRaceCollection'
 import { useListRacesMutation } from '../../hooks/useListRacesMutation'
 import { Pagination } from '@/core/shared'
 
 export const RaceCollection = () => {
-  const racesQuery = useListRacesMutation()
-  const rawRaces = racesQuery.data ?? []
+  const [page, setPage] = useState(1)
+  const racesQuery = useListRacesMutation({ page, pageSize: 20 })
+  const pageResult = racesQuery.data
+  const rawRaces = pageResult?.items ?? []
 
   const {
     races: paginatedRaces,
-    page,
-    totalPages,
-    totalItems,
-    startItem,
-    endItem,
-    setPage
   } = useRaceCollection(rawRaces)
+
+  const totalPages = pageResult?.totalPages ?? 1
+  const totalItems = pageResult?.totalItems ?? 0
+  const startItem = totalItems === 0 ? 0 : (page - 1) * (pageResult?.pageSize ?? 20) + 1
+  const endItem = Math.min(totalItems, page * (pageResult?.pageSize ?? 20))
 
   return (
     <section className="flex min-h-0 flex-1 flex-col" aria-label="Danh sách trận đấu">

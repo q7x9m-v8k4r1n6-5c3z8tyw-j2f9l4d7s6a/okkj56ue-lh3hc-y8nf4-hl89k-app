@@ -7,8 +7,8 @@ export const getAllListRaces = async (
 ): Promise<ListRacesResponse> => {
   
   return client.request<ListRacesResponse, ListRacesRequestData>({
-      path: '/api/v1/Race', 
-      query: payload,
-      signal,
+    path: '/Race',
+    query: payload,
+    signal,
   })
 }

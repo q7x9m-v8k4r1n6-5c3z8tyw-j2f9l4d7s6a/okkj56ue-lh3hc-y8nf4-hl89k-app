@@ -4,7 +4,7 @@ import type { BackendCreateRaceRequest } from '../helpers/mapToBackendRequest'
 
 export const createNewRace = async (backendPayload: BackendCreateRaceRequest): Promise<string> => {
   const response = await client.request<ApiResponseModel<string>, BackendCreateRaceRequest>({
-    path: '/api/v1/Race',
+    path: '/Race',
     method: 'POST',
     body: backendPayload,
   })
@@ -22,7 +22,7 @@ export const uploadRaceCoverImage = async (file: File): Promise<string> => {
   formData.append('file', file) 
 
   const response = await client.request<ApiResponseModel<string | null>>({
-    path: '/api/v1/Image/upload',
+    path: '/Image/upload',
     method: 'POST',
     body: formData,
   } as Parameters<typeof client.request>[0] & { body: unknown }) 

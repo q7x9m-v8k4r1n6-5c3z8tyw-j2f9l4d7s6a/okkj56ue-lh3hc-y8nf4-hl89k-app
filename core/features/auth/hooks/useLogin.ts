@@ -9,6 +9,8 @@ import { setAuthToken } from '@/core/shared/api'
 import { GOOGLE_CLIENT_ID } from '../constants'
 import { getErrorMessage } from '../utils'
 
+let googleIdentityInitialized = false
+
 export const useLogin = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -78,10 +80,27 @@ export const useLogin = () => {
   }
 
   useEffect(() => {
-    const google = (window as any).google 
-    
-    if (google) {
-      google.accounts.id.initialize({
+    let isDisposed = false
+    let retryTimer: number | undefined
+
+    const initializeGoogleButton = () => {
+      if (isDisposed) return
+
+      const google = (window as any).google
+      const buttonContainer = document.getElementById('googleSignInBtn')
+
+      if (!google?.accounts?.id || !buttonContainer) {
+        retryTimer = window.setTimeout(initializeGoogleButton, 100)
+        return
+      }
+
+      if (!GOOGLE_CLIENT_ID) {
+        setGlobalError('Thiếu cấu hình Google Client ID.')
+        return
+      }
+
+      if (!googleIdentityInitialized) {
+        google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
         callback: async (response: any) => {
           try {
@@ -95,11 +114,21 @@ export const useLogin = () => {
           }
         }
       })
-      
+        googleIdentityInitialized = true
+      }
+
+      buttonContainer.replaceChildren()
       google.accounts.id.renderButton(
-        document.getElementById('googleSignInBtn'),
+        buttonContainer,
         { theme: 'outline', size: 'large', width: '380' } 
       )
+    }
+
+    initializeGoogleButton()
+
+    return () => {
+      isDisposed = true
+      if (retryTimer !== undefined) window.clearTimeout(retryTimer)
     }
   }, [])
 

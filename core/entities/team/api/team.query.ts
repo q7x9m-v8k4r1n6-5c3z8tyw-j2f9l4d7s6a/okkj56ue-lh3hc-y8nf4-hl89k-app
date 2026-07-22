@@ -6,7 +6,7 @@ import { client } from '@core/shared/api/interceptor'
  */
 export const getTeams = async (): Promise<TeamModel[]> => {
   return client.request<TeamModel[]>({
-    path: '/api/v1/Team', 
+    path: '/Team',
     method: 'GET',
   })
 }

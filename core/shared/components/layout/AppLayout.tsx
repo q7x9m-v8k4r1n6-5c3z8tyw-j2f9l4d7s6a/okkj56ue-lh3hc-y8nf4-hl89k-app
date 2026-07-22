@@ -1,24 +1,45 @@
 import { useEffect, useRef, useState, type PropsWithChildren } from 'react'
 import { NavLink, useLocation, useMatches, useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   ChevronIcon,
   LogoutIcon,
-  userProfileAvatarUrl,
 } from '@/core/assets'
-import { useCurrentUser } from '@/core'
 import { navigationConfig } from '@/core/shared/config'
 import { authApi } from '@/core/features/auth/api'
 import { logout } from '@/core/features/auth/stores/authSlice'
 import { setAuthToken } from '@/core/shared/api'
+import type { RootState } from '@/src/app/store'
 
 const pageItems = Object.values(navigationConfig)
 const navigationItems = pageItems.filter(({ hidden }) => !hidden)
 
+const roleLabels: Record<string, string> = {
+  admin: 'Quản trị viên',
+  organizer: 'Ban tổ chức',
+  team: 'Đội chơi',
+}
+
+const ProfileAvatar = ({ name }: { name: string }) => {
+  const initials = name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase()
+
+  return (
+    <span className="flex size-full items-center justify-center rounded-full bg-[#fde5e5] text-xs font-semibold text-[#8f1c1e]" aria-hidden="true">
+      {initials || 'U'}
+    </span>
+  )
+}
+
 export const AppLayout = ({ children }: PropsWithChildren) => {
   const location = useLocation()
   const matches = useMatches()
-  const { data: user } = useCurrentUser()
+  const user = useSelector((state: RootState) => state.auth.user)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
   
@@ -30,6 +51,8 @@ export const AppLayout = ({ children }: PropsWithChildren) => {
     .map((match) => (match.handle as { title?: string } | undefined)?.title)
     .find(Boolean)
   const title = matchTitle ?? pageItems.find(({ to }) => to === location.pathname)?.title ?? 'Move'
+  const displayName = user?.displayName?.trim() || user?.email || 'Người dùng'
+  const roleLabel = roleLabels[user?.role ?? ''] ?? 'Thành viên'
 
   useEffect(() => {
     if (!isProfileOpen) return
@@ -116,7 +139,7 @@ export const AppLayout = ({ children }: PropsWithChildren) => {
               onClick={() => setIsProfileOpen((open) => !open)}
             >
               <span className="size-8 overflow-hidden rounded-full border border-[#e2e2e2] p-px">
-                <img src={userProfileAvatarUrl} alt="" className="size-full rounded-full object-cover" />
+                <ProfileAvatar name={displayName} />
               </span>
               <ChevronIcon className={`h-[7.4px] w-3 text-[#1a1c1c] transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} />
             </button>
@@ -125,21 +148,21 @@ export const AppLayout = ({ children }: PropsWithChildren) => {
               <section className="absolute right-0 top-[52px] flex w-[245px] flex-col gap-1 rounded-lg bg-white p-[10px] shadow-[0_4px_2.8px_rgba(0,0,0,0.08)]" aria-label="Thông tin tài khoản">
                 <div className="flex items-start gap-[10px] py-[5px]">
                   <span className="size-8 shrink-0 overflow-hidden rounded-full border border-[#e2e2e2] p-px">
-                    <img src={userProfileAvatarUrl} alt="" className="size-full rounded-full object-cover" />
+                    <ProfileAvatar name={displayName} />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex h-4 items-center gap-[5px]">
-                      <p className="truncate text-base leading-4">{user?.name ?? 'Nguyễn Văn A'}</p>
+                      <p className="truncate text-base leading-4">{displayName}</p>
                       <span className="size-[7px] shrink-0 rounded-full bg-[#de3336]" />
                     </div>
-                    <a className="mt-[5px] block truncate text-[10px] leading-3 tracking-[0.24px] text-[#5e5e5e]" href={`mailto:${user?.email ?? 'admin@university.edu'}`}>
-                      {user?.email ?? 'admin@university.edu'}
+                    <a className="mt-[5px] block truncate text-[10px] leading-3 tracking-[0.24px] text-[#5e5e5e]" href={`mailto:${user?.email ?? ''}`}>
+                      {user?.email ?? 'Chưa có email'}
                     </a>
                   </div>
                 </div>
 
                 <div className="rounded-lg bg-[#fdcacb] px-2 py-[5px] text-center text-xs leading-3 tracking-[0.24px] text-[#420001]">
-                  {user?.role ?? 'Ban Tổ chức'}
+                  {roleLabel}
                 </div>
 
                 <div className="py-[5px]">

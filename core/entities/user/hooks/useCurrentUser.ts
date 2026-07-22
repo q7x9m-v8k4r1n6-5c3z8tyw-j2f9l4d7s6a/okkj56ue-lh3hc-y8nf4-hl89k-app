@@ -6,7 +6,7 @@ export const useCurrentUser = () => {
   return useQuery({
     queryKey: ['current-user'],
     queryFn: ({ signal }) => client.request<CurrentUser>({
-      path: '/users/me',
+      path: '/auth/me',
       method: 'GET',
       signal,
     }),
