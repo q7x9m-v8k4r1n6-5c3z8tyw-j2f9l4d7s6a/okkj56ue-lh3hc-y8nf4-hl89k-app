@@ -27,12 +27,20 @@ export const AuthInitializer = ({ children }: { children: React.ReactNode }) => 
   const isInitialized = useSelector((state: RootState) => state.auth.isInitialized);
 
   useEffect(() => {
+    // The login page is public and a first-time visitor has no refresh-token
+    // cookie yet. Calling the refresh endpoint here only creates an expected
+    // 401 before the user has had a chance to sign in.
+    if (window.location.pathname === '/login' || window.location.pathname === '/login/') {
+      dispatch(setInitialized());
+      return;
+    }
+
     const initAuth = async () => {
       try {
         const { accessToken, user } = await restoreSession();
         
         dispatch(setCredentials({ user, accessToken }));
-      } catch (error) {
+      } catch {
         dispatch(logout());
       } finally {
         dispatch(setInitialized());
