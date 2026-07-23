@@ -11,10 +11,10 @@ export const createRaceRequestSchema = z.object({
     isHiddenPoint: z.boolean(),
     coverUrl: z.string().url({ message: 'Cover URL must be a valid URL' }).max(500, { message: 'Cover URL must be at most 500 characters long' }).optional().or(z.literal('')),
     
-    organizerId: z.array(z.string().uuid({ message: 'Organizer ID must be a valid UUID' })),
+    organizerId: z.array(z.string().min(1, { message: 'Organizer ID is required' })),
     
     raceTeam: z.array(z.object({
-        teamID: z.string().uuid({ message: 'Team ID must be a valid UUID' }), // Chuẩn hóa chữ ID viết hoa nếu swagger bắt vậy
+        teamID: z.string().min(1, { message: 'Team ID is required' }), // Chuẩn hóa chữ ID viết hoa nếu swagger bắt vậy
     })).optional(),
     
     booth: z.array(z.object({
