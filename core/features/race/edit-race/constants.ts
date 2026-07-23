@@ -11,11 +11,13 @@ export const EDIT_RACE_TABS = [
 
 export const EDIT_RACE_INITIAL_FORM: EditRaceForm = {
   raceName: 'Move 2026',
-  timeStart: '2026-09-09',
-  timeEnd: '2026-09-10',
+  timeStart: '2026-09-09T00:00:00',
+  timeEnd: '2026-09-10T00:00:00',
   coverUrl: '',
   coverFileName: '',
   place: 'Sân đấu Phú Thọ',
+  status: 'draft',
+  modifiedAt: '',
   booths: [
     {
       id: 'station-1',

@@ -26,6 +26,8 @@ export type EditRaceForm = {
   coverUrl: string
   coverFileName: string
   place: string
+  status: string
+  modifiedAt: string
   booths: EditRaceBooth[]
   teams: EditRaceTeam[]
   organizers: EditRaceOrganizer[]
@@ -42,7 +44,11 @@ export type EditRaceDetailResponse = {
   timeStart?: string
   timeEnd?: string
   place?: string
+  status?: string
   coverUrl?: string | null
+  modifiedAt?: string
+  modifiedAtUtc?: string
+  updatedAt?: string
   isToggledLeaderboard?: boolean
   isHiddenPoint?: boolean
   organizerId?: string[]
@@ -62,6 +68,7 @@ export type EditRaceRequest = {
   timeEnd: string
   place: string
   coverUrl?: string
+  status?: string
   isToggledLeaderboard: boolean
   isHiddenPoint: boolean
   organizerId: string[]

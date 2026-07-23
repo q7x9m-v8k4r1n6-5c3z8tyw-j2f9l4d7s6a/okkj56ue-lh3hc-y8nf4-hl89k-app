@@ -3,18 +3,17 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import type { OrganizerModel } from '@/core/entities/organizer'
 import type { TeamModel } from '@/core/entities/team'
 import { raceQueryKey } from '@/core/features/race/constants'
+import { getCurrentGmt7InstantString, toGmt7ApiDateTime } from '@/core/shared'
 import { EDIT_RACE_INITIAL_FORM } from '../constants'
 import { getRaceDetail, updateRace } from '../api'
 import type { EditRaceDetailResponse, EditRaceForm, EditRaceOrganizer, EditRaceRequest } from '../models'
 
-const toDateInputValue = (value?: string) => {
+const toDateTimeInputValue = (value?: string) => {
   if (!value) return ''
-  const parsed = new Date(value)
-  if (Number.isNaN(parsed.getTime())) return value.slice(0, 10)
-  return parsed.toISOString().slice(0, 10)
+  return toGmt7ApiDateTime(value)
 }
 
-const toApiDateTime = (value: string) => value.includes('T') ? value : `${value}T00:00:00.000Z`
+const toApiDateTime = (value: string) => toGmt7ApiDateTime(value)
 
 const createOrganizerFallback = (id: string, index: number): EditRaceOrganizer => ({
   id,
@@ -30,11 +29,13 @@ const createTeamFallback = (id: string, index: number): TeamModel => ({
 
 const mapDetailToForm = (detail: EditRaceDetailResponse): EditRaceForm => ({
   raceName: detail.raceName || detail.name || EDIT_RACE_INITIAL_FORM.raceName,
-  timeStart: toDateInputValue(detail.timeStart) || EDIT_RACE_INITIAL_FORM.timeStart,
-  timeEnd: toDateInputValue(detail.timeEnd) || EDIT_RACE_INITIAL_FORM.timeEnd,
+  timeStart: toDateTimeInputValue(detail.timeStart) || EDIT_RACE_INITIAL_FORM.timeStart,
+  timeEnd: toDateTimeInputValue(detail.timeEnd) || EDIT_RACE_INITIAL_FORM.timeEnd,
   coverUrl: detail.coverUrl ?? '',
   coverFileName: detail.coverUrl ? detail.coverUrl.split('/').pop() ?? '' : '',
   place: detail.place || EDIT_RACE_INITIAL_FORM.place,
+  status: detail.status || EDIT_RACE_INITIAL_FORM.status,
+  modifiedAt: detail.modifiedAt || detail.modifiedAtUtc || detail.updatedAt || EDIT_RACE_INITIAL_FORM.modifiedAt,
   booths: detail.booth?.length ? detail.booth.map((booth, index) => {
     const managerId = booth.organizerID || booth.organizerId || ''
 
@@ -55,12 +56,13 @@ const mapDetailToForm = (detail: EditRaceDetailResponse): EditRaceForm => ({
   },
 })
 
-const mapFormToRequest = (form: EditRaceForm): EditRaceRequest => ({
+const mapFormToRequest = (form: EditRaceForm, status = form.status): EditRaceRequest => ({
   raceName: form.raceName,
   timeStart: toApiDateTime(form.timeStart),
   timeEnd: toApiDateTime(form.timeEnd),
   place: form.place,
   coverUrl: form.coverUrl,
+  status,
   isToggledLeaderboard: form.settings.isToggledLeaderboard,
   isHiddenPoint: form.settings.isHiddenPoint,
   organizerId: form.organizers.map((organizer) => organizer.id),
@@ -86,7 +88,10 @@ export const useEditRace = (raceId?: string) => {
   })
 
   const updateMutation = useMutation({
-    mutationFn: () => updateRace(raceId ?? '', mapFormToRequest(form)),
+    mutationFn: (status?: string) => updateRace(raceId ?? '', mapFormToRequest(form, status)),
+    onSuccess: (updatedRace) => {
+      if (updatedRace) setForm({ ...mapDetailToForm(updatedRace), modifiedAt: getCurrentGmt7InstantString() })
+    },
   })
 
   useEffect(() => {
@@ -170,8 +175,13 @@ export const useEditRace = (raceId?: string) => {
     updateBasic({ coverFileName: file.name, coverUrl: URL.createObjectURL(file) })
   }
 
-  const saveRace = () => {
-    if (raceId) updateMutation.mutate()
+  const resetForm = () => {
+    setForm(detailQuery.data ? mapDetailToForm(detailQuery.data) : EDIT_RACE_INITIAL_FORM)
+    updateMutation.reset()
+  }
+
+  const saveRace = (options?: { onSuccess?: () => void; status?: string }) => {
+    if (raceId) updateMutation.mutate(options?.status, { onSuccess: options?.onSuccess })
   }
 
   return {
@@ -182,6 +192,7 @@ export const useEditRace = (raceId?: string) => {
     isSaving: updateMutation.isPending,
     saveError: updateMutation.error,
     saveRace,
+    resetForm,
     setActiveTab,
     title,
     updateBasic,

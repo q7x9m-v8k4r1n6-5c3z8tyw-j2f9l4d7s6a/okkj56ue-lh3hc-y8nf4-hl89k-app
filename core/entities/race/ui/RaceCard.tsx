@@ -1,15 +1,14 @@
-import { Badge, TableCard } from '@/core/shared'
+import { Badge, formatDateTime, TableCard } from '@/core/shared'
 import { DefaultCoverImage } from '@/core/assets'
 import { useRaceHooks } from '../hooks'
 import type { RaceModel } from '../model'
 
 const statusMeta = {
-  active: { label: 'Active', variant: 'primary' },
-  draft: { label: 'In progress', variant: 'success' },
-  upcoming: { label: 'Upcoming', variant: 'warning' },
-  ongoing: { label: 'Ongoing', variant: 'primary' },
-  completed: { label: 'Completed', variant: 'neutral' },
-  cancelled: { label: 'Cancelled', variant: 'warning' },
+  draft: { label: 'Nháp', variant: 'neutral' },
+  ready: { label: 'Sẵn sàng bắt đầu', variant: 'success' },
+  ongoing: { label: 'Đang diễn ra', variant: 'primary' },
+  paused: { label: 'Tạm dừng', variant: 'warning' },
+  completed: { label: 'Đã kết thúc', variant: 'danger' },
 } as const
 
 export type RaceCardRecord = RaceModel
@@ -17,7 +16,7 @@ export type RaceCardStatus = keyof typeof statusMeta
 
 export const RaceCard = ({ race }: { race: RaceModel }) => {
   const rawStatus = (race.status ?? 'draft').toLowerCase()
-  const status = statusMeta[rawStatus as RaceCardStatus] ?? statusMeta['active']
+  const status = statusMeta[rawStatus as RaceCardStatus] ?? statusMeta['draft']
   const { onDetailRaceView } = useRaceHooks()
 
   return (
@@ -30,8 +29,8 @@ export const RaceCard = ({ race }: { race: RaceModel }) => {
             <h2 className="truncate text-lg font-medium text-black">{race.name}</h2>
             <dl className="text-sm text-[#666666]">
               <div>Địa điểm: {race.place || 'Chưa cập nhật'}</div>
-              <div>Thời gian bắt đầu: {race.timeStart || '-'}</div>
-              <div>Thời gian kết thúc: {race.timeEnd || '-'}</div>
+              <div>Thời gian bắt đầu: {race.timeStart ? formatDateTime(race.timeStart) : '-'}</div>
+              <div>Thời gian kết thúc: {race.timeEnd ? formatDateTime(race.timeEnd) : '-'}</div>
             </dl>
           </div>
 

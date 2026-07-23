@@ -1,2 +1,2 @@
-export * from './editRace.type';
-export * from './editRace.schema';
+export * from './editRace.schema'
+export * from './editRace.type'

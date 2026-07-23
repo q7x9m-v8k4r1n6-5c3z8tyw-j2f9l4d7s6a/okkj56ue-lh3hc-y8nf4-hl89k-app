@@ -5,6 +5,7 @@ import type { TeamModel } from '@/core/entities/team'
 export const useTeamInformationStep = () => {
   const dispatch = useAppDispatch()
   const rows = useAppSelector((state) => state.createRace.teams)
+  const error = useAppSelector((state) => state.createRace.teamError)
 
   const addTeam = (teams: TeamModel[]) => {
     const team = teams[0]
@@ -23,6 +24,7 @@ export const useTeamInformationStep = () => {
 
   return {
     addTeam,
+    error,
     removeTeam,
     rows,
   }

@@ -5,6 +5,7 @@ import type { OrganizerModel } from '@/core/entities/organizer'
 export const useOrganizerInformationStep = () => {
   const dispatch = useAppDispatch()
   const rows = useAppSelector((state) => state.createRace.organizers)
+  const error = useAppSelector((state) => state.createRace.organizerError)
 
   const addOrganizer = (organizers: OrganizerModel[]) => {
     const organizer = organizers[0]
@@ -23,6 +24,7 @@ export const useOrganizerInformationStep = () => {
 
   return {
     addOrganizer,
+    error,
     removeOrganizer,
     rows,
   }

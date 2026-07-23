@@ -1,14 +1,14 @@
 import { OrganizerSearchBox } from '@/core/entities/organizer'
-import { useOrganizerInformationStep } from './useOrganizerInformationStep'
-import { CreateRaceStepLayout, } from '../../CreateRaceStepLayout/CreateRaceStepLayout'
 import { TrashGlyph } from '@/core/assets/icons'
+import { useOrganizerInformationStep } from './useOrganizerInformationStep'
+import { CreateRaceStepLayout } from '../../CreateRaceStepLayout/CreateRaceStepLayout'
 
 export const OrganizerInformationStep = () => {
-    const { addOrganizer, removeOrganizer, rows } = useOrganizerInformationStep()
+    const { addOrganizer, error, removeOrganizer, rows } = useOrganizerInformationStep()
 
     return <CreateRaceStepLayout step={4} title="BAN TỔ CHỨC LIÊN QUAN" action={
         <div className="w-[402px] max-w-[45%]">
-            <OrganizerSearchBox placeholder="Nhập để thêm Ban Tổ chức" onChange={addOrganizer} />
+            <OrganizerSearchBox error={error} placeholder="Nhập để thêm Ban Tổ chức" onChange={addOrganizer} />
         </div>
     }>
         <div className="overflow-hidden rounded-xl border border-[#e5e5e5] bg-white shadow-sm">

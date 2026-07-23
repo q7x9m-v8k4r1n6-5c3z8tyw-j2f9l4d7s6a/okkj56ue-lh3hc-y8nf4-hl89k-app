@@ -6,6 +6,7 @@ export const editRaceRequestSchema = z.object({
   timeEnd: z.string().min(1),
   place: z.string().min(1).max(255),
   coverUrl: z.string().optional(),
+  status: z.enum(['draft', 'ready', 'ongoing', 'paused', 'completed']).optional(),
   isToggledLeaderboard: z.boolean(),
   isHiddenPoint: z.boolean(),
   organizerId: z.array(z.string()),
