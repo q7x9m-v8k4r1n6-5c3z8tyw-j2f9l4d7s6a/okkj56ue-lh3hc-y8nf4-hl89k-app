@@ -1,6 +1,7 @@
 export { BasicInformationSection } from './BasicInformationSection'
 export { BoothInformationSection } from './BoothInformationSection'
 export { OrganizerInformationSection } from './OrganizerInformationSection'
+export { RaceDetailRibbon } from './RaceDetailRibbon'
 export { ReadonlyField } from './ReadonlyField'
 export { SectionCard } from './SectionCard'
 export { SectionTitle } from './SectionTitle'

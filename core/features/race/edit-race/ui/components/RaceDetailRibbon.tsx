@@ -119,9 +119,7 @@ export const RaceDetailRibbon = ({
         <div className="flex items-center gap-3">{renderActions()}</div>
 
         <div className="flex items-center gap-5 lg:ml-auto">
-          <span className={`rounded-xl px-3 py-1.5 text-sm ${meta.className}`}>
-            {meta.label}
-          </span>
+          <span className={`rounded-xl px-3 py-1.5 text-sm ${meta.className}`}>{meta.label}</span>
           <div className="text-right text-sm leading-4 text-[#a6a6a6]">
             <p className="italic">Cập nhật lần cuối:</p>
             <p>{formatUpdatedAt(modifiedAt)}</p>
