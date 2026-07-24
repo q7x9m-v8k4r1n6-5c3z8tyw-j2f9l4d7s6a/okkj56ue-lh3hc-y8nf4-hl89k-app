@@ -1,14 +1,5 @@
 import type { EditRaceForm } from './models'
 
-export const EDIT_RACE_TABS = [
-  { value: 'basic', label: 'Thông tin cơ bản' },
-  { value: 'live', label: 'Trực tiếp trận đấu' },
-  { value: 'cards', label: 'Quản lý thẻ' },
-  { value: 'secret', label: 'Quản lý nhiệm vụ bí mật' },
-  { value: 'history', label: 'Lịch sử hoạt động' },
-  { value: 'message', label: 'Gửi tin nhắn' },
-]
-
 export const EDIT_RACE_INITIAL_FORM: EditRaceForm = {
   raceName: 'Move 2026',
   timeStart: '2026-09-09T00:00:00',
@@ -23,16 +14,14 @@ export const EDIT_RACE_INITIAL_FORM: EditRaceForm = {
       id: 'station-1',
       name: 'Trạm 1',
       place: 'Tòa B6',
-      managerId: 'manager-1',
-      managerName: 'Olivia Rhye',
+      managers: [{ id: 'manager-1', displayName: 'Olivia Rhye', email: 'olivia@move.local' }],
       description: 'Luật chơi trạm này là hoàn thành thử thách theo chỉ dẫn của quản trạm.',
     },
     {
       id: 'station-2',
       name: 'Trạm 2',
       place: 'Sân sau Tòa A4',
-      managerId: 'manager-2',
-      managerName: 'Phoenix Baker',
+      managers: [{ id: 'manager-2', displayName: 'Phoenix Baker', email: 'phoenix@move.local' }],
       description: 'Luật chơi trạm này là hoàn thành thử thách theo chỉ dẫn của quản trạm.',
     },
   ],

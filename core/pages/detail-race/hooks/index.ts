@@ -1,0 +1,1 @@
+export { useDetailRace } from './useDetailRace'

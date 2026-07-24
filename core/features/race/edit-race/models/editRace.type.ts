@@ -2,8 +2,7 @@ export type EditRaceBooth = {
   id: string
   name: string
   place: string
-  managerId: string
-  managerName: string
+  managers: EditRaceOrganizer[]
   description: string
 }
 
@@ -52,13 +51,19 @@ export type EditRaceDetailResponse = {
   isToggledLeaderboard?: boolean
   isHiddenPoint?: boolean
   organizerId?: string[]
-  raceTeam?: Array<{ teamID?: string; teamId?: string }>
+  raceTeam?: Array<{ teamID?: string; teamId?: string; team?: EditRaceTeam; name?: string; leaderEmail?: string }>
   booth?: Array<{
+    id?: string
+    boothId?: string
     name?: string
     place?: string
+    location?: string
     description?: string
     organizerID?: string
     organizerId?: string
+    managerId?: string
+    managerIds?: string[]
+    managers?: EditRaceOrganizer[]
   }>
 }
 

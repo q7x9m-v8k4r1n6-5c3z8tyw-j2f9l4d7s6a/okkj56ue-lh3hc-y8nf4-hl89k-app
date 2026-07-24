@@ -16,6 +16,11 @@ export type BoothInformationSectionProps = {
 
 const shorten = (value: string) => (value.length > 28 ? `${value.slice(0, 28)} ...` : value)
 
+const formatManagers = (booth: EditRaceBooth) => {
+  if (!booth.managers.length) return 'Chưa có thông tin'
+  return booth.managers.map((manager) => manager.displayName || manager.email || manager.id).join(', ')
+}
+
 export const BoothInformationSection = ({
   addBooth,
   booths,
@@ -64,21 +69,18 @@ export const BoothInformationSection = ({
               <TableCell className="min-w-[230px]">
                 {isEditing ? (
                   <OrganizerSearchBox
-                    value={
-                      booth.managerId
-                        ? [{ id: booth.managerId, displayName: booth.managerName || booth.managerId, email: `${booth.managerId}@move.local` }]
-                        : []
-                    }
-                    onChange={(organizers) => {
-                      const organizer = organizers.at(-1)
-                      updateBooth(booth.id, {
-                        managerId: organizer?.id ?? '',
-                        managerName: organizer?.displayName ?? organizer?.email ?? '',
-                      })
-                    }}
+                    type="multiple"
+                    value={booth.managers}
+                    onChange={(managers) => updateBooth(booth.id, {
+                      managers: managers.map((manager) => ({
+                        id: manager.id,
+                        displayName: manager.displayName ?? manager.email,
+                        email: manager.email,
+                      })),
+                    })}
                   />
                 ) : (
-                  <AvatarName name={booth.managerName || booth.managerId || 'Chưa có thông tin'} />
+                  <AvatarName name={formatManagers(booth)} />
                 )}
               </TableCell>
               <TableCell className="min-w-[260px]">

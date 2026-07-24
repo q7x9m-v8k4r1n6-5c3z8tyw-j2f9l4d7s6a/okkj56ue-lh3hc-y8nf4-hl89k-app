@@ -5,7 +5,7 @@ import {
   NotFoundPage,
   PrototypePage,
   CreateRacePage,
-  EditRacePage,
+  DetailRacePage,
   RaceListPage,
   UserListPage,
   LoginPage
@@ -37,7 +37,7 @@ export const router = createBrowserRouter([
           },
           {
             path: 'races/:raceId',
-            element: <EditRacePage />,
+            element: <DetailRacePage />,
             handle: { title: 'Chi tiết trận đấu' },
           },
           {

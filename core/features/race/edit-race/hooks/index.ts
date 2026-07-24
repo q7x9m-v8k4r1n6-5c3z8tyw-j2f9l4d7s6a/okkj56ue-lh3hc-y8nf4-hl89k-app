@@ -1,12 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import type { OrganizerModel } from '@/core/entities/organizer'
-import type { TeamModel } from '@/core/entities/team'
+import { useOrganizerQuery } from '@/core/entities/organizer/hooks'
+import { useTeamQuery, type TeamModel } from '@/core/entities/team'
 import { raceQueryKey } from '@/core/features/race/constants'
 import { getCurrentGmt7InstantString, toGmt7ApiDateTime } from '@/core/shared'
 import { EDIT_RACE_INITIAL_FORM } from '../constants'
 import { getRaceDetail, updateRace } from '../api'
-import type { EditRaceDetailResponse, EditRaceForm, EditRaceOrganizer, EditRaceRequest } from '../models'
+import type { EditRaceDetailResponse, EditRaceForm, EditRaceOrganizer, EditRaceRequest, EditRaceTeam } from '../models'
 
 const toDateTimeInputValue = (value?: string) => {
   if (!value) return ''
@@ -15,19 +16,54 @@ const toDateTimeInputValue = (value?: string) => {
 
 const toApiDateTime = (value: string) => toGmt7ApiDateTime(value)
 
-const createOrganizerFallback = (id: string, index: number): EditRaceOrganizer => ({
-  id,
-  displayName: `Ban tổ chức ${index + 1}`,
-  email: `organizer${index + 1}@move.local`,
-})
+const normalizeCollection = <T,>(value: T[] | { data?: T[]; items?: T[] } | undefined): T[] => {
+  if (Array.isArray(value)) return value
+  if (Array.isArray(value?.data)) return value.data
+  if (Array.isArray(value?.items)) return value.items
+  return []
+}
 
-const createTeamFallback = (id: string, index: number): TeamModel => ({
-  id,
-  name: `Đội ${index + 1}`,
-  leaderEmail: `doi${index + 1}@gmail.com`,
-})
+const splitIds = (value?: string | string[]) => {
+  if (Array.isArray(value)) return value.filter(Boolean)
+  return (value ?? '')
+    .split(/[|,;]/)
+    .map((id) => id.trim())
+    .filter(Boolean)
+}
 
-const mapDetailToForm = (detail: EditRaceDetailResponse): EditRaceForm => ({
+const findOrganizer = (organizers: OrganizerModel[], id: string, index: number): EditRaceOrganizer => {
+  const organizer = organizers.find((item) => item.id === id)
+  if (organizer) {
+    return {
+      id: organizer.id,
+      displayName: organizer.displayName ?? organizer.email,
+      email: organizer.email,
+    }
+  }
+
+  return {
+    id,
+    displayName: `Quản trạm ${index + 1}`,
+    email: `${id}@move.local`,
+  }
+}
+
+const mapOrganizerIds = (organizerIds: string[] | undefined, organizers: OrganizerModel[]) => (
+  organizerIds?.map((id, index) => findOrganizer(organizers, id, index)) ?? []
+)
+
+const mapTeam = (raceTeam: NonNullable<EditRaceDetailResponse['raceTeam']>[number], index: number, teams: TeamModel[]): EditRaceTeam => {
+  const id = raceTeam.team?.id || raceTeam.teamID || raceTeam.teamId || `team-${index + 1}`
+  const matchedTeam = teams.find((team) => team.id === id)
+
+  return {
+    id,
+    name: raceTeam.team?.name || raceTeam.name || matchedTeam?.name || `Đội ${index + 1}`,
+    leaderEmail: raceTeam.team?.leaderEmail || raceTeam.leaderEmail || matchedTeam?.leaderEmail || `doi${index + 1}@gmail.com`,
+  }
+}
+
+const mapDetailToForm = (detail: EditRaceDetailResponse, teams: TeamModel[], organizers: OrganizerModel[]): EditRaceForm => ({
   raceName: detail.raceName || detail.name || EDIT_RACE_INITIAL_FORM.raceName,
   timeStart: toDateTimeInputValue(detail.timeStart) || EDIT_RACE_INITIAL_FORM.timeStart,
   timeEnd: toDateTimeInputValue(detail.timeEnd) || EDIT_RACE_INITIAL_FORM.timeEnd,
@@ -36,20 +72,19 @@ const mapDetailToForm = (detail: EditRaceDetailResponse): EditRaceForm => ({
   place: detail.place || EDIT_RACE_INITIAL_FORM.place,
   status: detail.status || EDIT_RACE_INITIAL_FORM.status,
   modifiedAt: detail.modifiedAt || detail.modifiedAtUtc || detail.updatedAt || EDIT_RACE_INITIAL_FORM.modifiedAt,
-  booths: detail.booth?.length ? detail.booth.map((booth, index) => {
-    const managerId = booth.organizerID || booth.organizerId || ''
+  booths: detail.booth?.map((booth, index) => {
+    const managerIds = splitIds(booth.managerIds ?? booth.organizerID ?? booth.organizerId ?? booth.managerId)
 
     return {
-      id: `${managerId || 'booth'}-${index}`,
+      id: booth.id || booth.boothId || `booth-${index + 1}`,
       name: booth.name || `Trạm ${index + 1}`,
-      place: booth.place || '',
-      managerId,
-      managerName: managerId ? `Quản trạm ${index + 1}` : '',
+      place: booth.place || booth.location || '',
+      managers: booth.managers?.length ? booth.managers : managerIds.map((id, managerIndex) => findOrganizer(organizers, id, managerIndex)),
       description: booth.description || '',
     }
-  }) : EDIT_RACE_INITIAL_FORM.booths,
-  teams: detail.raceTeam?.length ? detail.raceTeam.map((team, index) => createTeamFallback(team.teamID || team.teamId || `team-${index + 1}`, index)) : EDIT_RACE_INITIAL_FORM.teams,
-  organizers: detail.organizerId?.length ? detail.organizerId.map(createOrganizerFallback) : EDIT_RACE_INITIAL_FORM.organizers,
+  }) ?? [],
+  teams: detail.raceTeam?.map((team, index) => mapTeam(team, index, teams)) ?? [],
+  organizers: mapOrganizerIds(detail.organizerId, organizers),
   settings: {
     isToggledLeaderboard: detail.isToggledLeaderboard ?? EDIT_RACE_INITIAL_FORM.settings.isToggledLeaderboard,
     isHiddenPoint: detail.isHiddenPoint ?? EDIT_RACE_INITIAL_FORM.settings.isHiddenPoint,
@@ -71,14 +106,15 @@ const mapFormToRequest = (form: EditRaceForm, status = form.status): EditRaceReq
     name: booth.name,
     place: booth.place,
     description: booth.description,
-    organizerID: booth.managerId,
+    organizerID: booth.managers.map((manager) => manager.id).join('|'),
   })),
 })
 
 export const useEditRace = (raceId?: string) => {
-  const [activeTab, setActiveTab] = useState('basic')
   const [form, setForm] = useState<EditRaceForm>(EDIT_RACE_INITIAL_FORM)
   const imageInputRef = useRef<HTMLInputElement>(null)
+  const teamQuery = useTeamQuery()
+  const organizerQuery = useOrganizerQuery()
 
   const detailQuery = useQuery({
     queryKey: [...raceQueryKey, 'detail', raceId],
@@ -90,15 +126,19 @@ export const useEditRace = (raceId?: string) => {
   const updateMutation = useMutation({
     mutationFn: (status?: string) => updateRace(raceId ?? '', mapFormToRequest(form, status)),
     onSuccess: (updatedRace) => {
-      if (updatedRace) setForm({ ...mapDetailToForm(updatedRace), modifiedAt: getCurrentGmt7InstantString() })
+      if (updatedRace) {
+        setForm({
+          ...mapDetailToForm(updatedRace, normalizeCollection(teamQuery.data), normalizeCollection(organizerQuery.data)),
+          modifiedAt: getCurrentGmt7InstantString(),
+        })
+      }
     },
   })
 
   useEffect(() => {
-    if (detailQuery.data) setForm(mapDetailToForm(detailQuery.data))
-  }, [detailQuery.data])
-
-  const title = useMemo(() => `Chi tiết: ${form.raceName || 'Trận đấu'}`, [form.raceName])
+    if (!detailQuery.data) return
+    setForm(mapDetailToForm(detailQuery.data, normalizeCollection(teamQuery.data), normalizeCollection(organizerQuery.data)))
+  }, [detailQuery.data, organizerQuery.data, teamQuery.data])
 
   const updateBasic = (changes: Partial<Pick<EditRaceForm, 'raceName' | 'timeStart' | 'timeEnd' | 'coverUrl' | 'coverFileName' | 'place'>>) => {
     setForm((current) => ({ ...current, ...changes }))
@@ -124,8 +164,7 @@ export const useEditRace = (raceId?: string) => {
           id: crypto.randomUUID(),
           name: '',
           place: '',
-          managerId: '',
-          managerName: '',
+          managers: [],
           description: '',
         },
       ],
@@ -176,7 +215,7 @@ export const useEditRace = (raceId?: string) => {
   }
 
   const resetForm = () => {
-    setForm(detailQuery.data ? mapDetailToForm(detailQuery.data) : EDIT_RACE_INITIAL_FORM)
+    setForm(detailQuery.data ? mapDetailToForm(detailQuery.data, normalizeCollection(teamQuery.data), normalizeCollection(organizerQuery.data)) : EDIT_RACE_INITIAL_FORM)
     updateMutation.reset()
   }
 
@@ -185,7 +224,6 @@ export const useEditRace = (raceId?: string) => {
   }
 
   return {
-    activeTab,
     detailQuery,
     form,
     imageInputRef,
@@ -193,8 +231,6 @@ export const useEditRace = (raceId?: string) => {
     saveError: updateMutation.error,
     saveRace,
     resetForm,
-    setActiveTab,
-    title,
     updateBasic,
     addBooth,
     updateBooth,

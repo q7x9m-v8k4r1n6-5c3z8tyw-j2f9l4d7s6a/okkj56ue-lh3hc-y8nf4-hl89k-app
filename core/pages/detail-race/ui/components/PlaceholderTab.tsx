@@ -1,4 +1,4 @@
-import { SectionCard } from './SectionCard'
+import { SectionCard } from '@/core/features/race/edit-race/ui/components'
 
 export const PlaceholderTab = ({ label }: { label: string }) => (
   <SectionCard>
