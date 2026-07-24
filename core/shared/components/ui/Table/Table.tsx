@@ -1,21 +1,30 @@
 import type { HTMLAttributes, PropsWithChildren, TableHTMLAttributes, ThHTMLAttributes, TdHTMLAttributes } from 'react'
 
-export const Table = ({ children, className = '', ...props }: PropsWithChildren<TableHTMLAttributes<HTMLTableElement>>) => (
-  <div className="w-full overflow-x-auto">
+export type TableProps = TableHTMLAttributes<HTMLTableElement> & {
+  wrapperClassName?: string
+}
+
+export const Table = ({ children, className = '', wrapperClassName = 'overflow-x-auto', ...props }: PropsWithChildren<TableProps>) => (
+  <div className={`w-full ${wrapperClassName}`}>
     <table className={`w-full border-collapse text-left ${className}`} {...props}>{children}</table>
   </div>
 )
 
-export const TableHead = ({ children, className = '', ...props }: PropsWithChildren<HTMLAttributes<HTMLTableSectionElement>>) => (
-  <thead className={`bg-[#fafafa] ${className}`} {...props}>{children}</thead>
-)
+export const TableHead = ({ children, className = '', ...props }: PropsWithChildren<HTMLAttributes<HTMLTableSectionElement>>) => {
+  const hasCustomBg = className.includes('bg-')
+  return (
+    <thead className={`${hasCustomBg ? '' : 'bg-[#fafafa]'} ${className}`} {...props}>
+      {children}
+    </thead>
+  )
+}
 
 export const TableBody = ({ children, className = '', ...props }: PropsWithChildren<HTMLAttributes<HTMLTableSectionElement>>) => (
   <tbody className={className} {...props}>{children}</tbody>
 )
 
 export const TableRow = ({ children, className = '', ...props }: PropsWithChildren<HTMLAttributes<HTMLTableRowElement>>) => (
-  <tr className={`border-b border-white ${className}`} {...props}>{children}</tr>
+  <tr className={`border-b border-gray-100 ${className}`} {...props}>{children}</tr>
 )
 
 export const TableHeaderCell = ({ children, className = '', ...props }: PropsWithChildren<ThHTMLAttributes<HTMLTableCellElement>>) => (

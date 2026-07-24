@@ -1,4 +1,5 @@
 import { EditRaceView } from '@/core/features/race/edit-race'
+import { LiveRaceView } from '@/core/features/race/view-race/ui'
 import { Tabs } from '@/core/shared'
 import { DETAIL_RACE_TABS } from '../constants'
 import { useDetailRace } from '../hooks'
@@ -70,6 +71,8 @@ export const DetailRaceView = ({ raceId }: DetailRaceViewProps) => {
                 updateSetting={editRace.updateSetting}
               />
             </div>
+          ) : activeTab === 'live' ? (
+            <LiveRaceView raceId={raceId} />
           ) : (
             <PlaceholderTab label={activeTabLabel} />
           )}
