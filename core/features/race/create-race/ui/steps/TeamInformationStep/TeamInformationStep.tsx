@@ -1,15 +1,15 @@
 import { TeamSearchBox } from '@/core/entities/team'
+import { TrashGlyph } from '@/core/assets/icons'
 import { useTeamInformationStep } from '../../../hooks'
 import { CreateRaceStepLayout } from '../../CreateRaceStepLayout/CreateRaceStepLayout'
-import { TrashGlyph } from '@/core/assets/icons'
 
 export const TeamInformationStep = () => {
-    const { addTeam, removeTeam, rows } = useTeamInformationStep()
+    const { addTeam, error, removeTeam, rows } = useTeamInformationStep()
 
     return (
         <CreateRaceStepLayout step={3} title="THÔNG TIN ĐỘI CHƠI" action={
             <div className="w-[402px] max-w-[45%]">
-                <TeamSearchBox placeholder="Nhập tên đội" onChange={addTeam} />
+                <TeamSearchBox error={error} placeholder="Nhập tên đội" onChange={addTeam} />
             </div>
         }>
             <div className="overflow-hidden rounded-xl border border-[#e5e5e5] bg-white shadow-sm">
@@ -42,5 +42,5 @@ export const TeamInformationStep = () => {
                 </div>
             </div>
         </CreateRaceStepLayout>
-    );
+    )
 }

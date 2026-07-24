@@ -31,6 +31,8 @@ export type CreateRaceState = {
   basic: BasicDraft
   basicErrors: BasicValidationErrors
   stationErrors: StationValidationErrors
+  teamError: string
+  organizerError: string
   stations: StationDraft[]
   teams: TeamDraft[]
   organizers: OrganizerDraft[]
@@ -42,6 +44,8 @@ const initialState: CreateRaceState = {
   basic: { name: '', startAt: '', endAt: '', imageName: '', coverUrl: '', location: '' },
   basicErrors: {},
   stationErrors: {},
+  teamError: '',
+  organizerError: '',
   stations: [],
   teams: [],
   organizers: [],
@@ -57,6 +61,8 @@ const createRaceSlice = createSlice({
     setBasicErrors: (state, action: PayloadAction<BasicValidationErrors>) => { state.basicErrors = action.payload },
     clearBasicError: (state, action: PayloadAction<keyof BasicDraft>) => { delete state.basicErrors[action.payload] },
     setStationErrors: (state, action: PayloadAction<StationValidationErrors>) => { state.stationErrors = action.payload },
+    setTeamError: (state, action: PayloadAction<string>) => { state.teamError = action.payload },
+    setOrganizerError: (state, action: PayloadAction<string>) => { state.organizerError = action.payload },
     clearStationError: (state, action: PayloadAction<{ id: string; field: 'name' | 'location' | 'managers' }>) => {
       delete state.stationErrors[action.payload.id]?.[action.payload.field]
       if (state.stationErrors[action.payload.id] && !Object.keys(state.stationErrors[action.payload.id]).length) delete state.stationErrors[action.payload.id]
@@ -71,9 +77,9 @@ const createRaceSlice = createSlice({
       state.stations = state.stations.filter((row) => row.id !== action.payload)
       delete state.stationErrors[action.payload]
     },
-    addTeam: (state, action: PayloadAction<TeamDraft>) => { state.teams.push(action.payload) },
+    addTeam: (state, action: PayloadAction<TeamDraft>) => { state.teams.push(action.payload); state.teamError = '' },
     removeTeam: (state, action: PayloadAction<string>) => { state.teams = state.teams.filter((row) => row.id !== action.payload) },
-    addOrganizer: (state, action: PayloadAction<OrganizerDraft>) => { state.organizers.push(action.payload) },
+    addOrganizer: (state, action: PayloadAction<OrganizerDraft>) => { state.organizers.push(action.payload); state.organizerError = '' },
     removeOrganizer: (state, action: PayloadAction<string>) => { state.organizers = state.organizers.filter((row) => row.id !== action.payload) },
     updateSettings: (state, action: PayloadAction<Partial<CreateRaceState['settings']>>) => { Object.assign(state.settings, action.payload) },
     resetCreateRace: () => initialState,

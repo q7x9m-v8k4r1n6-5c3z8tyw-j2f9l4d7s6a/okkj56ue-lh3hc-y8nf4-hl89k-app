@@ -6,7 +6,7 @@ export const listRacesResponseSchema = z.array(z.object({
     place: z.string().optional(),
     timeStart: z.string().optional(),
     timeEnd: z.string().optional(),
-    status: z.enum(['draft', 'upcoming', 'ongoing', 'completed', 'cancelled']),
+    status: z.enum(['draft', 'ready', 'ongoing', 'paused', 'completed']),
 }))
 
 export const listRacesRequestSchema = z.object({

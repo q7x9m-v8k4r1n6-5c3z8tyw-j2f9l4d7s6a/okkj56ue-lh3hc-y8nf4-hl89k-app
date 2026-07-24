@@ -4,13 +4,13 @@ export const raceModelSchema = z.object({
     id: z.string().uuid(),
     name: z.string().max(255).optional(),
     place: z.string().max(255).optional(),
-    timeStart: z.string().datetime().optional(),
-    timeEnd: z.string().datetime().optional(),
+    timeStart: z.string().optional(),
+    timeEnd: z.string().optional(),
     coverUrl: z.string().url().max(500).optional(),
-    status: z.enum(['draft', 'upcoming', 'ongoing', 'completed', 'cancelled']).optional(),
-    createdAt: z.string().datetime().optional(),
+    status: z.enum(['draft', 'ready', 'ongoing', 'paused', 'completed']).optional(),
+    createdAt: z.string().optional(),
     createdBy: z.string().uuid().optional(),
-    modifiedAt: z.string().datetime().optional(),
+    modifiedAt: z.string().optional(),
     modifiedBy: z.string().uuid().optional(),
 });
 

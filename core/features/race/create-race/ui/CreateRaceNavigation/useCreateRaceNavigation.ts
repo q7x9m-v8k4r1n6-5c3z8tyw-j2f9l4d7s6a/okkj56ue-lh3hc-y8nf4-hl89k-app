@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector, useToast } from '@/core/shared'
-import { validateBasicStep, validateStationStep, buildCreateRaceRequest } from '../../helpers'; // 🔌 Đấu nối hàm build chuẩn từ helpers chung
-import { createRaceActions } from '../../stores/createRaceSlice';
-import { useCreateRaceMutation } from '../../hooks/useCreateRaceMutation';
+import { buildCreateRaceRequest, validateBasicStep, validateStationStep } from '../../helpers'
+import { createRaceActions } from '../../stores/createRaceSlice'
+import { useCreateRaceMutation } from '../../hooks/useCreateRaceMutation'
 
 export const useCreateRaceNavigation = () => {
   const navigate = useNavigate()
@@ -10,6 +10,20 @@ export const useCreateRaceNavigation = () => {
   const { toast } = useToast()
   const state = useAppSelector((store) => store.createRace)
   const createRace = useCreateRaceMutation()
+
+  const requireTeam = () => {
+    if (state.teams.length > 0) return false
+    dispatch(createRaceActions.setTeamError('Vui lòng chọn ít nhất 1 đội chơi.'))
+    dispatch(createRaceActions.setStep(3))
+    return true
+  }
+
+  const requireOrganizer = () => {
+    if (state.organizers.length > 0) return false
+    dispatch(createRaceActions.setOrganizerError('Vui lòng chọn ít nhất 1 ban tổ chức.'))
+    dispatch(createRaceActions.setStep(4))
+    return true
+  }
 
   const continueToNextStep = () => {
     const hasValidationErrors = (errors: object) => Object.keys(errors).length > 0
@@ -22,6 +36,7 @@ export const useCreateRaceNavigation = () => {
         return
       }
     }
+
     if (state.step === 2) {
       const errors = validateStationStep(state.stations)
       dispatch(createRaceActions.setStationErrors(errors))
@@ -30,24 +45,19 @@ export const useCreateRaceNavigation = () => {
         return
       }
     }
+
+    if (state.step === 3 && requireTeam()) return
+    if (state.step === 4 && requireOrganizer()) return
+
     dispatch(createRaceActions.setStep(state.step + 1))
   }
 
   const submit = async () => {
     try {
-      // 📊 QUE ĐO 1: Kiểm tra xem dữ liệu người dùng gõ từ UI đã vào đến Redux Store chưa
-      console.log("=== 🔌 KIỂM TRA REDUX STORE (Bước 1: basic) ===");
-      console.log("Dữ liệu hiện tại trong store:", state.basic);
+      if (requireTeam() || requireOrganizer()) return
 
-      // Thực hiện đóng gói dữ liệu dựa trên state hiện tại
-      const backendPayload = buildCreateRaceRequest(state);
-
-      // 📊 QUE ĐO 2: Kiểm tra cấu trúc gói tin sau khi chạy qua hàm dịch (Mapping)
-      console.log("=== 📦 KIỂM TRA PAYLOAD SAU MAPPING ===");
-      console.log("Gói tin sẽ gửi lên Backend:", backendPayload);
-
-      // Kích hoạt truyền tải tín hiệu qua API
-      const raceId = await createRace.mutateAsync(backendPayload);
+      const backendPayload = buildCreateRaceRequest(state)
+      const raceId = await createRace.mutateAsync(backendPayload)
 
       toast({ title: 'Đã tạo trận đấu thành công.', variant: 'success' })
       dispatch(createRaceActions.resetCreateRace())

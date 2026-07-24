@@ -1,0 +1,1 @@
+export { DetailRaceView } from './DetailRaceView'
