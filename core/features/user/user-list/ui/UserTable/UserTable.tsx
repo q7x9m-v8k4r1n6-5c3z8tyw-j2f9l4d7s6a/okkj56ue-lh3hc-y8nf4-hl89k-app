@@ -3,6 +3,7 @@ import { PlusIcon, SearchIcon } from '@/core/assets'
 import { UserTableRow } from '@/core/entities/user'
 import { Button, Pagination, TableCard } from '@/core/shared'
 import { UserForm } from '@/core/features/user/create-user/ui'
+import { CreateOrganizerForm } from '@/core/features/organizer/create-organizer'
 import { useUserMutation } from '../../hooks/useUserMutation'
 import {
   getCreateLabel,
@@ -168,17 +169,27 @@ export const UserTable = () => {
         onChange={setPage}
       />
       {userPanel ? (
-        <UserForm
-          category={userPanel.category}
-          mode={userPanel.mode}
-          open={userPanelOpen}
-          userId={userPanel.userId}
-          onClose={closeUserPanel}
-          onSaved={() => {
-            refreshUsers()
-            closeUserPanel()
-          }}
-        />
+        userPanel.category === 'staff' && userPanel.mode === 'create' ? (
+          <CreateOrganizerForm
+            open={userPanelOpen}
+            onClose={() => {
+              refreshUsers()
+              closeUserPanel()
+            }}
+          />
+        ) : (
+          <UserForm
+            category={userPanel.category}
+            mode={userPanel.mode}
+            open={userPanelOpen}
+            userId={userPanel.userId}
+            onClose={closeUserPanel}
+            onSaved={() => {
+              refreshUsers()
+              closeUserPanel()
+            }}
+          />
+        )
       ) : null}
     </TableCard>
     </div>

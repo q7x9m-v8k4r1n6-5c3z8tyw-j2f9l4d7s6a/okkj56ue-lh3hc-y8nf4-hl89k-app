@@ -3,8 +3,9 @@ import { useQuery } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
 import type { StaffRole, UserCategory, UserStatus } from '@/core/entities/user/model'
 import { useToast } from '@/core/shared'
-import { createOrganizer, createTeam, getOrganizerDetail, getTeamDetail, updateOrganizer, updateTeam } from '../../api'
-import { buildStaffIdentityFromEmail, DEFAULT_USER_PASSWORD, validateUserUsername } from '../../helpers'
+import { createOrganizer, getOrganizerDetail, updateOrganizer } from '@/core/entities/organizer/api'
+import { createTeam, getTeamDetail, updateTeam } from '@/core/entities/team/api'
+import { buildStaffIdentityFromEmail, DEFAULT_USER_PASSWORD, validateUserUsername } from '@/core/entities/user/helpers'
 import type { UserFormProps } from '../../models'
 
 const getReturnPath = () => '/users'
@@ -140,7 +141,7 @@ export const useUserForm = ({ category, mode, onClose, onSaved, userId }: UserFo
       if (mode === 'create') {
         const derivedIdentity = buildStaffIdentityFromEmail(nextEmail)
         nextUsername = derivedIdentity.username
-        nextDisplayName = derivedIdentity.displayName || 'Thành viên BTC'
+        nextDisplayName = 'Giám khảo'
 
         if (!nextUsername) {
           setError('Email chưa hợp lệ để tạo tên đăng nhập cho Ban Tổ chức.')

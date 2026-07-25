@@ -1,1 +1,2 @@
-export { getOrganizers } from './organizer.query'
+export * from './organizer.query'
+export * from './organizer.mutation'
