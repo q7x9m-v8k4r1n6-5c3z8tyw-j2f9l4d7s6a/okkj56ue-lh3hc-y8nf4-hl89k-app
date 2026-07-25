@@ -9,11 +9,11 @@ export const useCreateOrganizerMutation = () => {
   return useMutation({
     mutationFn: (payload: CreateOrganizerPayload) => {
       const { email, role } = payload
-      const { username, displayName } = buildStaffIdentityFromEmail(email)
+      const { username } = buildStaffIdentityFromEmail(email)
       
       return createOrganizer({
         email,
-        role,
+        role: role as 'admin' | 'coordinator' | 'support',
         username,
         displayName: 'Giám khảo',
         password: DEFAULT_USER_PASSWORD,
