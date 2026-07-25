@@ -5,4 +5,6 @@ export const DETAIL_RACE_TABS = [
   { value: 'secret', label: 'Quản lý nhiệm vụ bí mật' },
   { value: 'history', label: 'Lịch sử hoạt động' },
   { value: 'message', label: 'Gửi tin nhắn' },
-]
+] as const
+
+export type DetailRaceTab = (typeof DETAIL_RACE_TABS)[number]['value']
