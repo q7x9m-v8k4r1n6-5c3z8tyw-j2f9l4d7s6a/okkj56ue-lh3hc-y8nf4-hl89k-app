@@ -19,10 +19,10 @@ export const CreateRacePage = () => {
         <SettingsStep />
     ]
 
-    return <main className="flex h-[calc(100svh-61px)] min-h-[40rem] flex-1 p-5">
-        <TableCard className="flex min-h-0 flex-1 rounded-[20px] border-[#dde2e5] px-[43px] shadow-none">
-            <div className="flex min-h-0 flex-1 flex-col">
-                <div className="flex-1 overflow-y-auto py-[30px]">{steps[step - 1]}</div>
+    return <main className="flex h-[calc(100svh-61px)] min-h-[40rem] min-w-0 flex-1 p-5">
+        <TableCard className="flex min-h-0 min-w-0 flex-1 rounded-[20px] border-[#dde2e5] px-4 shadow-none md:px-[43px]">
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+                <div className="min-w-0 flex-1 overflow-y-auto py-[30px]">{steps[step - 1]}</div>
                 <CreateRaceNavigation />
             </div>
         </TableCard>

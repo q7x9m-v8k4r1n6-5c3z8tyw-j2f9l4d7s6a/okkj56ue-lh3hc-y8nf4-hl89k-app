@@ -1,0 +1,1 @@
+export { DetailRacePage } from './DetailRacePage'

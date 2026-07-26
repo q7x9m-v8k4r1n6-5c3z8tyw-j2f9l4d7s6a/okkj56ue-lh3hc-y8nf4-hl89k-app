@@ -1,15 +1,13 @@
 import { client } from '@/core/shared/api/interceptor'
-import type { ApiResponseModel } from '@/core/shared/types/api-types' 
+import type { ApiResponseModel } from '@/core/shared/types/api-types'
 import type { BackendCreateRaceRequest } from '../helpers/mapToBackendRequest'
 
 export const createNewRace = async (backendPayload: BackendCreateRaceRequest): Promise<string> => {
-  const response = await client.request<ApiResponseModel<string>, BackendCreateRaceRequest>({
+  return client.request<string, BackendCreateRaceRequest>({
     path: '/Race',
     method: 'POST',
     body: backendPayload,
   })
-  
-  return response.data ?? ''
 }
 
 /**

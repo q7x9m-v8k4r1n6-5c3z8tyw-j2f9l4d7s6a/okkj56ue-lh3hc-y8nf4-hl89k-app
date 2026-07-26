@@ -1,12 +1,7 @@
-import { toIsoString } from '@/core/shared'
+import { getCurrentGmt7DateTime, toGmt7ApiDateTime } from '@/core/shared'
 import type { CreateRaceRequest } from '../models'
 import type { BasicDraft, BasicValidationErrors, CreateRaceState, StationDraft, StationValidationErrors } from '../stores/createRaceSlice'
 
-/**
- * Xác thực mô tả trạm chơi có nội dung hay không
- * @param station dòng trạm chơi trong form tạo trận đấu mới
- * @returns true nếu có nội dung, false nếu không có nội dung
- */
 export const hasStationContent = (station: Partial<Omit<StationDraft, 'id'>>) => {
   return Boolean(
     station.name?.trim() ||
@@ -16,45 +11,27 @@ export const hasStationContent = (station: Partial<Omit<StationDraft, 'id'>>) =>
   )
 }
 
-/**
- * Build model from local state to request body for create race API
- * @param state local state of create race feature
- * @returns request body for create race API
- */
 export const buildCreateRaceRequest = (state: CreateRaceState): CreateRaceRequest => ({
   raceName: state.basic?.name?.trim() ?? '',
   place: state.basic?.location?.trim() ?? '',
-  
-  timeStart: state.basic?.startAt ? toIsoString(state.basic.startAt) : new Date().toISOString(),
-  timeEnd: state.basic?.endAt ? toIsoString(state.basic.endAt) : new Date().toISOString(),
-  
+  status: 'draft',
+  timeStart: state.basic?.startAt ? toGmt7ApiDateTime(state.basic.startAt) : getCurrentGmt7DateTime(),
+  timeEnd: state.basic?.endAt ? toGmt7ApiDateTime(state.basic.endAt) : getCurrentGmt7DateTime(),
   isToggledLeaderboard: state.settings?.disableLeaderboard ?? false,
   isHiddenPoint: state.settings?.hideScores ?? false,
-  
   coverUrl: state.basic?.coverUrl || undefined,
-  
   organizerId: state.organizers?.map((o) => o.id) || [],
-  
   raceTeam: state.teams?.map((t) => ({ teamID: t.id })) || [],
-  
   booth: (state.stations || [])
     .filter(hasStationContent)
     .map((station) => ({
       name: station.name?.trim() ?? '',
-      
       place: station.location?.trim() ?? '',
-      
       description: station.description || undefined,
-      
       organizerID: station.managers?.map((manager) => manager.id).join('|') || '',
     })),
 })
 
-/**
- * Validation local state for basic information step in create race
- * @param basic basic information local state
- * @returns validation errors state for basic information step
- */
 export const validateBasicStep = (basic: BasicDraft): BasicValidationErrors => {
   const startAt = new Date(basic.startAt)
   const endAt = new Date(basic.endAt)
@@ -80,11 +57,6 @@ export const validateBasicStep = (basic: BasicDraft): BasicValidationErrors => {
   return errors
 }
 
-/**
- * Validation local state for station information step in create race
- * @param stations station information local state
- * @returns validation errors state for station information step
- */
 export const validateStationStep = (stations: StationDraft[]): StationValidationErrors => {
   const errors: StationValidationErrors = {}
 
@@ -100,30 +72,3 @@ export const validateStationStep = (stations: StationDraft[]): StationValidation
 
   return errors
 }
-export type RaceLifecycleStatus = 'upcoming' | 'ongoing' | 'completed';
-
-/**
- * Bộ so sánh thời gian thực tế đã được bọc bộ lọc an toàn cho trị số undefined
- * @param timeStart Có thể là chuỗi ISO hoặc undefined
- * @param timeEnd Có thể là chuỗi ISO hoặc undefined
- */
-export const getRaceLifecycleStatus = (
-  timeStart?: string, 
-  timeEnd?: string
-): RaceLifecycleStatus => {
-  if (!timeStart || !timeEnd) {
-    return 'upcoming'; 
-  }
-
-  const now = new Date().getTime();
-  const start = new Date(timeStart).getTime();
-  const end = new Date(timeEnd).getTime();
-
-  if (now < start) {
-    return 'upcoming';
-  }
-  if (now >= start && now <= end) {
-    return 'ongoing'; // 
-  }
-  return 'completed';
-};
