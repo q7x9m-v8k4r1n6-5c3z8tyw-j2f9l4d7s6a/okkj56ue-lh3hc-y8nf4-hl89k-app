@@ -1,3 +1,4 @@
+/** Renders the application routing fallback without business dependencies. */
 export const NotFoundPage = () => {
   return (
     <main className="flex min-h-svh items-center justify-center px-4">

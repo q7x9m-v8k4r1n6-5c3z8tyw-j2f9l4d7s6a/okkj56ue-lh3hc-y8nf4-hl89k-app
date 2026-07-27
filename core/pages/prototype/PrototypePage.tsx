@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { HelpCircleIcon, PlusIcon, SearchIcon, UsersIcon } from '@/core/assets'
+import { HelpCircleIcon, PlusIcon, SearchIcon } from '@/core/assets'
 import {
   Badge,
   Button,
@@ -22,41 +21,37 @@ import {
   TableRow,
   Tabs,
   Tooltip,
-  useToast,
-  type SearchOption,
 } from '@/core/shared'
+import * as Icons from '@/core/assets/icons'
+import {
+  prototypeRoleOptions,
+  prototypeSearchOptions,
+  prototypeTeams,
+} from './model/prototype.data'
+import { usePrototypePage } from './model/usePrototypePage'
 
-// Import toàn bộ icons để preview
-import * as Icons from '@/core/assets/icons';
-
-const roleOptions = [
-  { value: 'admin', label: 'Quản trị viên', description: 'Toàn quyền quản lý giải đấu' },
-  { value: 'organizer', label: 'Ban Tổ chức', description: 'Quản lý đội chơi và trận đấu' },
-  { value: 'referee', label: 'Trọng tài', description: 'Cập nhật kết quả trận đấu' },
-  { value: 'viewer', label: 'Khách xem', description: 'Chỉ có quyền xem dữ liệu' },
-]
-
-const searchOptions: SearchOption[] = Array.from({ length: 18 }, (_, index) => ({
-  id: String(index + 1),
-  label: `Đội thi ${String(index + 1).padStart(2, '0')}`,
-  description: index % 2 === 0 ? 'Đại học Bách khoa Hà Nội' : 'Đại học Công nghệ',
-  keywords: [`team-${index + 1}`, index % 2 === 0 ? 'bach khoa' : 'cong nghe'],
-  icon: index < 2 ? <UsersIcon className="size-4" /> : undefined,
-}))
-
-const teams = [
-  { id: 'olivia', name: 'Olivia Rhye', username: 'olivia', email: 'olivia@untitledui.com' },
-  { id: 'phoenix', name: 'Phoenix Baker', username: 'phoenix', email: 'phoenix@untitledui.com' },
-]
-
+/**
+ * Renders a development-only shared UI showcase.
+ */
 export const PrototypePage = () => {
-  const { toast } = useToast()
-  const [page, setPage] = useState(1)
-  const [tab, setTab] = useState('teams')
-  const [role, setRole] = useState('')
-  const [modalOpen, setModalOpen] = useState(false)
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const [selectedSearch, setSelectedSearch] = useState<SearchOption | null>(null)
+  const {
+    closeDrawer,
+    closeModal,
+    drawerOpen,
+    modalOpen,
+    notifyError,
+    notifySuccess,
+    onPageChange,
+    onRoleChange,
+    onSearchSelect,
+    onTabChange,
+    openDrawer,
+    openModal,
+    page,
+    role,
+    selectedSearch,
+    tab,
+  } = usePrototypePage()
 
   return (
     <main className="min-h-full bg-[#fafafa] p-6 lg:p-10">
@@ -68,17 +63,17 @@ export const PrototypePage = () => {
         <section className="rounded-xl border border-[#eeeeee] bg-white p-6">
           <h3 className="text-lg font-semibold">Buttons, inputs và dropdown</h3>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Button leadingIcon={<PlusIcon className="size-5" />} onClick={() => setDrawerOpen(true)}>Thêm mới</Button>
-            <Button variant="secondary" onClick={() => setModalOpen(true)}>Mở modal</Button>
+            <Button leadingIcon={<PlusIcon className="size-5" />} onClick={openDrawer}>Thêm mới</Button>
+            <Button variant="secondary" onClick={openModal}>Mở modal</Button>
             <Button variant="ghost">Ghost button</Button>
             <Button variant="danger">Xóa dữ liệu</Button>
             <Button disabled>Disabled</Button>
-            <Button variant="secondary" onClick={() => toast({ title: 'Cập nhật thành công', description: 'Dữ liệu đã được lưu vào hệ thống.', variant: 'success' })}>Toast success</Button>
-            <Button variant="secondary" onClick={() => toast({ title: 'Có lỗi xảy ra', description: 'Không thể hoàn tất thao tác. Vui lòng thử lại.', variant: 'danger' })}>Toast error</Button>
+            <Button variant="secondary" onClick={notifySuccess}>Toast success</Button>
+            <Button variant="secondary" onClick={notifyError}>Toast error</Button>
           </div>
           <div className="mt-6 grid gap-5 md:grid-cols-2">
             <Input label="Địa điểm" requiredMark placeholder="Nhập địa điểm trận đấu" />
-            <Dropdown label="Vai trò" requiredMark placeholder="Chọn vai trò" options={roleOptions} value={role} onChange={setRole} />
+            <Dropdown label="Vai trò" requiredMark placeholder="Chọn vai trò" options={prototypeRoleOptions} value={role} onChange={onRoleChange} />
             <Input label="Tìm nhanh" leadingIcon={<SearchIcon className="size-5" />} placeholder="Nhập từ khóa" />
             <Input label="Email" requiredMark error="Email này đã tồn tại" defaultValue="admin@university.edu" />
             <Input label="Thông tin đã khóa" disabled value="Không thể chỉnh sửa" readOnly />
@@ -89,7 +84,7 @@ export const PrototypePage = () => {
           <h3 className="text-lg font-semibold">Search box</h3>
           <p className="mt-1 text-sm text-[#737373]">Gõ để lọc, dùng ↑ ↓ và Enter để chọn. Danh sách dài sẽ tự cuộn.</p>
           <div className="mt-5 max-w-2xl">
-            <SearchBox options={searchOptions} defaultOptionIcon={<SearchIcon className="size-4" />} placeholder="Tìm đội thi..." onSelect={setSelectedSearch} />
+            <SearchBox options={prototypeSearchOptions} defaultOptionIcon={<SearchIcon className="size-4" />} placeholder="Tìm đội thi..." onSelect={onSearchSelect} />
             {selectedSearch ? <p className="mt-3 text-sm text-[#525252]">Đã chọn: <strong>{selectedSearch.label}</strong></p> : null}
           </div>
         </section>
@@ -139,7 +134,7 @@ export const PrototypePage = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {teams.map((team) => (
+                {prototypeTeams.map((team) => (
                   <TableRow key={team.id} className="hover:bg-[#fffafa]">
                     <TableCell className="font-medium text-[#171717]"><span className="flex items-center gap-3"><Checkbox aria-label={`Chọn ${team.name}`} />{team.name}</span></TableCell>
                     <TableCell>{team.username}</TableCell>
@@ -149,7 +144,7 @@ export const PrototypePage = () => {
                 ))}
               </TableBody>
             </Table>
-            <Pagination page={page} totalPages={10} onChange={setPage} />
+            <Pagination page={page} totalPages={10} onChange={onPageChange} />
           </TableCard>
         </section>
 
@@ -157,63 +152,56 @@ export const PrototypePage = () => {
           <h3 className="mb-5 text-lg font-semibold">Tabs</h3>
           <Tabs
             value={tab}
-            onChange={setTab}
+            onChange={onTabChange}
             items={[{ value: 'teams', label: 'Đội chơi' }, { value: 'organizers', label: 'Ban tổ chức' }]}
           />
           <div className="py-8 text-sm text-[#525252]">Nội dung tab: <strong>{tab === 'teams' ? 'Đội chơi' : 'Ban tổ chức'}</strong></div>
         </section>
 
-        {/* THÊM PHẦN ICON GALLERY PREVIEW VÀO ĐÂY */}
         <section className="rounded-xl border border-[#eeeeee] bg-white p-6">
           <h3 className="mb-6 text-lg font-semibold text-gray-800">Icon Gallery Preview</h3>
-          
-          {/* Lưới hiển thị các Icon */}
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+
+          <div className="grid cursor-pointer grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
             {Object.entries(Icons).map(([iconName, IconComponent]) => {
-              // Bỏ qua nếu có export nào đó không phải là React Component hợp lệ
-              if (typeof IconComponent !== 'function') return null;
+              if (typeof IconComponent !== 'function') return null
 
               return (
-                <div 
-                  key={iconName} 
-                  className="flex flex-col items-center justify-center p-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:border-[#de3336] transition-all cursor-pointer"
+                <div
+                  key={iconName}
+                  className="flex flex-col items-center justify-center rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-[#de3336] hover:shadow-md"
                   title={iconName}
                 >
-                  {/* Render Component Icon, truyền class để set kích thước và màu sắc mặc định */}
                   <IconComponent className="size-8 text-gray-700" />
-                  
-                  {/* Tên của Icon để dễ copy */}
-                  <span className="mt-3 text-xs font-medium text-gray-500 text-center break-all">
+                  <span className="mt-3 break-all text-center text-xs font-medium text-gray-500">
                     {iconName}
                   </span>
                 </div>
-              );
+              )
             })}
           </div>
         </section>
-        
       </div>
 
       <Modal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={closeModal}
         title="Xác nhận thao tác"
         description="Modal dùng chung với overlay, Escape và click ra ngoài để đóng."
-        footer={<><Button variant="secondary" onClick={() => setModalOpen(false)}>Hủy</Button><Button onClick={() => setModalOpen(false)}>Xác nhận</Button></>}
+        footer={<><Button variant="secondary" onClick={closeModal}>Hủy</Button><Button onClick={closeModal}>Xác nhận</Button></>}
       >
         <p className="text-sm leading-6 text-[#525252]">Bạn có thể đặt form, nội dung xác nhận hoặc thông tin chi tiết vào khu vực này.</p>
       </Modal>
 
       <Drawer
         open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        onClose={closeDrawer}
         title="Thêm mới Ban Tổ chức"
         icon={<PlusIcon className="size-6 text-[#de3336]" />}
-        footer={<><Button variant="secondary" onClick={() => setDrawerOpen(false)}>Hủy</Button><Button onClick={() => setDrawerOpen(false)}>Lưu</Button></>}
+        footer={<><Button variant="secondary" onClick={closeDrawer}>Hủy</Button><Button onClick={closeDrawer}>Lưu</Button></>}
       >
         <div className="grid gap-8">
           <Input label="Email" requiredMark placeholder="Nhập email Ban Tổ chức" type="email" />
-          <Dropdown label="Vai trò" requiredMark placeholder="Chọn vai trò" options={roleOptions} value={role} onChange={setRole} />
+          <Dropdown label="Vai trò" requiredMark placeholder="Chọn vai trò" options={prototypeRoleOptions} value={role} onChange={onRoleChange} />
         </div>
       </Drawer>
     </main>

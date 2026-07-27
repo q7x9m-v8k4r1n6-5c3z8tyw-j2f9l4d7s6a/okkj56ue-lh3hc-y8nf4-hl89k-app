@@ -1,2 +1,1 @@
-export * from './LoginPage'
-export * from './assets'
+export { LoginPage } from './LoginPage'

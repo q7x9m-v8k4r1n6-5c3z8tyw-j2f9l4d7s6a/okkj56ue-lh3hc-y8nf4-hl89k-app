@@ -1,4 +1,4 @@
-import type { IconProps } from '@/core/shared/types'
+import type { IconProps } from './icon.type'
 
 export const UsersIcon = ({ className }: IconProps) => (
   <svg className={className} viewBox="0 0 18 18" fill="none" aria-hidden="true">

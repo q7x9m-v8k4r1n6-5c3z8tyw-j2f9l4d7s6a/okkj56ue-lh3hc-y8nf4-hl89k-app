@@ -1,8 +1,8 @@
 import { Button, Drawer, Input, RichTextEditor } from '@/core/shared'
 import { TrashGlyph } from '@/core/assets/icons'
 import { CreateRaceStepLayout, } from '../../CreateRaceStepLayout/CreateRaceStepLayout'
-import { useBoothInformationStep } from '@/core/features/race/create-race/hooks'
-import { OrganizerSearchBox } from '@/core/entities/organizer/ui/OrganizerSearchBox/OrganizerSearchBox'
+import { useBoothInformationStep } from './useBoothInformationStep'
+import { OrganizerSearchBox } from '@/core/entities/organizer'
 
 export const BoothInformationStep = () => {
     const {

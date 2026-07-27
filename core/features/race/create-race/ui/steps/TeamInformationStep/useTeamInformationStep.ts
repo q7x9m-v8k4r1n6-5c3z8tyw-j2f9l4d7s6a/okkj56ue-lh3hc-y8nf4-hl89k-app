@@ -1,25 +1,23 @@
-import { useAppDispatch, useAppSelector } from '@/core/shared'
-import { createRaceActions } from '../../../stores/createRaceSlice'
-import type { TeamModel } from '@/core/entities/team'
+import type { TeamSummary } from '@/core/entities/team'
+import { useCreateRaceForm } from '../../../model/frontend/useCreateRaceForm'
 
+/** Adapts selected teams for the team step. */
 export const useTeamInformationStep = () => {
-  const dispatch = useAppDispatch()
-  const rows = useAppSelector((state) => state.createRace.teams)
-  const error = useAppSelector((state) => state.createRace.teamError)
+  const { dispatch, form } = useCreateRaceForm()
+  const rows = form.teams
+  const error = form.errors.team
 
-  const addTeam = (teams: TeamModel[]) => {
+  const addTeam = (teams: TeamSummary[]) => {
     const team = teams[0]
-    if (!team || rows.some((row) => row.id === team.id || row.email === team.leaderEmail)) return
+    if (!team || rows.some((row) => (
+      row.id === team.id || row.leaderEmail === team.leaderEmail
+    ))) return
 
-    dispatch(createRaceActions.addTeam({
-      id: team.id,
-      name: team.name,
-      email: team.leaderEmail,
-    }))
+    dispatch({ type: 'teams/add', team })
   }
 
   const removeTeam = (id: string) => {
-    dispatch(createRaceActions.removeTeam(id))
+    dispatch({ type: 'teams/remove', id })
   }
 
   return {

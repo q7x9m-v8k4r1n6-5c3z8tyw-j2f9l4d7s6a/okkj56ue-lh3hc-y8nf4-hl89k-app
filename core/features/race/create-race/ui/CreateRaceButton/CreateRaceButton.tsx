@@ -1,6 +1,6 @@
 import { PlusIcon } from '@/core/assets'
 import { Button } from '@/core/shared'
-import { useCreateRaceButton } from '@/core/features/race/create-race/hooks'
+import { useCreateRaceButton } from './useCreateRaceButton'
 
 export const CreateRaceAction = () => {
     const { onClickCreateRaceButton } = useCreateRaceButton()

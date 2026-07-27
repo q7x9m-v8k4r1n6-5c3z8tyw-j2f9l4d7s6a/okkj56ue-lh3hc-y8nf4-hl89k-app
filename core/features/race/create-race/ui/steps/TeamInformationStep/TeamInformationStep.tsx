@@ -1,6 +1,6 @@
 import { TeamSearchBox } from '@/core/entities/team'
 import { TrashGlyph } from '@/core/assets/icons'
-import { useTeamInformationStep } from '../../../hooks'
+import { useTeamInformationStep } from './useTeamInformationStep'
 import { CreateRaceStepLayout } from '../../CreateRaceStepLayout/CreateRaceStepLayout'
 
 export const TeamInformationStep = () => {
@@ -26,7 +26,7 @@ export const TeamInformationStep = () => {
                             </div>
                         ) : rows.map(row =>
                             <div key={row.id} className="grid h-[72px] min-w-[640px] grid-cols-[minmax(260px,1fr)_minmax(220px,1fr)_44px] items-center gap-6 border-b border-[#f2f2f2] px-6 text-sm text-[#525252] last:border-b-0">
-                                <span className="whitespace-nowrap">{row.email}</span>
+                                <span className="whitespace-nowrap">{row.leaderEmail}</span>
                                 <span className="whitespace-nowrap">{row.name}</span>
                                 <button
                                     type="button"

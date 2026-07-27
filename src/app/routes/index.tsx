@@ -1,63 +1,70 @@
 import { createBrowserRouter } from 'react-router-dom'
 import App from '@/src/app/App'
 import { ProtectedRoute } from './protected-routes'
-import {
-  NotFoundPage,
-  PrototypePage,
-  CreateRacePage,
-  DetailRacePage,
-  RaceListPage,
-  UserListPage,
-  LoginPage
-} from '@/core/pages'
 
 export const router = createBrowserRouter([
-  // --- PUBLIC ROUTES ---
   {
     path: 'login',
-    element: <LoginPage />, 
+    lazy: async () => {
+      const { LoginPage } = await import('@/core/pages/login')
+      return { Component: LoginPage }
+    },
   },
-
-  // --- PRIVATE ROUTES (Phải có Token mới vào được) ---
   {
-    element: <ProtectedRoute />, 
+    element: <ProtectedRoute />,
     children: [
       {
-        element: <App />, 
+        element: <App />,
         children: [
           {
             index: true,
-            element: <RaceListPage />,
             handle: { title: 'Danh sách trận đấu' },
+            lazy: async () => {
+              const { RaceListPage } = await import('@/core/pages/race-list')
+              return { Component: RaceListPage }
+            },
           },
           {
             path: 'races/new',
-            element: <CreateRacePage />,
             handle: { title: 'Tạo trận đấu mới' },
+            lazy: async () => {
+              const { CreateRacePage } = await import('@/core/pages/create-race')
+              return { Component: CreateRacePage }
+            },
           },
           {
             path: 'races/:raceId',
-            element: <DetailRacePage />,
             handle: { title: 'Chi tiết trận đấu' },
+            lazy: async () => {
+              const { DetailRacePage } = await import('@/core/pages/detail-race')
+              return { Component: DetailRacePage }
+            },
           },
           {
             path: 'users',
-            element: <UserListPage />,
             handle: { title: 'Người dùng' },
+            lazy: async () => {
+              const { UserListPage } = await import('@/core/pages/user-list')
+              return { Component: UserListPage }
+            },
           },
           {
             path: 'prototype',
-            element: <PrototypePage />,
             handle: { title: 'Common UI Prototype' },
+            lazy: async () => {
+              const { PrototypePage } = await import('@/core/pages/prototype')
+              return { Component: PrototypePage }
+            },
           },
         ],
       },
     ],
   },
-
-  // --- CATCH ALL (ERROR 404) ---
   {
     path: '*',
-    element: <NotFoundPage />,
+    lazy: async () => {
+      const { NotFoundPage } = await import('@/core/pages/not-found')
+      return { Component: NotFoundPage }
+    },
   },
 ])

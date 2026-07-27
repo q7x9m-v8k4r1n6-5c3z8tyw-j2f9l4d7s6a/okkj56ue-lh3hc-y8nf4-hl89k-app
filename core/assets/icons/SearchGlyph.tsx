@@ -1,4 +1,4 @@
-import type { IconProps } from "@/core/shared"
+import type { IconProps } from './icon.type'
 
 export const SearchGlyph = ({ className }: IconProps) => {
     return (

@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom'
-import { AppLayout } from '@/core/shared'
+import { AppLayout } from '@/core/widgets/app-layout'
 
 function App() {
   return (

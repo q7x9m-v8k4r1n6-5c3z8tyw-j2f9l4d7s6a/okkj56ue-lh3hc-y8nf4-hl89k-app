@@ -1,5 +1,2 @@
-export * from './pages'
-export * from './entities'
-export * from './features'
 export * from './shared'
 export * from './assets'

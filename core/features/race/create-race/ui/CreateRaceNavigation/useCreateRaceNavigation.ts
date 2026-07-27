@@ -1,70 +1,57 @@
 import { useNavigate } from 'react-router-dom'
-import { useAppDispatch, useAppSelector, useToast } from '@/core/shared'
-import { buildCreateRaceRequest, validateBasicStep, validateStationStep } from '../../helpers'
-import { createRaceActions } from '../../stores/createRaceSlice'
-import { useCreateRaceMutation } from '../../hooks/useCreateRaceMutation'
+import { useToast } from '@/core/shared'
+import { mapCreateRaceFormToRequest } from '../../model/mapCreateRaceFormToRequest'
+import {
+  hasValidationErrors,
+  validateBasicStep,
+  validateStationStep,
+} from '../../model/createRace.validation'
+import { useCreateRaceForm } from '../../model/frontend/useCreateRaceForm'
+import { useCreateRaceMutation } from '../../model/server/useCreateRaceMutation'
 
+/** Coordinates step validation, submission and navigation for create-race. */
 export const useCreateRaceNavigation = () => {
   const navigate = useNavigate()
-  const dispatch = useAppDispatch()
   const { toast } = useToast()
-  const state = useAppSelector((store) => store.createRace)
+  const { clearCoverFile, coverFile, dispatch, form } = useCreateRaceForm()
   const createRace = useCreateRaceMutation()
 
-  const requireTeam = () => {
-    if (state.teams.length > 0) return false
-    dispatch(createRaceActions.setTeamError('Vui lòng chọn ít nhất 1 đội chơi.'))
-    dispatch(createRaceActions.setStep(3))
-    return true
-  }
-
-  const requireOrganizer = () => {
-    if (state.organizers.length > 0) return false
-    dispatch(createRaceActions.setOrganizerError('Vui lòng chọn ít nhất 1 ban tổ chức.'))
-    dispatch(createRaceActions.setStep(4))
-    return true
-  }
-
   const continueToNextStep = () => {
-    const hasValidationErrors = (errors: object) => Object.keys(errors).length > 0
-
-    if (state.step === 1) {
-      const errors = validateBasicStep(state.basic)
-      dispatch(createRaceActions.setBasicErrors(errors))
+    if (form.step === 1) {
+      const errors = validateBasicStep(form.basic)
+      dispatch({ type: 'basic/errors/set', errors })
       if (hasValidationErrors(errors)) {
-        dispatch(createRaceActions.setStep(1))
+        dispatch({ type: 'step/set', step: 1 })
         return
       }
     }
 
-    if (state.step === 2) {
-      const errors = validateStationStep(state.stations)
-      dispatch(createRaceActions.setStationErrors(errors))
+    if (form.step === 2) {
+      const errors = validateStationStep(form.stations)
+      dispatch({ type: 'stations/errors/set', errors })
       if (hasValidationErrors(errors)) {
-        dispatch(createRaceActions.setStep(2))
+        dispatch({ type: 'step/set', step: 2 })
         return
       }
     }
 
-    if (state.step === 3 && requireTeam()) return
-    if (state.step === 4 && requireOrganizer()) return
-
-    dispatch(createRaceActions.setStep(state.step + 1))
+    dispatch({ type: 'step/set', step: form.step + 1 })
   }
 
   const submit = async () => {
     try {
-      if (requireTeam() || requireOrganizer()) return
-
-      const backendPayload = buildCreateRaceRequest(state)
-      const raceId = await createRace.mutateAsync(backendPayload)
+      const request = mapCreateRaceFormToRequest(form)
+      const raceId = await createRace.mutateAsync({
+        request,
+        coverImage: coverFile,
+      })
 
       toast({ title: 'Đã tạo trận đấu thành công.', variant: 'success' })
-      dispatch(createRaceActions.resetCreateRace())
+      clearCoverFile()
 
       navigate('/', {
         state: {
-          toastMessage: `Đã tạo trận đấu "${state.basic.name}" thành công!`,
+          toastMessage: `Đã tạo trận đấu "${form.basic.name}" thành công!`,
           newRaceId: raceId,
         },
       })
@@ -79,8 +66,8 @@ export const useCreateRaceNavigation = () => {
 
   return {
     isSubmitting: createRace.isPending,
-    step: state.step,
-    goBack: () => dispatch(createRaceActions.setStep(state.step - 1)),
+    step: form.step,
+    goBack: () => dispatch({ type: 'step/set', step: form.step - 1 }),
     cancel: () => navigate('/'),
     continueToNextStep,
     submit,

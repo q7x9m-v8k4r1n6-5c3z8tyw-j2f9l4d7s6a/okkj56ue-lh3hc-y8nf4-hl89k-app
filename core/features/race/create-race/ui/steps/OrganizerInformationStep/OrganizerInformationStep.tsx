@@ -25,7 +25,7 @@ export const OrganizerInformationStep = () => {
                         </div>
                     ) : rows.map(row => (
                         <div key={row.id} className="grid h-[72px] min-w-[640px] grid-cols-[minmax(220px,1fr)_minmax(260px,1fr)_44px] items-center gap-6 border-b border-[#f2f2f2] px-6 text-sm text-[#525252] last:border-b-0">
-                            <span className="whitespace-nowrap">{row.name}</span>
+                            <span className="whitespace-nowrap">{row.displayName ?? row.email}</span>
                             <span className="whitespace-nowrap">{row.email}</span>
                             <button
                                 type="button"

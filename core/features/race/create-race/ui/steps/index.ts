@@ -1,5 +1,0 @@
-export { BasicInformationStep } from './BasicInformationStep/BasicInformationStep'
-export { BoothInformationStep } from './BoothInformationStep/BoothInformationStep'
-export { TeamInformationStep } from './TeamInformationStep/TeamInformationStep'
-export { OrganizerInformationStep } from './OrganizerInformationStep/OrganizerInformationStep'
-export { SettingsStep } from './SettingsStep/SettingsStep'

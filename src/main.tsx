@@ -4,7 +4,7 @@ import { RouterProvider } from 'react-router-dom'
 import './index.css'
 import { router } from './app/routes'
 import { AppProviders } from './app/providers'
-import { AuthInitializer } from '@/core/features/auth/components/AuthInitializer'
+import { AuthInitializer } from '@/core/features/auth'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

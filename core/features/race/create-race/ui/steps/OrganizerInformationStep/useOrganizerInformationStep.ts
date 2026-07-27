@@ -1,25 +1,21 @@
-import { useAppDispatch, useAppSelector } from '@/core/shared'
-import { createRaceActions } from '@/core/features/race/create-race/stores'
-import type { OrganizerModel } from '@/core/entities/organizer'
+import type { OrganizerSummary } from '@/core/entities/organizer'
+import { useCreateRaceForm } from '../../../model/frontend/useCreateRaceForm'
 
+/** Adapts selected organizers for the organizer step. */
 export const useOrganizerInformationStep = () => {
-  const dispatch = useAppDispatch()
-  const rows = useAppSelector((state) => state.createRace.organizers)
-  const error = useAppSelector((state) => state.createRace.organizerError)
+  const { dispatch, form } = useCreateRaceForm()
+  const rows = form.organizers
+  const error = form.errors.organizer
 
-  const addOrganizer = (organizers: OrganizerModel[]) => {
+  const addOrganizer = (organizers: OrganizerSummary[]) => {
     const organizer = organizers[0]
     if (!organizer || rows.some((row) => row.id === organizer.id || row.email === organizer.email)) return
 
-    dispatch(createRaceActions.addOrganizer({
-      id: organizer.id,
-      name: organizer.displayName ?? organizer.email,
-      email: organizer.email,
-    }))
+    dispatch({ type: 'organizers/add', organizer })
   }
 
   const removeOrganizer = (id: string) => {
-    dispatch(createRaceActions.removeOrganizer(id))
+    dispatch({ type: 'organizers/remove', id })
   }
 
   return {

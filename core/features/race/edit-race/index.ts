@@ -1,5 +1,3 @@
-export * from './api'
-export * from './constants'
-export * from './hooks'
-export * from './models'
-export * from './ui'
+// Public API: consumers only render the feature entry point.
+// Internal API, model, hooks, and UI sections stay isolated inside this slice.
+export { EditRaceView } from './ui/EditRaceView'

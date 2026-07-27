@@ -1,4 +1,4 @@
-import type { IconProps } from '@/core/shared/types'
+import type { IconProps } from './icon.type'
 
 export const TrashGlyph = ({ className }: IconProps) => {
     const svgClassName = ['h-5 w-5 shrink-0', className].filter(Boolean).join(' ')

@@ -1,8 +1,9 @@
 import { ChevronIcon, EditIcon } from '@/core/assets'
 import { Button, Drawer } from '@/core/shared'
-import type { StaffRole, UserStatus } from '@/core/entities/user/model'
-import type { UserFormProps } from '../../models'
-import { useUserForm } from './useUserForm'
+import type { StaffRole, UserStatus } from '@/core/entities/user'
+import type { EditableUser, UserFormProps } from '../../model/userForm'
+import { useUserForm } from '../hooks/useUserForm'
+import { useUserFormView } from '../hooks/useUserFormView'
 
 const USER_FORM_ID = 'user-form-panel'
 const fieldClassName = 'block'
@@ -13,65 +14,36 @@ const selectClassName = `${inputClassName} appearance-none pr-11`
 
 const RequiredMark = () => <span> (<span className="text-[#de3336]">*</span>)</span>
 
-export const UserForm = ({ open = true, ...props }: UserFormProps) => {
+type UserFormEditorProps = UserFormProps & {
+  initialForm?: EditableUser
+}
+
+const UserFormEditor = ({
+  initialForm,
+  open = true,
+  ...props
+}: UserFormEditorProps) => {
   const { category, mode } = props
   const {
-    displayName,
     displayNameLabel,
     displayNamePlaceholder,
-    email,
     emailLabel,
     emailPlaceholder,
     error,
-    existingRow,
+    form,
     handleSubmit,
     hint,
-    isLoadingExistingRow,
+    isSaving,
     resetPassword,
     returnToList,
-    role,
     setDisplayName,
     setEmail,
     setRole,
     setStatus,
     setUsername,
-    status,
     title,
-    username,
     usernamePlaceholder,
-  } = useUserForm(props)
-
-  if (mode === 'edit' && isLoadingExistingRow) {
-    return (
-      <Drawer
-        open={open}
-        title="Đang tải dữ liệu"
-        onClose={returnToList}
-        icon={<EditIcon className="size-6 text-[#de3336]" />}
-        footer={<Button variant="secondary" onClick={returnToList}>Hủy</Button>}
-      >
-        <p className="text-sm text-[#8b8580]">
-          Đang tải thông tin người dùng...
-        </p>
-      </Drawer>
-    )
-  }
-
-  if (mode === 'edit' && !existingRow) {
-    return (
-      <Drawer
-        open={open}
-        title="Không tìm thấy dữ liệu"
-        onClose={returnToList}
-        icon={<EditIcon className="size-6 text-[#de3336]" />}
-        footer={<Button variant="secondary" onClick={returnToList}>Quay lại</Button>}
-      >
-        <p className="text-sm text-[#8b8580]">
-          Người dùng cần chỉnh sửa không còn tồn tại hoặc đường dẫn không hợp lệ.
-        </p>
-      </Drawer>
-    )
-  }
+  } = useUserForm(props, initialForm)
 
   return (
     <Drawer
@@ -82,7 +54,7 @@ export const UserForm = ({ open = true, ...props }: UserFormProps) => {
       footer={(
         <>
           <Button type="button" variant="secondary" size="sm" className="h-[37px] min-h-0 px-[33px] py-0 text-sm font-semibold leading-[14px] tracking-[0.7px]" onClick={returnToList}>Hủy</Button>
-          <Button type="submit" size="sm" className="h-[37px] min-h-0 px-8 py-0 text-sm font-semibold leading-[14px] tracking-[0.7px]" form={USER_FORM_ID}>Lưu</Button>
+          <Button disabled={isSaving} type="submit" size="sm" className="h-[37px] min-h-0 px-8 py-0 text-sm font-semibold leading-[14px] tracking-[0.7px]" form={USER_FORM_ID}>Lưu</Button>
         </>
       )}
     >
@@ -91,14 +63,14 @@ export const UserForm = ({ open = true, ...props }: UserFormProps) => {
           {!(category === 'staff' && mode === 'create') ? (
             <label className={fieldClassName}>
               <span className={labelClassName}>{displayNameLabel.replace(' (*)', '')}<RequiredMark /></span>
-              <input value={displayName} onChange={(event) => setDisplayName(event.target.value)} type="text" required className={inputClassName} placeholder={displayNamePlaceholder} />
+              <input value={form.displayName} onChange={(event) => setDisplayName(event.target.value)} type="text" required className={inputClassName} placeholder={displayNamePlaceholder} />
             </label>
           ) : null}
 
           {category !== 'staff' ? (
             <label className={fieldClassName}>
               <span className={labelClassName}>{mode === 'edit' ? 'Tên đăng nhập' : 'Username'}{mode === 'create' ? <RequiredMark /> : null}</span>
-              <input value={username} onChange={(event) => setUsername(event.target.value)} type="text" required={mode === 'create'} disabled={mode === 'edit'} className={mode === 'edit' ? disabledInputClassName : inputClassName} placeholder={usernamePlaceholder} />
+              <input value={form.username} onChange={(event) => setUsername(event.target.value)} type="text" required={mode === 'create'} disabled={mode === 'edit'} className={mode === 'edit' ? disabledInputClassName : inputClassName} placeholder={usernamePlaceholder} />
             </label>
           ) : null}
 
@@ -108,7 +80,7 @@ export const UserForm = ({ open = true, ...props }: UserFormProps) => {
               {!(category === 'staff' && mode === 'edit') ? <RequiredMark /> : null}
             </span>
             <input
-              value={email}
+              value={form.email}
               onChange={(event) => setEmail(event.target.value)}
               type="email"
               required
@@ -121,7 +93,7 @@ export const UserForm = ({ open = true, ...props }: UserFormProps) => {
           {category === 'staff' ? (
             <label className={`${fieldClassName} relative`}>
               <span className={labelClassName}>Vai trò<RequiredMark /></span>
-              <select value={role} required onChange={(event) => setRole(event.target.value as StaffRole)} className={selectClassName}>
+              <select value={form.role} required onChange={(event) => setRole(event.target.value as StaffRole)} className={selectClassName}>
                 <option value="" disabled>Chọn vai trò</option>
                 <option value="admin">Quản trị viên</option>
                 <option value="coordinator">Điều phối viên</option>
@@ -134,7 +106,7 @@ export const UserForm = ({ open = true, ...props }: UserFormProps) => {
           {mode === 'edit' ? (
             <label className={`${fieldClassName} relative`}>
               <span className={labelClassName}>Trạng thái<RequiredMark /></span>
-              <select value={status} onChange={(event) => setStatus(event.target.value as UserStatus)} className={selectClassName}>
+              <select value={form.status} onChange={(event) => setStatus(event.target.value as UserStatus)} className={selectClassName}>
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
@@ -154,5 +126,41 @@ export const UserForm = ({ open = true, ...props }: UserFormProps) => {
         ) : null}
       </form>
     </Drawer>
+  )
+}
+
+/** Public create/edit user panel with server initialization isolated in a hook. */
+export const UserForm = ({ open = true, ...props }: UserFormProps) => {
+  const { close, initialForm, isLoading, isMissing } = useUserFormView(props)
+
+  if (props.mode === 'edit' && (isLoading || isMissing)) {
+    return (
+      <Drawer
+        open={open}
+        title={isLoading ? 'Đang tải dữ liệu' : 'Không tìm thấy dữ liệu'}
+        onClose={close}
+        icon={<EditIcon className="size-6 text-[#de3336]" />}
+        footer={(
+          <Button variant="secondary" onClick={close}>
+            {isLoading ? 'Hủy' : 'Quay lại'}
+          </Button>
+        )}
+      >
+        <p className="text-sm text-[#8b8580]">
+          {isLoading
+            ? 'Đang tải thông tin người dùng...'
+            : 'Người dùng cần chỉnh sửa không còn tồn tại hoặc đường dẫn không hợp lệ.'}
+        </p>
+      </Drawer>
+    )
+  }
+
+  return (
+    <UserFormEditor
+      key={`${props.category}-${props.mode}-${initialForm?.id ?? 'new'}`}
+      {...props}
+      initialForm={initialForm}
+      open={open}
+    />
   )
 }

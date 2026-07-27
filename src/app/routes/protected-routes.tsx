@@ -1,15 +1,12 @@
 import { Navigate, Outlet } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import type { RootState } from '../store'
+import { useAuthSession } from '@/core/features/auth'
 
 export const ProtectedRoute = () => {
-  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated)
+  const { isAuthenticated } = useAuthSession()
 
-  // Nếu chưa đăng nhập, đá văng ra trang login và xóa lịch sử route hiện tại
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
   }
 
-  // Nếu đã đăng nhập, cho phép đi tiếp vào các route con bên trong (Outlet)
   return <Outlet />
 }

@@ -1,4 +1,4 @@
-import type { IconProps } from '@/core/shared/types'
+import type { IconProps } from './icon.type'
 
 export const ChevronIcon = ({ className }: IconProps) => (
   <svg className={className} viewBox="0 0 12 8" fill="none" aria-hidden="true">

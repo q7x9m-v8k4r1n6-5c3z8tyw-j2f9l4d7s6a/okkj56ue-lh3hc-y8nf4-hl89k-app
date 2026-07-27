@@ -1,4 +1,4 @@
-import type { IconProps } from '@/core/shared/types'
+import type { IconProps } from './icon.type'
 import {GoogleIconimg} from '../images'
 
 export const GoogleIcon = ({ className }: IconProps) => (

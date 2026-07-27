@@ -1,13 +1,16 @@
 import { EditIcon, TrashIcon } from '@/core/assets'
-import type { UserTableRowModel } from '@/core/entities/user/model'
 import { Badge, IconButton } from '@/core/shared'
+import type { UserSummary } from '../model/user'
 
-type UserTableRowProps = {
-  user: UserTableRowModel
-  onDelete: (user: UserTableRowModel) => void
-  onEdit: (user: UserTableRowModel) => void
+export type UserTableRowProps = {
+  user: UserSummary
+  onDelete: (user: UserSummary) => void
+  onEdit: (user: UserSummary) => void
 }
 
+/**
+ * Renders a reusable user summary row and delegates workflow actions.
+ */
 export const UserTableRow = ({ onDelete, onEdit, user }: UserTableRowProps) => {
   return (
     <tr className="h-[72px] border-b border-white">

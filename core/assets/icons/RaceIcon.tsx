@@ -1,4 +1,4 @@
-import type { IconProps } from '@/core/shared/types'
+import type { IconProps } from './icon.type'
 
 export const RaceIcon = ({ className }: IconProps) => (
   <svg className={className} viewBox="0 0 26 16" fill="none" aria-hidden="true">

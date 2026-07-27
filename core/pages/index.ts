@@ -1,7 +1,0 @@
-export { NotFoundPage } from './not-found'
-export { RaceListPage } from './race-list'
-export { PrototypePage } from './prototype'
-export { UserListPage } from './user-list'
-export { CreateRacePage } from './create-race'
-export { DetailRacePage } from './detail-race'
-export { LoginPage } from './login'

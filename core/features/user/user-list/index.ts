@@ -1,3 +1,1 @@
-export * from './hooks'
-export * from './ui'
-export * from './models'
+export { UserTable } from './ui/UserTable/UserTable'

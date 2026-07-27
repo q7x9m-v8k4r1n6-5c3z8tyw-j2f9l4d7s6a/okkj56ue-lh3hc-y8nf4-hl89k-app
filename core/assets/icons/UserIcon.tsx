@@ -1,4 +1,4 @@
-import type { IconProps } from '@/core/shared/types'
+import type { IconProps } from './icon.type'
 import {UserIconImg} from '../images'
 
 export const UserIcon = ({ className }: IconProps) => (

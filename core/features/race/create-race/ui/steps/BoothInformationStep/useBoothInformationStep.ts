@@ -1,27 +1,31 @@
 import { useEffect, useRef, useState } from 'react'
-import { hasStationContent } from '@/core/features/race/create-race/helpers'
-import { createRaceActions, type StationDraft } from '@/core/features/race/create-race/stores/createRaceSlice'
-import { useAppDispatch, useAppSelector } from '@/core/shared'
-import type { OrganizerModel } from '@/core/entities'
+import type { OrganizerSummary } from '@/core/entities/organizer'
+import type { CreateRaceStationForm } from '../../../model/createRace.form'
+import { hasStationContent } from '../../../model/createRace.validation'
+import { useCreateRaceForm } from '../../../model/frontend/useCreateRaceForm'
 
+/** Adapts station rows, drawer state and focus behavior for the station step. */
 export const useBoothInformationStep = () => {
   type StationInputField = 'name' | 'location';
 
-  const dispatch = useAppDispatch()
-  const rows = useAppSelector((state) => state.createRace.stations)
-  const errors = useAppSelector((state) => state.createRace.stationErrors)
+  const { dispatch, form } = useCreateRaceForm()
+  const rows = form.stations
+  const errors = form.errors.stations
 
   const [detailId, setDetailId] = useState<string | null>(null)
   const inputRefs = useRef<Record<string, Partial<Record<StationInputField, HTMLInputElement | null>>>>({})
   const pendingFocusRef = useRef<{ id: string; field: StationInputField } | null>(null)
   const selectedStation = rows.find((row) => row.id === detailId)
 
-  const update = (id: string, changes: Partial<Omit<StationDraft, 'id'>>) => {
-    dispatch(createRaceActions.updateStation({ id, changes }))
+  const update = (
+    id: string,
+    changes: Partial<Omit<CreateRaceStationForm, 'id'>>,
+  ) => {
+    dispatch({ type: 'stations/update', id, changes })
   }
 
   const clearError = (id: string, field: 'name' | 'location' | 'managers') => {
-    dispatch(createRaceActions.clearStationError({ id, field }))
+    dispatch({ type: 'stations/error/clear', id, field })
   }
 
   const updateTextField = (id: string, field: StationInputField, value: string) => {
@@ -30,7 +34,7 @@ export const useBoothInformationStep = () => {
   }
 
   const createStation = (
-    changes: Partial<Omit<StationDraft, 'id'>>,
+    changes: Partial<Omit<CreateRaceStationForm, 'id'>>,
     focusField?: StationInputField,
     allowEmpty = false,
   ) => {
@@ -40,14 +44,14 @@ export const useBoothInformationStep = () => {
 
     if (focusField) pendingFocusRef.current = { id, field: focusField }
 
-    dispatch(createRaceActions.addStationWithId({
+    dispatch({ type: 'stations/add', station: {
       id, ...{
         name: '',
         location: '',
         managers: [],
         description: '',
-      }, ...changes
-    }))
+      }, ...changes,
+    } })
 
     return id
   }
@@ -64,17 +68,20 @@ export const useBoothInformationStep = () => {
     }
 
     if (!hasStationContent(selectedStation)) {
-      dispatch(createRaceActions.removeStation(selectedStation.id))
+      dispatch({ type: 'stations/remove', id: selectedStation.id })
     }
 
     setDetailId(null)
   }
 
-  const getManagerValue = (row: StationDraft): OrganizerModel[] => {
+  const getManagerValue = (row: CreateRaceStationForm): OrganizerSummary[] => {
     return row.managers
   }
 
-  const updateManagers = (row: StationDraft, organizers: OrganizerModel[]) => {
+  const updateManagers = (
+    row: CreateRaceStationForm,
+    organizers: OrganizerSummary[],
+  ) => {
     update(row.id, { managers: organizers })
     if (errors[row.id]?.managers) clearError(row.id, 'managers')
   }
@@ -108,6 +115,6 @@ export const useBoothInformationStep = () => {
     getManagerValue,
     updateManagers,
     setInputRef,
-    removeStation: (id: string) => dispatch(createRaceActions.removeStation(id)),
+    removeStation: (id: string) => dispatch({ type: 'stations/remove', id }),
   }
 }

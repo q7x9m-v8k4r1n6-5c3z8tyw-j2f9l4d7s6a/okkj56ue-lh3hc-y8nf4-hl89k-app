@@ -1,7 +1,14 @@
-import { Badge, formatDateTime, TableCard } from '@/core/shared'
+import {
+  Badge,
+  formatDateTime,
+  TableCard,
+  type BadgeVariant,
+} from '@/core/shared'
 import { DefaultCoverImage } from '@/core/assets'
-import { useRaceHooks } from '../hooks'
-import type { RaceModel } from '../model'
+import type {
+  RaceStatus,
+  RaceSummary,
+} from '../model/race'
 
 const statusMeta = {
   draft: { label: 'Nháp', variant: 'neutral' },
@@ -9,20 +16,38 @@ const statusMeta = {
   ongoing: { label: 'Đang diễn ra', variant: 'primary' },
   paused: { label: 'Tạm dừng', variant: 'warning' },
   completed: { label: 'Đã kết thúc', variant: 'danger' },
-} as const
+} satisfies Record<RaceStatus, {
+  label: string
+  variant: BadgeVariant
+}>
 
-export type RaceCardRecord = RaceModel
-export type RaceCardStatus = keyof typeof statusMeta
+export type RaceCardProps = {
+  onSelect: (raceId: string) => void
+  race: RaceSummary
+}
 
-export const RaceCard = ({ race }: { race: RaceModel }) => {
-  const rawStatus = (race.status ?? 'draft').toLowerCase()
-  const status = statusMeta[rawStatus as RaceCardStatus] ?? statusMeta['draft']
-  const { onDetailRaceView } = useRaceHooks()
+/**
+ * Renders a reusable race summary.
+ *
+ * Navigation stays in the consuming feature through onSelect, keeping the
+ * entity independent from application routes and feature workflows.
+ */
+export const RaceCard = ({ onSelect, race }: RaceCardProps) => {
+  const status = statusMeta[race.status]
+  const coverUrl = race.coverUrl || DefaultCoverImage()
 
   return (
     <TableCard className="transition-shadow hover:shadow-[0_4px_10px_rgba(0,0,0,0.08)]">
-      <button type="button" className="grid w-full text-left md:grid-cols-[162px_minmax(0,1fr)]" onClick={() => onDetailRaceView(race.id)}>
-        <img src={DefaultCoverImage()} alt={`Cover ${race.name}`} className="h-[194px] w-full object-cover" />
+      <button
+        type="button"
+        className="grid w-full text-left md:grid-cols-[162px_minmax(0,1fr)]"
+        onClick={() => onSelect(race.id)}
+      >
+        <img
+          src={coverUrl}
+          alt={`Ảnh bìa ${race.name}`}
+          className="h-[194px] w-full object-cover"
+        />
 
         <div className="min-w-0 px-6 py-4">
           <div className="space-y-2">
