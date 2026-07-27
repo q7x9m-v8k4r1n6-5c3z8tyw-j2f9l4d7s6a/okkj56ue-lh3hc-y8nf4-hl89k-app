@@ -22,6 +22,8 @@ const statusMeta = {
 }>
 
 export type RaceCardProps = {
+  disabled?: boolean
+  disabledReason?: string
   onSelect: (raceId: string) => void
   race: RaceSummary
 }
@@ -32,15 +34,21 @@ export type RaceCardProps = {
  * Navigation stays in the consuming feature through onSelect, keeping the
  * entity independent from application routes and feature workflows.
  */
-export const RaceCard = ({ onSelect, race }: RaceCardProps) => {
+export const RaceCard = ({
+  disabled = false,
+  disabledReason,
+  onSelect,
+  race,
+}: RaceCardProps) => {
   const status = statusMeta[race.status]
   const coverUrl = race.coverUrl || DefaultCoverImage()
 
   return (
-    <TableCard className="transition-shadow hover:shadow-[0_4px_10px_rgba(0,0,0,0.08)]">
+    <TableCard className={`transition-shadow ${disabled ? 'opacity-80' : 'hover:shadow-[0_4px_10px_rgba(0,0,0,0.08)]'}`}>
       <button
         type="button"
-        className="grid w-full text-left md:grid-cols-[162px_minmax(0,1fr)]"
+        className={`grid w-full text-left md:grid-cols-[162px_minmax(0,1fr)] ${disabled ? 'cursor-not-allowed' : ''}`}
+        disabled={disabled}
         onClick={() => onSelect(race.id)}
       >
         <img
@@ -63,6 +71,11 @@ export const RaceCard = ({ onSelect, race }: RaceCardProps) => {
             <div className="flex items-center gap-4 text-sm text-[#666666]">
               <span>Trạng thái:</span>
               <Badge variant={status.variant}>{status.label}</Badge>
+              {disabledReason ? (
+                <span className="ml-auto text-sm font-medium text-[#de3336]">
+                  {disabledReason}
+                </span>
+              ) : null}
             </div>
           </div>
         </div>

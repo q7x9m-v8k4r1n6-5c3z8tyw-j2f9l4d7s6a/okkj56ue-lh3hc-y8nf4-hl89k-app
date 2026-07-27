@@ -14,8 +14,8 @@ export const useLogin = () => {
   const form = useLoginFormState()
   const { setGlobalError } = form
 
-  const finishLogin = useCallback(() => {
-    navigate('/', { replace: true })
+  const finishLogin = useCallback((role?: string) => {
+    navigate(role?.toLowerCase() === 'team' ? '/team' : '/', { replace: true })
   }, [navigate])
 
   const handleStandardLogin = async (
@@ -25,8 +25,8 @@ export const useLogin = () => {
     if (!request) return
     setGlobalError('')
     try {
-      await mutateAsync({ method: 'password', request })
-      finishLogin()
+      const session = await mutateAsync({ method: 'password', request })
+      finishLogin(session.user.role)
     } catch (error) {
       setGlobalError(getAuthErrorMessage(error))
     }
@@ -35,12 +35,12 @@ export const useLogin = () => {
   const handleGoogleCredential = useCallback(async (credential: string) => {
     setGlobalError('')
     try {
-      await mutateAsync({
+      const session = await mutateAsync({
         method: 'google',
         credential,
         profile: getGoogleProfileFromCredential(credential),
       })
-      finishLogin()
+      finishLogin(session.user.role)
     } catch (error) {
       setGlobalError(
         getAuthErrorMessage(error, 'Đăng nhập Google thất bại.'),
