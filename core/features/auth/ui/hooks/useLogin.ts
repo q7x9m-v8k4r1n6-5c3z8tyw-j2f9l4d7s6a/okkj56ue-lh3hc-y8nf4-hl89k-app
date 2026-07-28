@@ -15,7 +15,14 @@ export const useLogin = () => {
   const { setGlobalError } = form
 
   const finishLogin = useCallback((role?: string) => {
-    navigate(role?.toLowerCase() === 'team' ? '/team' : '/', { replace: true })
+    const normalizedRole = role?.toLowerCase()
+    const nextPath = normalizedRole === 'team'
+      ? '/team'
+      : normalizedRole === 'organizer'
+        ? '/organizer'
+        : '/'
+
+    navigate(nextPath, { replace: true })
   }, [navigate])
 
   const handleStandardLogin = async (
