@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { staffRoleSchema, userStatusSchema } from '@/core/entities/user'
+import { userStatusSchema } from '@/core/entities/user'
 
 const accountFieldsSchema = z.object({
   displayName: z.string().min(1),
@@ -9,12 +9,16 @@ const accountFieldsSchema = z.object({
   status: userStatusSchema,
 })
 
-export const createTeamRequestSchema = accountFieldsSchema
+export const createTeamRequestSchema = accountFieldsSchema.pick({
+  displayName: true,
+  email: true,
+})
 export const createOrganizerRequestSchema = accountFieldsSchema.extend({
-  role: staffRoleSchema,
+  roleIds: z.array(z.string().uuid()).min(1),
 })
 export const updateTeamRequestSchema = accountFieldsSchema.extend({
   id: z.string().min(1),
+  resetPassword: z.boolean().optional(),
 })
 export const updateOrganizerRequestSchema = createOrganizerRequestSchema.extend({
   id: z.string().min(1),
@@ -34,7 +38,8 @@ export const organizerDetailResponseSchema = z.object({
   username: z.string().optional(),
   password: z.string().optional(),
   email: z.string().email(),
-  role: staffRoleSchema,
+  role: z.string(),
+  roleIds: z.array(z.string().uuid()).default([]),
   status: userStatusSchema,
 })
 export const saveUserResponseSchema = z.object({

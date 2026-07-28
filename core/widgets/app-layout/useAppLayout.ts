@@ -1,24 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
-import { useLocation, useMatches } from 'react-router-dom'
+import { useLocation, useMatches, useNavigate } from 'react-router-dom'
 import { useAuthSession, useLogout } from '@/core/features/auth'
+import { useRaceDetailQuery } from '@/core/features/race/edit-race/model/server/useRaceDetailQuery'
 import { navigationConfig } from './navigation.config'
 
 const pageItems = Object.values(navigationConfig)
 
-const roleLabels: Record<string, string> = {
-  admin: 'Quản trị viên',
-  organizer: 'Ban tổ chức',
-  team: 'Đội chơi',
-}
-
 /** Combines layout-only browser state with the authenticated session view. */
 export const useAppLayout = () => {
   const location = useLocation()
+  const navigate = useNavigate()
   const matches = useMatches()
   const { user } = useAuthSession()
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
   const { isLoggingOut, logout } = useLogout()
+  const raceId = /^\/races\/([^/]+)$/.exec(location.pathname)?.[1]
+  const raceDetail = useRaceDetailQuery(raceId)
 
   useEffect(() => {
     if (!isProfileOpen) return
@@ -45,9 +43,14 @@ export const useAppLayout = () => {
     logout,
     navigationItems: pageItems.filter(({ hidden }) => !hidden),
     profileRef,
-    roleLabel: roleLabels[user?.role ?? ''] ?? 'Thành viên',
+    returnToNavigation: () => {
+      setIsProfileOpen(false)
+      navigate('/organizer/select')
+    },
     setIsProfileOpen,
-    title: matchTitle
+    title: raceDetail.data?.raceName
+      ? `Chi tiết: ${raceDetail.data.raceName}`
+      : matchTitle
       ?? pageItems.find(({ to }) => to === location.pathname)?.title
       ?? 'Move',
     user,

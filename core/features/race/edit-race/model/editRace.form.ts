@@ -4,6 +4,7 @@ export type EditRaceOrganizer = {
   id: string
   displayName: string
   email: string
+  avatarUrl?: string | null
 }
 
 export type EditRaceBooth = {

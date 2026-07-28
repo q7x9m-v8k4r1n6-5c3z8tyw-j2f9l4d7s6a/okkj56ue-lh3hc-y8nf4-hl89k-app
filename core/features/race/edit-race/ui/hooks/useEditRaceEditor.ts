@@ -1,4 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { useToast } from '@/core/shared'
 import {
   getEditRaceErrorMessage,
   isEditRaceConflict,
@@ -19,6 +20,7 @@ import type { EditRaceStatus } from '../../model/editRace.contract'
 export const useEditRaceEditor = (raceId?: string) => {
   const editor = useEditRaceForm()
   const queryClient = useQueryClient()
+  const { toast } = useToast()
   const patchMutation = usePatchRaceMutation(raceId)
 
   /** Sends the current form and optionally changes the race status. */
@@ -40,6 +42,10 @@ export const useEditRaceEditor = (raceId?: string) => {
       {
         onSuccess: (detail) => {
           editor.finishEditing(mapRaceDetailToForm(detail))
+          toast({
+            title: 'Đã lưu thay đổi thành công.',
+            variant: 'success',
+          })
         },
       },
     )

@@ -8,11 +8,11 @@ export const useSettingsSection = () => {
 
   return {
     isEditing: editor.isEditing,
-    isHiddenPoint: editor.form.settings.isHiddenPoint,
-    isToggledLeaderboard: editor.form.settings.isToggledLeaderboard,
-    onHiddenPointChange: (checked: boolean) =>
-      editor.updateSetting('isHiddenPoint', checked),
-    onLeaderboardChange: (checked: boolean) =>
-      editor.updateSetting('isToggledLeaderboard', checked),
+    showLeaderboard: editor.form.settings.isToggledLeaderboard,
+    showScores: !editor.form.settings.isHiddenPoint,
+    onLeaderboardChange: (showLeaderboard: boolean) =>
+      editor.updateSetting('isToggledLeaderboard', showLeaderboard),
+    onScoresChange: (showScores: boolean) =>
+      editor.updateSetting('isHiddenPoint', !showScores),
   }
 }

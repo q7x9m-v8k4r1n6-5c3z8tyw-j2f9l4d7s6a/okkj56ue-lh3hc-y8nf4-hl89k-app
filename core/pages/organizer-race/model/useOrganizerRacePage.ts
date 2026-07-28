@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useOrganizerRaceAccess } from '@/core/features/organizer/organizer-race'
 import {
   isOrganizerPrimaryRaceTab,
@@ -15,8 +15,12 @@ import {
 export const useOrganizerRacePage = () => {
   const navigate = useNavigate()
   const { raceId } = useParams<{ raceId: string }>()
+  const [searchParams, setSearchParams] = useSearchParams()
   const raceAccess = useOrganizerRaceAccess(raceId)
-  const [activeTab, setActiveTab] = useState<OrganizerRaceTab>('rules')
+  const initialTab = searchParams.get('tab')
+  const [activeTab, setActiveTab] = useState<OrganizerRaceTab>(
+    initialTab && isOrganizerRaceTab(initialTab) && initialTab !== 'menu' ? initialTab : 'rules',
+  )
   const [previousTab, setPreviousTab] = useState<OrganizerPrimaryRaceTab>('rules')
   const isMenuOpen = activeTab === 'menu'
 
@@ -42,6 +46,7 @@ export const useOrganizerRacePage = () => {
       }
       setPreviousTab(value)
       setActiveTab(value)
+      setSearchParams((current) => { current.set('tab', value); return current })
     },
     openMenu,
     raceName: raceAccess.raceName,

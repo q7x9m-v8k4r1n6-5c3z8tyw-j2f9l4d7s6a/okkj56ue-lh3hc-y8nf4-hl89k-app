@@ -41,7 +41,7 @@ export const prepareUserForm = (
   const email = form.email.trim()
 
   if (category === 'staff') {
-    if (!email || !form.role || (mode === 'edit' && !displayName)) {
+    if (!email || (mode === 'create' && form.roleIds.length === 0) || (mode === 'edit' && !displayName)) {
       return {
         error: mode === 'edit'
           ? 'Vui lòng nhập đầy đủ tên hiển thị, email và vai trò.'
@@ -60,11 +60,11 @@ export const prepareUserForm = (
     }
   }
 
-  if (category === 'team' && (!displayName || !username || !email)) {
-    return { error: 'Vui lòng nhập đầy đủ tên hiển thị, username và email.' }
+  if (category === 'team' && (!displayName || !email)) {
+    return { error: 'Vui lòng nhập đầy đủ tên hiển thị và email.' }
   }
 
-  const usernameError = username
+  const usernameError = username && !(category === 'team' && mode === 'create')
     ? validateUserUsername(category, username)
     : ''
   if (usernameError) return { error: usernameError }
@@ -73,7 +73,7 @@ export const prepareUserForm = (
     form: {
       ...form,
       displayName,
-      username,
+      username: category === 'team' && mode === 'create' ? '' : username,
       email,
       role: form.role || 'coordinator',
     },

@@ -19,7 +19,7 @@ export const useLogin = () => {
     const nextPath = normalizedUserType === 'team'
       ? '/team'
       : normalizedUserType === 'organizer'
-        ? '/organizer'
+        ? '/organizer/select'
         : '/'
 
     navigate(nextPath, { replace: true })

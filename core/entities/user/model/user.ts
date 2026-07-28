@@ -25,6 +25,7 @@ export const userSummarySchema = z.object({
   displayName: z.string().min(1),
   username: z.string().min(1),
   email: z.string().email(),
+  avatarUrl: z.string().url().or(z.literal('')).nullable().optional(),
   status: userStatusSchema,
 })
 

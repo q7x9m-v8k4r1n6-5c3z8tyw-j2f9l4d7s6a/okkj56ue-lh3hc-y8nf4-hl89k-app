@@ -22,6 +22,7 @@ export const mapUserDetailToForm = (
       password: team.password ?? DEFAULT_USER_PASSWORD,
       email: team.leaderEmail,
       role: '',
+      roleIds: [],
       status: team.status,
     }
   }
@@ -33,7 +34,8 @@ export const mapUserDetailToForm = (
     username: organizer.username ?? organizer.email.split('@')[0] ?? '',
     password: organizer.password ?? DEFAULT_USER_PASSWORD,
     email: organizer.email,
-    role: organizer.role,
+    role: organizer.role as EditableUser['role'],
+    roleIds: organizer.roleIds,
     status: organizer.status,
   }
 }

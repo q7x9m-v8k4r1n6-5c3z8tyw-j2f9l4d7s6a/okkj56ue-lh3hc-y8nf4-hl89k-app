@@ -1,9 +1,11 @@
 import { OrganizerSearchBox } from '@/core/entities/organizer'
-import { PlusIcon, TrashGlyph } from '@/core/assets'
+import { TrashGlyph } from '@/core/assets'
 import {
   Button,
+  Drawer,
   IconButton,
   Input,
+  RichTextEditor,
   Table,
   TableBody,
   TableCell,
@@ -21,14 +23,7 @@ export const BoothInformationSection = () => {
 
   return (
     <SectionCard>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <SectionTitle index={2} title="Thông tin trạm" />
-        {section.isEditing ? (
-          <Button variant="secondary" leadingIcon={<PlusIcon className="size-4" />} onClick={section.addBooth}>
-            Thêm trạm
-          </Button>
-        ) : null}
-      </div>
+      <SectionTitle index={2} title="Thông tin trạm" />
 
       <div className="mt-5 overflow-hidden rounded-lg border border-[#eeeeee]">
         <Table>
@@ -46,12 +41,12 @@ export const BoothInformationSection = () => {
               <TableRow key={booth.id} className="border-[#f5f5f5]">
                 <TableCell>
                   {section.isEditing ? (
-                    <Input aria-label="Tên trạm" error={section.errors[booth.id]?.name} value={booth.name} onChange={booth.onNameChange} />
+                    <Input ref={(node) => section.setInputRef(booth.id, 'name', node)} aria-label="Tên trạm" error={section.errors[booth.id]?.name} value={booth.name} onChange={booth.onNameChange} />
                   ) : booth.name}
                 </TableCell>
                 <TableCell>
                   {section.isEditing ? (
-                    <Input aria-label="Địa điểm trạm" error={section.errors[booth.id]?.place} value={booth.place} onChange={booth.onPlaceChange} />
+                    <Input ref={(node) => section.setInputRef(booth.id, 'place', node)} aria-label="Địa điểm trạm" error={section.errors[booth.id]?.place} value={booth.place} onChange={booth.onPlaceChange} />
                   ) : booth.place}
                 </TableCell>
                 <TableCell className="min-w-[230px]">
@@ -62,17 +57,19 @@ export const BoothInformationSection = () => {
                       onChange={booth.onManagersChange}
                     />
                   ) : (
-                    <AvatarName name={booth.managerText} />
+                    <AvatarName name={booth.managerText} avatarUrl={booth.managers[0]?.avatarUrl} />
                   )}
                 </TableCell>
                 <TableCell className="min-w-[260px]">
                   {section.isEditing ? (
-                    <Input
+                    <button
+                      type="button"
+                      className={`h-10 w-full rounded-lg border bg-[#fcfcfc] px-3 text-left text-sm text-[#525252] transition hover:border-[#de3336] hover:bg-white ${section.errors[booth.id]?.description ? 'border-[#de3336]' : 'border-[#eeeeee]'}`}
                       aria-label="Mô tả trạm"
-                      error={section.errors[booth.id]?.description}
-                      value={booth.description}
-                      onChange={booth.onDescriptionChange}
-                    />
+                      onClick={() => section.openDetails(booth.id)}
+                    >
+                      <span className="block truncate">{booth.descriptionText}</span>
+                    </button>
                   ) : booth.descriptionText}
                 </TableCell>
                 {section.isEditing ? (
@@ -87,9 +84,79 @@ export const BoothInformationSection = () => {
                 ) : null}
               </TableRow>
             ))}
+            {section.isEditing ? (
+              <TableRow
+                key={`new-booth-${section.booths.length}`}
+                className="border-[#f5f5f5]"
+              >
+                <TableCell>
+                  <Input
+                    aria-label="Thêm tên trạm"
+                    className="border-dashed bg-white"
+                    placeholder="Nhập tên trạm"
+                    onChange={(event) => section.createBooth({
+                      name: event.target.value,
+                    }, 'name')}
+                  />
+                </TableCell>
+                <TableCell>
+                  <Input
+                    aria-label="Thêm địa điểm trạm"
+                    className="border-dashed bg-white"
+                    placeholder="Nhập địa điểm"
+                    onChange={(event) => section.createBooth({
+                      place: event.target.value,
+                    }, 'place')}
+                  />
+                </TableCell>
+                <TableCell className="min-w-[230px]">
+                  <OrganizerSearchBox
+                    type="multiple"
+                    onChange={(managers) => section.createBooth({
+                      managers: managers.map((manager) => ({
+                        id: manager.id,
+                        displayName: manager.displayName ?? manager.email,
+                        email: manager.email,
+                      })),
+                    })}
+                  />
+                </TableCell>
+                <TableCell className="min-w-[260px]">
+                  <button
+                    type="button"
+                    className="flex h-10 w-full items-center rounded-lg border border-dashed border-[#e2e2e2] bg-white px-3 text-left text-sm text-[#9ca3af] transition hover:border-[#de3336] hover:text-[#525252]"
+                    onClick={section.createBoothWithDescription}
+                  >
+                    Thêm mô tả
+                  </button>
+                </TableCell>
+                <TableCell />
+              </TableRow>
+            ) : null}
           </TableBody>
         </Table>
       </div>
+
+      <Drawer
+        open={Boolean(section.selectedBooth)}
+        panelClassName="!max-w-[760px]"
+        title={`Mô tả trạm: ${section.selectedBooth?.name || 'Trạm mới'}`}
+        onClose={section.closeDetails}
+        footer={(
+          <>
+            <Button variant="secondary" onClick={section.closeDetails}>Hủy</Button>
+            <Button onClick={section.closeDetails}>Lưu</Button>
+          </>
+        )}
+      >
+        {section.selectedBooth ? (
+          <RichTextEditor
+            value={section.selectedBooth.description}
+            placeholder="Nhập luật và mô tả cho trạm..."
+            onChange={section.updateSelectedDescription}
+          />
+        ) : null}
+      </Drawer>
     </SectionCard>
   )
 }

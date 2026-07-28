@@ -10,7 +10,7 @@ export type ModalProps = PropsWithChildren<{
   onClose: () => void
 }>
 
-export const Modal = ({ children, description, footer, onClose, open, title }: ModalProps) => {
+export const Modal = ({ children, footer, onClose, open, title }: ModalProps) => {
   useEffect(() => {
     if (!open) return
     const handleKeyDown = (event: KeyboardEvent) => event.key === 'Escape' && onClose()
@@ -26,7 +26,6 @@ export const Modal = ({ children, description, footer, onClose, open, title }: M
         <header className="flex items-start justify-between gap-4 border-b border-[#eeeeee] px-6 py-5">
           <div>
             {title ? <h2 id="modal-title" className="text-lg font-semibold text-[#1a1c1c]">{title}</h2> : null}
-            {description ? <p className="mt-1 text-sm text-[#737373]">{description}</p> : null}
           </div>
           <button type="button" className="rounded-lg p-1.5 text-[#525252] hover:bg-[#f5f5f5]" aria-label="Đóng modal" onClick={onClose}>
             <CloseIcon className="size-5" />

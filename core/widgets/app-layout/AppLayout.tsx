@@ -2,6 +2,7 @@ import type { PropsWithChildren } from 'react'
 import { NavLink } from 'react-router-dom'
 import {
   ChevronIcon,
+  GridMenuIcon,
   LogoutIcon,
 } from '@/core/assets'
 import { useAppLayout } from './useAppLayout'
@@ -34,7 +35,7 @@ export const AppLayout = ({ children }: PropsWithChildren) => {
     logout,
     navigationItems,
     profileRef,
-    roleLabel,
+    returnToNavigation,
     setIsProfileOpen,
     title,
     user,
@@ -111,13 +112,18 @@ export const AppLayout = ({ children }: PropsWithChildren) => {
                   </div>
                 </div>
 
-                <div className="rounded-lg bg-[#fdcacb] px-2 py-[5px] text-center text-xs leading-3 tracking-[0.24px] text-[#420001]">
-                  {roleLabel}
-                </div>
-
                 <div className="py-[5px]">
                   <div className="h-px bg-[#e2e2e2]" />
                 </div>
+
+                <button
+                  type="button"
+                  className="flex items-center gap-[10px] rounded-lg px-[3px] py-[5px] text-left text-xs text-[#525252] hover:bg-[#f5f5f5]"
+                  onClick={returnToNavigation}
+                >
+                  <GridMenuIcon className="size-6 shrink-0" />
+                  Quay lại điều hướng
+                </button>
 
                 <button
                   type="button"

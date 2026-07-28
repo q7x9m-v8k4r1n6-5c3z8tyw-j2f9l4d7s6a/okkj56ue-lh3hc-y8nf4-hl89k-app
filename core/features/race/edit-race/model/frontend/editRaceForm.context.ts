@@ -9,7 +9,7 @@ import type {
 import type { BasicInformationChanges } from './editRaceForm.reducer'
 
 export type EditRaceFormContextValue = {
-  addBooth: () => void
+  addBooth: (changes?: Partial<Omit<EditRaceBooth, 'id'>>) => string
   addOrganizers: (organizers: EditRaceOrganizer[]) => void
   addTeams: (teams: EditRaceTeam[]) => void
   cancelEditing: () => void

@@ -59,7 +59,7 @@ export const createOrganizer = async (
 ): Promise<SaveUserResponse> => {
   const body = createOrganizerRequestSchema.parse(request)
   const response = await client.request<unknown, CreateOrganizerRequest>({
-    path: '/Organizer',
+    path: '/admin/organizers',
     method: 'POST',
     body,
   })
@@ -77,6 +77,14 @@ export const updateTeam = async (
     body,
   })
   return saveUserResponseSchema.parse(response)
+}
+
+/** Immediately issues a new server-generated password for a team account. */
+export const resetTeamPassword = async (teamId: string): Promise<void> => {
+  await client.request<unknown>({
+    path: `/Team/${teamId}/reset-password`,
+    method: 'POST',
+  })
 }
 
 /** Updates an organizer after validating both API boundaries. */
