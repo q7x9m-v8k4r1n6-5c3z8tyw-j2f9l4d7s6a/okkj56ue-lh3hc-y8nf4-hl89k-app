@@ -14,8 +14,15 @@ export const useLogin = () => {
   const form = useLoginFormState()
   const { setGlobalError } = form
 
-  const finishLogin = useCallback((role?: string) => {
-    navigate(role?.toLowerCase() === 'team' ? '/team' : '/', { replace: true })
+  const finishLogin = useCallback((userType?: string) => {
+    const normalizedUserType = userType?.toLowerCase()
+    const nextPath = normalizedUserType === 'team'
+      ? '/team'
+      : normalizedUserType === 'organizer'
+        ? '/organizer'
+        : '/'
+
+    navigate(nextPath, { replace: true })
   }, [navigate])
 
   const handleStandardLogin = async (
@@ -26,7 +33,7 @@ export const useLogin = () => {
     setGlobalError('')
     try {
       const session = await mutateAsync({ method: 'password', request })
-      finishLogin(session.user.role)
+      finishLogin(session.user.userType)
     } catch (error) {
       setGlobalError(getAuthErrorMessage(error))
     }
@@ -40,7 +47,7 @@ export const useLogin = () => {
         credential,
         profile: getGoogleProfileFromCredential(credential),
       })
-      finishLogin(session.user.role)
+      finishLogin(session.user.userType)
     } catch (error) {
       setGlobalError(
         getAuthErrorMessage(error, 'Đăng nhập Google thất bại.'),

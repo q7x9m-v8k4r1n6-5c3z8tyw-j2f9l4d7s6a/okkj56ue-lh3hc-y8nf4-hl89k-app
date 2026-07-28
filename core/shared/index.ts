@@ -5,8 +5,13 @@ export {
 } from './api'
 export type { UnauthorizedRecovery } from './api'
 export { useDebouncedValue } from './hooks'
-export { TeamLayout } from './layout'
-export type { TeamLayoutProps, TeamNavItem } from './layout'
+export { OrganizerLayout, TeamLayout } from './layout'
+export type {
+  OrganizerLayoutProps,
+  OrganizerNavItem,
+  TeamLayoutProps,
+  TeamNavItem,
+} from './layout'
 export {
   formatDateTime,
   formatGmt7DateTime,

@@ -1,6 +1,11 @@
 import { createBrowserRouter } from 'react-router-dom'
 import App from '@/src/app/App'
-import { AdminRoute, ProtectedRoute, TeamRoute } from './protected-routes'
+import {
+  AdminRoute,
+  OrganizerRoute,
+  ProtectedRoute,
+  TeamRoute,
+} from './protected-routes'
 
 export const router = createBrowserRouter([
   {
@@ -30,6 +35,27 @@ export const router = createBrowserRouter([
             lazy: async () => {
               const { TeamDetailRacePage } = await import('@/core/pages/team-detail-race')
               return { Component: TeamDetailRacePage }
+            },
+          },
+        ],
+      },
+      {
+        element: <OrganizerRoute />,
+        children: [
+          {
+            path: 'organizer',
+            handle: { title: 'Quản trạm' },
+            lazy: async () => {
+              const { OrganizerRaceListPage } = await import('@/core/pages/organizer-race-list')
+              return { Component: OrganizerRaceListPage }
+            },
+          },
+          {
+            path: 'organizer/races/:raceId',
+            handle: { title: 'Chi tiết trận đấu' },
+            lazy: async () => {
+              const { OrganizerRacePage } = await import('@/core/pages/organizer-race')
+              return { Component: OrganizerRacePage }
             },
           },
         ],

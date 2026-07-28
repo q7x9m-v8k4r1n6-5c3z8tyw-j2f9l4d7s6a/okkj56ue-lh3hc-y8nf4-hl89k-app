@@ -38,6 +38,8 @@ export const userProfileSchema = z.object({
   id: z.string().min(1),
   email: z.string().email(),
   role: z.string().min(1),
+  roles: z.array(z.string().min(1)),
+  userType: z.enum(['team', 'organizer']),
   displayName: z.string().nullable(),
   avatarUrl: z.string().url().or(z.literal('')).nullable().optional(),
 })
