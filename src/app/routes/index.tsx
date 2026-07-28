@@ -107,6 +107,14 @@ export const router = createBrowserRouter([
                 },
               },
               {
+                path: 'settings',
+                handle: { title: 'Cài đặt' },
+                lazy: async () => {
+                  const { SettingsPage } = await import('@/core/pages/settings')
+                  return { Component: SettingsPage }
+                },
+              },
+              {
                 path: 'prototype',
                 handle: { title: 'Common UI Prototype' },
                 lazy: async () => {
