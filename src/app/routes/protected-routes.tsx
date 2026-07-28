@@ -1,9 +1,11 @@
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuthSession } from '@/core/features/auth'
 
-const isTeamRole = (role?: string) => role?.toLowerCase() === 'team'
-const isOrganizerRole = (role?: string) => role?.toLowerCase() === 'organizer'
-const isAdminRole = (role?: string) => role?.toLowerCase() === 'admin'
+const isTeamUser = (userType?: string) => userType?.toLowerCase() === 'team'
+const isOrganizerUser = (userType?: string) => userType?.toLowerCase() === 'organizer'
+const hasAdminRole = (roles: readonly string[] = []) => (
+  roles.some((role) => role.toLowerCase() === 'admin')
+)
 
 export const ProtectedRoute = () => {
   const { isAuthenticated } = useAuthSession()
@@ -18,13 +20,13 @@ export const ProtectedRoute = () => {
 export const AdminRoute = () => {
   const { user } = useAuthSession()
 
-  if (isTeamRole(user?.role)) {
+  if (isTeamUser(user?.userType)) {
     return <Navigate to="/team" replace />
   }
-  if (isOrganizerRole(user?.role)) {
+  if (isOrganizerUser(user?.userType) && !hasAdminRole(user?.roles)) {
     return <Navigate to="/organizer" replace />
   }
-  if (!isAdminRole(user?.role)) {
+  if (!hasAdminRole(user?.roles)) {
     return <Navigate to="/login" replace />
   }
 
@@ -34,7 +36,7 @@ export const AdminRoute = () => {
 export const TeamRoute = () => {
   const { user } = useAuthSession()
 
-  if (!isTeamRole(user?.role)) {
+  if (!isTeamUser(user?.userType)) {
     return <Navigate to="/" replace />
   }
 
@@ -44,7 +46,7 @@ export const TeamRoute = () => {
 export const OrganizerRoute = () => {
   const { user } = useAuthSession()
 
-  if (!isOrganizerRole(user?.role)) {
+  if (!isOrganizerUser(user?.userType)) {
     return <Navigate to="/" replace />
   }
 

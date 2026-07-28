@@ -17,6 +17,7 @@ import {
 const authMeResponseSchema = z.object({
   id: z.string().min(1),
   email: z.string().email(),
+  userType: z.enum(['team', 'organizer']),
   roles: z.array(z.object({
     code: z.string().min(1),
   })).default([]),
@@ -25,6 +26,7 @@ const authMeResponseSchema = z.object({
 }).transform(({ roles, ...user }) => ({
   ...user,
   role: roles[0]?.code ?? '',
+  roles: roles.map((role) => role.code),
 }))
 
 /** Authenticates a username/password credential pair. */
