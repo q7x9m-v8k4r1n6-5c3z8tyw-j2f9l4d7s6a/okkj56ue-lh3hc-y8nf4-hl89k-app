@@ -1,8 +1,12 @@
 import { EnterStationIcon } from '@/core/assets'
 import { useOrganizerJoinRequests } from './hooks/useOrganizerJoinRequests'
 
-export const OrganizerJoinRequestsView = () => {
-  const joinRequests = useOrganizerJoinRequests()
+interface OrganizerJoinRequestsViewProps {
+  boothId?: string
+}
+
+export const OrganizerJoinRequestsView = ({ boothId }: OrganizerJoinRequestsViewProps) => {
+  const joinRequests = useOrganizerJoinRequests({ boothId })
 
   if (joinRequests.acceptedRequest) {
     return (
@@ -28,9 +32,10 @@ export const OrganizerJoinRequestsView = () => {
                 <button
                   key={scoreOption}
                   type="button"
-                  className={`flex aspect-[102/119] w-[clamp(84px,27vw,102px)] min-w-0 flex-col items-center justify-center rounded-lg border-2 text-[#040000] transition ${isSelected
-                    ? 'border-[#de3336] bg-[#de3336]/5 shadow-[0_0_0_2px_rgba(222,51,54,0.08)]'
-                    : 'border-[#e5e5e5] bg-white hover:border-[#de3336]/50'
+                  className={`flex aspect-[102/119] w-[clamp(84px,27vw,102px)] min-w-0 flex-col items-center justify-center rounded-lg border-2 text-[#040000] transition ${
+                    isSelected
+                      ? 'border-[#de3336] bg-[#de3336]/5 shadow-[0_0_0_2px_rgba(222,51,54,0.08)]'
+                      : 'border-[#e5e5e5] bg-white hover:border-[#de3336]/50'
                   }`}
                   onClick={() => joinRequests.selectScore(scoreOption)}
                 >
@@ -45,10 +50,10 @@ export const OrganizerJoinRequestsView = () => {
         <button
           type="button"
           className="h-[42px] w-full rounded-md bg-[#de3336] text-sm font-bold text-white transition-colors hover:bg-[#c92d30] disabled:cursor-not-allowed disabled:bg-[#ef9a9c]"
-          disabled={!joinRequests.canSubmitScore}
+          disabled={!joinRequests.canSubmitScore || joinRequests.isSubmitting}
           onClick={joinRequests.submitScore}
         >
-          Xác nhận
+          {joinRequests.isSubmitting ? 'Đang gửi...' : 'Xác nhận'}
         </button>
       </section>
     )
