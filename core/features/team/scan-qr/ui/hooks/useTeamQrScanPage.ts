@@ -1,15 +1,22 @@
+import { useAuthSession } from '@/core/features/auth'
 import { useTeamQrScanForm } from '../../model/frontend/useTeamQrScanForm'
 import { useScanQrMutation } from '../../model/server/useScanQrMutation'
 import { mapQrToRequest } from '../../model/mapQrToRequest'
 import { validateQrCode } from '../../model/scanQr.validation'
-import { useAuthSession } from '@/core/features/auth'
+
+const getErrorMessage = (error: unknown) => {
+  if (error instanceof Error) return error.message
+  if (typeof error === 'object' && error && 'message' in error) {
+    return String((error as { message?: unknown }).message ?? '')
+  }
+
+  return ''
+}
 
 export const useTeamQrScanPage = () => {
   const form = useTeamQrScanForm()
   const mutation = useScanQrMutation()
-
   const authSession = useAuthSession()
-
   const teamId = authSession?.user?.id
 
   const handleScan = (qrCode: string) => {
@@ -33,10 +40,10 @@ export const useTeamQrScanPage = () => {
 
     mutation.mutate(requestPayload, {
       onSuccess: (data) => {
-        console.log('⚡ Quét QR vào trạm thành công:', data)
+        console.log('Quét QR vào trạm thành công:', data)
       },
-      onError: (err: any) => {
-        form.setErrorMessage(err?.message || 'Không thể gửi mã QR. Vui lòng thử lại!')
+      onError: (err: unknown) => {
+        form.setErrorMessage(getErrorMessage(err) || 'Không thể gửi mã QR. Vui lòng thử lại!')
       },
     })
   }

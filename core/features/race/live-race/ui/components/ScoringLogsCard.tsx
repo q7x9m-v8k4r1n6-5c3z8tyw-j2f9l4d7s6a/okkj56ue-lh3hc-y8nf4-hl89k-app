@@ -29,7 +29,7 @@ export const ScoringLogsCard = ({ raceId }: { raceId?: string }) => {
                     <TableCell>
                       <div className="flex flex-col gap-1">
                         <span className="text-[#333333]">
-                          {log.teamName} {log.boothName ? `hoàn thành ${log.boothName}` : `bị ${log.eventName}`}
+                          {log.teamName} {log.boothName ? `hoàn thành ${log.boothName}` : log.reason.trim() || log.eventName}
                           <span className={`block font-semibold ${log.scoreDelta > 0 ? 'text-[#16a34a]' : 'text-[#de3336]'}`}>
                             ({log.scoreDelta > 0 ? '+' : ''}{log.scoreDelta} điểm)
                           </span>
