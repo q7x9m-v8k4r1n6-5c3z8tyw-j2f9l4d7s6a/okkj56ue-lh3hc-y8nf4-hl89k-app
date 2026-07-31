@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 export const teamLeaderboardItemSchema = z.object({
+  teamId: z.string(),
   displayName: z.string(),
   totalScore: z.number(),
 })

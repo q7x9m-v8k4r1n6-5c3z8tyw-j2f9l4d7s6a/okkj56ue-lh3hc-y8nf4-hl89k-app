@@ -17,7 +17,7 @@ import {
 const authMeResponseSchema = z.object({
   id: z.string().min(1),
   email: z.string().email(),
-  userType: z.enum(['team', 'organizer']),
+  userType: z.string().min(1).transform((value) => value.toLowerCase()),
   roles: z.array(z.object({
     code: z.string().min(1),
   })).default([]),

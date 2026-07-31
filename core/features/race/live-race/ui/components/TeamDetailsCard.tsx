@@ -1,9 +1,19 @@
 import { UsersIcon } from '@/core/assets/icons'
-import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@/core/shared'
+import { Skeleton, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@/core/shared'
+import type { LiveRaceSelectedTeam } from '../../model/liveRace.selection'
+import { useTeamDetailsSection } from '../hooks/useTeamDetailsSection'
 import { SectionHeader } from './SectionHeader'
 
-export const TeamDetailsCard = () => {
-  const hardcodedTeams = Array.from({ length: 10 }, (_, i) => ({ id: i, name: 'Muhahaha' }))
+type TeamDetailsCardProps = {
+  raceId?: string
+  onSelectTeam: (team: LiveRaceSelectedTeam) => void
+}
+
+export const TeamDetailsCard = ({ raceId, onSelectTeam }: TeamDetailsCardProps) => {
+  const { teams, isLoading, emptyMessage, selectTeam } = useTeamDetailsSection({
+    raceId,
+    onSelectTeam,
+  })
 
   return (
     <div className="flex flex-col bg-white">
@@ -15,11 +25,33 @@ export const TeamDetailsCard = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {hardcodedTeams.map((team) => (
-            <TableRow key={team.id} className="border-[#f5f5f5]">
-              <TableCell className="underline">{team.name}</TableCell>
+          {isLoading ? (
+            <TableRow>
+              <TableCell className="text-center">
+                <Skeleton lines={5} className="py-2" />
+              </TableCell>
             </TableRow>
-          ))}
+          ) : teams.length === 0 ? (
+            <TableRow>
+              <TableCell className="text-center italic text-gray-400">
+                {emptyMessage}
+              </TableCell>
+            </TableRow>
+          ) : (
+            teams.map((team) => (
+              <TableRow key={team.teamId} className="border-[#f5f5f5]">
+                <TableCell>
+                  <button
+                    type="button"
+                    className="font-medium text-[#333333] underline underline-offset-4 transition hover:text-[#DE3336]"
+                    onClick={() => selectTeam(team)}
+                  >
+                    {team.displayName}
+                  </button>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
     </div>

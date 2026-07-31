@@ -11,7 +11,7 @@ export const loginResponseSchema = z.object({
   accessToken: z.string().min(1),
   accessTokenExpiration: z.string().min(1),
   userId: z.string().min(1),
-  userType: z.enum(['team', 'organizer']),
+  userType: z.string().min(1).transform((value) => value.toLowerCase()),
 })
 export const logoutResponseSchema = z.boolean()
 
