@@ -24,9 +24,12 @@ export const useAuthClientRecovery = () => {
         const response = await refreshAccessToken()
         return response.accessToken
       },
-      shouldRecover: (path) => (
-        !AUTH_ENTRY_PATHS.some((entryPath) => path.includes(entryPath))
-      ),
+      shouldRecover: (path) => {
+        const normalizedPath = path.toLowerCase()
+        return !AUTH_ENTRY_PATHS.some((entryPath) => (
+          normalizedPath.includes(entryPath)
+        ))
+      },
       onRecoveryFailed: () => {
         setAuthToken(null)
         clearGoogleProfile()

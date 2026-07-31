@@ -23,10 +23,7 @@ export const AdminRoute = () => {
   if (isTeamUser(user?.userType)) {
     return <Navigate to="/team" replace />
   }
-  if (isOrganizerUser(user?.userType) && !hasAdminRole(user?.roles)) {
-    return <Navigate to="/organizer" replace />
-  }
-  if (!hasAdminRole(user?.roles)) {
+  if (!isOrganizerUser(user?.userType) && !hasAdminRole(user?.roles)) {
     return <Navigate to="/login" replace />
   }
 
