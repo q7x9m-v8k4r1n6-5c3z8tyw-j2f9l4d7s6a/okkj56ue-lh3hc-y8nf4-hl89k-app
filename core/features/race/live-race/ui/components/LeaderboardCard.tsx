@@ -9,7 +9,7 @@ export const LeaderboardCard = ({ raceId }: { raceId?: string }) => {
   return (
     <div className="flex flex-col rounded-xl bg-white">
       <SectionHeader icon={<LeaderboardIcon className="size-5" />} title="Bảng Xếp Hạng" />
-      <Table wrapperClassName="max-h-[332px] overflow-y-auto rounded-lg border border-[#eeeeee]">
+      <Table wrapperClassName="max-h-[332px] overflow-y-auto rounded-lg border border-[#e5e5e5]">
         <TableHead className="sticky top-0 z-10 bg-[#DE3336]">
           <TableRow className="border-none">
             <TableHeaderCell className="text-center font-bold text-white">HẠNG</TableHeaderCell>
