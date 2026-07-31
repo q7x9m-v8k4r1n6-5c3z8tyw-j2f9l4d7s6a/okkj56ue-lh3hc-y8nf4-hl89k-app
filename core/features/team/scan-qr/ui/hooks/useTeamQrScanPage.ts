@@ -2,7 +2,7 @@ import { useTeamQrScanForm } from '../../model/frontend/useTeamQrScanForm'
 import { useScanQrMutation } from '../../model/server/useScanQrMutation'
 import { mapQrToRequest } from '../../model/mapQrToRequest'
 import { validateQrCode } from '../../model/scanQr.validation'
-import { useAuthSession } from '@/core/features/auth' 
+import { useAuthSession } from '@/core/features/auth'
 
 export const useTeamQrScanPage = () => {
   const form = useTeamQrScanForm()
@@ -13,7 +13,8 @@ export const useTeamQrScanPage = () => {
   const teamId = authSession?.user?.id
 
   const handleScan = (qrCode: string) => {
-    // Validate định dạng mã QR
+    if (mutation.isPending || mutation.isSuccess) return
+
     const error = validateQrCode(qrCode)
     if (error) {
       form.setErrorMessage(error)
