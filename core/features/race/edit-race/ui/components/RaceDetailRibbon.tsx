@@ -40,9 +40,9 @@ export const RaceDetailRibbon = (options: RaceDetailRibbonOptions) => {
           <span className={`rounded-xl px-3 py-1.5 text-sm ${ribbon.statusClassName}`}>
             {ribbon.statusLabel}
           </span>
-          <div className="text-right text-sm leading-4 text-[#a6a6a6]">
+          <div className="text-right text-xs text-[#a6a6a6]">
             <p className="italic">Cập nhật lần cuối:</p>
-            <p>{ribbon.modifiedAtText}</p>
+            <p className="text-xs">{ribbon.modifiedAtText}</p>
           </div>
         </div>
       </div>

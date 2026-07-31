@@ -1,6 +1,8 @@
 import { ChevronIcon, EditIcon } from '@/core/assets'
-import { Button, Drawer } from '@/core/shared'
-import type { StaffRole, UserStatus } from '@/core/entities/user'
+import { Button, Drawer, client } from '@/core/shared'
+import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import type { UserStatus } from '@/core/entities/user'
 import type { EditableUser, UserFormProps } from '../../model/userForm'
 import { useUserForm } from '../hooks/useUserForm'
 import { useUserFormView } from '../hooks/useUserFormView'
@@ -9,7 +11,7 @@ const USER_FORM_ID = 'user-form-panel'
 const fieldClassName = 'block'
 const labelClassName = 'mb-2 block text-sm font-bold uppercase leading-[14px] tracking-[0.35px] text-[#1a1c1c]'
 const inputClassName = 'h-12 w-full rounded-lg border border-[#e5e5e5] bg-white px-[17px] py-[14.5px] text-base leading-normal text-[#6b7280] outline-none transition placeholder:text-[#6b7280] focus:border-[#d4d4d4] focus:ring-2 focus:ring-[#de3336]/10'
-const disabledInputClassName = `${inputClassName} cursor-not-allowed bg-[#fafafa]`
+const disabledInputClassName = `${inputClassName} cursor-not-allowed !bg-[#e5e7eb] text-[#737373] hover:!bg-[#e5e7eb]`
 const selectClassName = `${inputClassName} appearance-none pr-11`
 
 const RequiredMark = () => <span> (<span className="text-[#de3336]">*</span>)</span>
@@ -33,17 +35,32 @@ const UserFormEditor = ({
     form,
     handleSubmit,
     hint,
+    isResettingPassword,
     isSaving,
     resetPassword,
     returnToList,
     setDisplayName,
     setEmail,
-    setRole,
+    setRoleIds,
     setStatus,
     setUsername,
     title,
     usernamePlaceholder,
   } = useUserForm(props, initialForm)
+  const [rolePanelOpen, setRolePanelOpen] = useState(false)
+  const [pendingRoleIds, setPendingRoleIds] = useState<string[]>(form.roleIds)
+  const rolesQuery = useQuery({
+    queryKey: ['rbac', 'roles'],
+    queryFn: () => client.request<Array<{ id: string; name: string; code: string; description?: string | null }>>({
+      path: '/admin/organizers/roles',
+    }),
+    enabled: category === 'staff',
+  })
+  const selectedRoles = (rolesQuery.data ?? []).filter((role) => form.roleIds.includes(role.id))
+  const openRolePanel = () => {
+    setPendingRoleIds(form.roleIds)
+    setRolePanelOpen(true)
+  }
 
   return (
     <Drawer
@@ -67,14 +84,14 @@ const UserFormEditor = ({
             </label>
           ) : null}
 
-          {category !== 'staff' ? (
+          {category !== 'staff' && mode === 'edit' ? (
             <label className={fieldClassName}>
-              <span className={labelClassName}>{mode === 'edit' ? 'Tên đăng nhập' : 'Username'}{mode === 'create' ? <RequiredMark /> : null}</span>
-              <input value={form.username} onChange={(event) => setUsername(event.target.value)} type="text" required={mode === 'create'} disabled={mode === 'edit'} className={mode === 'edit' ? disabledInputClassName : inputClassName} placeholder={usernamePlaceholder} />
+              <span className={labelClassName}>Tên đăng nhập<RequiredMark /></span>
+              <input value={form.username} onChange={(event) => setUsername(event.target.value)} type="text" required className={inputClassName} placeholder={usernamePlaceholder} />
             </label>
           ) : null}
 
-          <label className={fieldClassName}>
+          <label className={`${fieldClassName} ${category === 'staff' && mode === 'edit' ? 'cursor-not-allowed' : ''}`}>
             <span className={labelClassName}>
               {category === 'staff' && mode === 'edit' ? 'Email' : emailLabel.replace(' (*)', '')}
               {!(category === 'staff' && mode === 'edit') ? <RequiredMark /> : null}
@@ -84,23 +101,31 @@ const UserFormEditor = ({
               onChange={(event) => setEmail(event.target.value)}
               type="email"
               required
-              disabled={mode === 'edit'}
-              className={mode === 'edit' ? disabledInputClassName : inputClassName}
+              disabled={category === 'staff' && mode === 'edit'}
+              className={category === 'staff' && mode === 'edit' ? disabledInputClassName : inputClassName}
               placeholder={emailPlaceholder}
             />
           </label>
 
           {category === 'staff' ? (
-            <label className={`${fieldClassName} relative`}>
+            <div className={fieldClassName}>
               <span className={labelClassName}>Vai trò<RequiredMark /></span>
-              <select value={form.role} required onChange={(event) => setRole(event.target.value as StaffRole)} className={selectClassName}>
-                <option value="" disabled>Chọn vai trò</option>
-                <option value="admin">Quản trị viên</option>
-                <option value="coordinator">Điều phối viên</option>
-                <option value="support">Hỗ trợ</option>
-              </select>
-              <ChevronIcon className="pointer-events-none absolute bottom-[18px] right-[17px] h-2 w-3 text-[#6b7280]" />
-            </label>
+              {selectedRoles.length ? (
+                <div className="flex min-h-12 items-center gap-2 overflow-hidden rounded-lg border border-[#e5e5e5] bg-white px-4">
+                  <span className="min-w-0 flex-1 truncate text-sm text-[#1a1c1c]" title={selectedRoles.map((role) => role.name).join(', ')}>
+                    {selectedRoles.map((role) => role.name).join(', ')}
+                  </span>
+                  <button type="button" className="shrink-0 text-sm font-semibold text-[#de3336]" onClick={openRolePanel}>Chỉnh sửa</button>
+                </div>
+              ) : (
+                <>
+                  <button type="button" className="flex h-12 w-full items-center justify-center rounded-lg border border-dashed border-[#d4d4d4] text-sm font-semibold text-[#de3336] hover:bg-[#fff5f5]" onClick={openRolePanel}>
+                    + Thêm vai trò
+                  </button>
+                  {rolesQuery.isError ? <p className="mt-2 text-xs text-[#b43b35]">Không tải được danh sách vai trò. Vui lòng khởi động lại backend và thử lại.</p> : null}
+                </>
+              )}
+            </div>
           ) : null}
 
           {mode === 'edit' ? (
@@ -119,12 +144,41 @@ const UserFormEditor = ({
         </div>
         {mode === 'edit' && category !== 'staff' ? (
           <div className="mt-auto pt-8">
-            <Button type="button" size="sm" className="h-[37px] min-h-0 w-full px-8 py-0 text-sm font-semibold leading-[14px] tracking-[0.7px]" onClick={resetPassword}>
-              Cấp lại mật khẩu mới
+            <Button disabled={isResettingPassword} type="button" size="sm" className="h-[37px] min-h-0 w-full px-8 py-0 text-sm font-semibold leading-[14px] tracking-[0.7px]" onClick={() => void resetPassword()}>
+              {isResettingPassword ? 'Đang cấp lại mật khẩu...' : 'Cấp lại mật khẩu mới'}
             </Button>
           </div>
         ) : null}
       </form>
+      <Drawer
+        open={rolePanelOpen}
+        title="Thêm vai trò"
+        onClose={() => setRolePanelOpen(false)}
+        layerClassName="z-[60]"
+        panelClassName="max-w-[430px]"
+        footer={(
+          <>
+            <Button variant="secondary" onClick={() => setRolePanelOpen(false)}>Quay lui</Button>
+            <Button onClick={() => { setRoleIds(pendingRoleIds); setRolePanelOpen(false) }}>Thêm</Button>
+          </>
+        )}
+      >
+        <div className="border-y border-[#eeeeee]">
+          {rolesQuery.isLoading ? <p className="py-6 text-center text-sm text-[#737373]">Đang tải vai trò...</p> : null}
+          {rolesQuery.data?.map((role) => (
+            <label key={role.id} className="flex cursor-pointer items-start gap-3 border-b border-[#eeeeee] px-1 py-4 last:border-b-0 hover:bg-[#fafafa]">
+              <input
+                type="checkbox"
+                className="mt-0.5 size-4 rounded border-[#bdbdbd] accent-[#de3336]"
+                checked={pendingRoleIds.includes(role.id)}
+                onChange={() => setPendingRoleIds((current) => current.includes(role.id) ? current.filter((id) => id !== role.id) : [...current, role.id])}
+              />
+              <span className="min-w-0"><span className="block text-sm font-semibold text-[#1a1c1c]">{role.name}</span><span className="mt-1 block text-xs leading-5 text-[#737373]">{role.description || 'Chưa có mô tả cho vai trò này.'}</span></span>
+            </label>
+          ))}
+          {rolesQuery.isError ? <p className="py-6 text-center text-sm text-[#b43b35]">Không thể tải danh sách vai trò.</p> : null}
+        </div>
+      </Drawer>
     </Drawer>
   )
 }

@@ -25,4 +25,5 @@ export const mapUserListToSummaries = (
     username: organizer.email.split('@')[0] ?? '',
     status: organizer.status,
     email: organizer.email,
+    avatarUrl: organizer.avatarUrl,
   }))

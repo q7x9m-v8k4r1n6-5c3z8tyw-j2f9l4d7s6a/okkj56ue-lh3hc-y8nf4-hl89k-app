@@ -61,6 +61,7 @@ const editRaceOrganizerSchema = z.object({
   id: z.string().uuid(),
   displayName: z.string(),
   email: z.string(),
+  avatarUrl: z.string().url().or(z.literal('')).nullable().optional(),
 })
 
 const editRaceTeamSchema = z.object({

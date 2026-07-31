@@ -23,6 +23,7 @@ export const organizerManagementRowSchema = z.object({
   email: z.string().email(),
   role: z.string(),
   status: userStatusSchema,
+  avatarUrl: z.string().url().or(z.literal('')).nullable().optional(),
 })
 
 const createPageSchema = <Item extends z.ZodType>(itemSchema: Item) => z.object({

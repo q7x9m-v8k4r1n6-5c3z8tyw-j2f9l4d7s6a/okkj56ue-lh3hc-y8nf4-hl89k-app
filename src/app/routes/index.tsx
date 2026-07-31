@@ -43,6 +43,14 @@ export const router = createBrowserRouter([
         element: <OrganizerRoute />,
         children: [
           {
+            path: 'organizer/select',
+            handle: { title: 'Chọn khu vực làm việc' },
+            lazy: async () => {
+              const { OrganizerEntryPage } = await import('@/core/pages/organizer-entry')
+              return { Component: OrganizerEntryPage }
+            },
+          },
+          {
             path: 'organizer',
             handle: { title: 'Quản trạm' },
             lazy: async () => {
@@ -96,6 +104,14 @@ export const router = createBrowserRouter([
                 lazy: async () => {
                   const { UserListPage } = await import('@/core/pages/user-list')
                   return { Component: UserListPage }
+                },
+              },
+              {
+                path: 'settings',
+                handle: { title: 'Cài đặt' },
+                lazy: async () => {
+                  const { SettingsPage } = await import('@/core/pages/settings')
+                  return { Component: SettingsPage }
                 },
               },
               {

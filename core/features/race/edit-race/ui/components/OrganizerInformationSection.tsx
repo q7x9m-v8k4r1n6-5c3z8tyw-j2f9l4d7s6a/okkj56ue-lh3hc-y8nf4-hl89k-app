@@ -41,7 +41,7 @@ export const OrganizerInformationSection = () => {
             {section.organizers.map((organizer) => (
               <TableRow key={organizer.id} className="border-[#f5f5f5]">
                 <TableCell>
-                  <AvatarName name={organizer.displayName} />
+                  <AvatarName name={organizer.displayName} avatarUrl={organizer.avatarUrl} />
                 </TableCell>
                 <TableCell>{organizer.email}</TableCell>
                 {section.isEditing ? (

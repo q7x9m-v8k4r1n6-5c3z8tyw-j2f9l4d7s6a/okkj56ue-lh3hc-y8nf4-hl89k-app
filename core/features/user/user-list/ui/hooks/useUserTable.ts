@@ -1,5 +1,6 @@
 import type { KeyboardEvent } from 'react'
-import type { UserCategory } from '@/core/entities/user'
+import { type UserCategory, type UserSummary } from '@/core/entities/user'
+import { useState } from 'react'
 import { useToast } from '@/core/shared'
 import { useUserListState } from '../../model/frontend/useUserListState'
 import { mapUserListToSummaries } from '../../model/mapUserListToSummary'
@@ -16,12 +17,12 @@ const getDisplayLabel = (tab: UserCategory) =>
 export const useUserTable = () => {
   const state = useUserListState()
   const { toast } = useToast()
-  const teamsQuery = useTeamListQuery(state.request, state.tab === 'team')
-  const organizersQuery = useOrganizerListQuery(
-    state.request,
-    state.tab === 'staff',
-  )
+  // Load both totals on entry so the inactive tab's badge is immediately
+  // accurate instead of waiting for the user to visit that tab.
+  const teamsQuery = useTeamListQuery(state.request, true)
+  const organizersQuery = useOrganizerListQuery(state.request, true)
   const deleteUser = useDeleteUserMutation()
+  const [userPendingDeletion, setUserPendingDeletion] = useState<UserSummary | null>(null)
   const activeQuery = state.tab === 'team' ? teamsQuery : organizersQuery
   const rows = mapUserListToSummaries(
     state.tab,
@@ -29,17 +30,20 @@ export const useUserTable = () => {
     organizersQuery.data?.items ?? [],
   )
 
-  const handleDelete = async (category: UserCategory, userId: string) => {
+  const confirmDelete = async () => {
+    const user = userPendingDeletion
+    if (!user) return
     try {
-      await deleteUser.mutateAsync({ category, userId })
+      await deleteUser.mutateAsync({ category: user.category, userId: user.id })
       toast({
         title: 'Thông báo',
-        description: `Đã xóa ${getDisplayLabel(category)} khỏi danh sách.`,
+        description: `Đã xóa ${getDisplayLabel(user.category)} khỏi danh sách.`,
       })
+      setUserPendingDeletion(null)
     } catch {
       toast({
         title: 'Thông báo',
-        description: `Không thể xóa ${getDisplayLabel(category)}.`,
+        description: `Không thể xóa ${getDisplayLabel(user.category)}.`,
       })
     }
   }
@@ -66,7 +70,11 @@ export const useUserTable = () => {
     errorMessage: activeQuery.error instanceof Error
       ? activeQuery.error.message
       : `Không thể tải danh sách ${labels.display}.`,
-    handleDelete,
+    confirmDelete,
+    isDeleting: deleteUser.isPending,
+    requestDelete: setUserPendingDeletion,
+    userPendingDeletion,
+    cancelDelete: () => setUserPendingDeletion(null),
     handleSearchKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
       if (event.key !== 'Enter') return
       event.preventDefault()

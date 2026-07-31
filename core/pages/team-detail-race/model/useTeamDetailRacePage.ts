@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useTeamRaceAccess } from '@/core/features/team/team-race'
 import {
   isTeamDetailRaceTab,
@@ -15,8 +15,12 @@ import {
 export const useTeamDetailRacePage = () => {
   const navigate = useNavigate()
   const { raceId } = useParams<{ raceId: string }>()
+  const [searchParams, setSearchParams] = useSearchParams()
   const raceAccess = useTeamRaceAccess(raceId)
-  const [activeTab, setActiveTab] = useState<TeamDetailRaceTab>('rules')
+  const initialTab = searchParams.get('tab')
+  const [activeTab, setActiveTab] = useState<TeamDetailRaceTab>(
+    initialTab && isTeamDetailRaceTab(initialTab) && initialTab !== 'more' ? initialTab : 'rules',
+  )
   const [previousTab, setPreviousTab] = useState<TeamPrimaryDetailRaceTab>('rules')
   const isMenuOpen = activeTab === 'more'
 
@@ -42,6 +46,7 @@ export const useTeamDetailRacePage = () => {
       }
       setPreviousTab(value)
       setActiveTab(value)
+      setSearchParams((current) => { current.set('tab', value); return current })
     },
     openMenu,
     raceName: raceAccess.raceName,

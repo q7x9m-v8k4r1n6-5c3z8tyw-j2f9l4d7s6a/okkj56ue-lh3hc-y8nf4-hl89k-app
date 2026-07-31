@@ -92,15 +92,20 @@ export const useEditRaceFormState = (
     dispatch({ type: 'UPDATE_BASIC', changes })
   }, [])
 
-  const addBooth = useCallback(() => {
+  const addBooth = useCallback((
+    changes: Partial<Omit<EditRaceBooth, 'id'>> = {},
+  ) => {
+    const id = crypto.randomUUID()
     const booth: EditRaceBooth = {
-      id: crypto.randomUUID(),
+      id,
       name: '',
       place: '',
       managers: [],
       description: '',
+      ...changes,
     }
     dispatch({ type: 'ADD_BOOTH', booth })
+    return id
   }, [])
 
   const updateBooth = useCallback((

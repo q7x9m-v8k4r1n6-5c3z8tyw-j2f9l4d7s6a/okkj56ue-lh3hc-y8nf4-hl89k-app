@@ -22,6 +22,7 @@ export type EditableUser = {
   password: string
   email: string
   role: StaffRole | ''
+  roleIds: string[]
   status: UserStatus
 }
 
@@ -33,6 +34,7 @@ export const createEmptyUserForm = (): EditableUser => ({
   username: '',
   email: '',
   role: '',
+  roleIds: [],
   status: 'active',
   password: DEFAULT_USER_PASSWORD,
 })

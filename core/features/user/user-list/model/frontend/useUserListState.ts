@@ -19,11 +19,13 @@ const PAGE_SIZE = 20
 export const useUserListState = () => {
   const location = useLocation()
   const navigate = useNavigate()
-  const [, setSearchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const { toast } = useToast()
   const locationState = location.state as PageState | null
   const [tab, setTab] = useState<UserCategory>(
-    locationState?.activeTab ?? 'team',
+    searchParams.get('tab') === 'staff'
+      ? 'staff'
+      : locationState?.activeTab ?? 'team',
   )
   const [page, setPage] = useState(1)
   const [searchValue, setSearchValue] = useState('')
@@ -53,6 +55,10 @@ export const useUserListState = () => {
     setPage(1)
     setSearchValue('')
     setQuery('')
+    setSearchParams((current) => {
+      current.set('tab', nextTab)
+      return current
+    })
   }
 
   const submitSearch = () => {

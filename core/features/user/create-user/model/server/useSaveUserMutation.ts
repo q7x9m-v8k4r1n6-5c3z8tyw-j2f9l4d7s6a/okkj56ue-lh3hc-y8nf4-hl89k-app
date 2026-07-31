@@ -12,6 +12,7 @@ type SaveUserInput = {
   category: UserCategory
   mode: UserFormMode
   form: EditableUser
+  resetPassword?: boolean
 }
 
 /** Owns create/update server state and refreshes affected user collections. */
@@ -19,7 +20,7 @@ export const useSaveUserMutation = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ category, mode, form }: SaveUserInput) => {
+    mutationFn: ({ category, mode, form, resetPassword = false }: SaveUserInput) => {
       const commonRequest = {
         displayName: form.displayName,
         username: form.username,
@@ -29,12 +30,19 @@ export const useSaveUserMutation = () => {
       }
       if (category === 'team') {
         return mode === 'create'
-          ? createTeam(commonRequest)
-          : updateTeam({ ...commonRequest, id: form.id ?? '' })
+          ? createTeam({
+            displayName: form.displayName,
+            email: form.email,
+          })
+          : updateTeam({
+            ...commonRequest,
+            id: form.id ?? '',
+            resetPassword,
+          })
       }
       const organizerRequest = {
         ...commonRequest,
-        role: form.role || 'coordinator' as const,
+        roleIds: form.roleIds,
       }
       return mode === 'create'
         ? createOrganizer(organizerRequest)
@@ -44,6 +52,7 @@ export const useSaveUserMutation = () => {
       void queryClient.invalidateQueries({ queryKey: ['users'] })
       void queryClient.invalidateQueries({ queryKey: ['teams'] })
       void queryClient.invalidateQueries({ queryKey: ['organizers'] })
+      void queryClient.invalidateQueries({ queryKey: ['user-form'] })
     },
   })
 }

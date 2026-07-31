@@ -29,13 +29,14 @@ describe('user form validation', () => {
     })
   })
 
-  it('rejects an invalid team username', () => {
+  it('leaves the team username empty for backend generation', () => {
     const result = prepareUserForm('team', 'create', {
       ...createEmptyUserForm(),
       displayName: 'Alpha',
       username: 'Alpha Team',
       email: 'leader@example.com',
     })
-    expect(result.error).toContain('chữ thường')
+    expect(result.error).toBeUndefined()
+    expect(result.form?.username).toBe('')
   })
 })

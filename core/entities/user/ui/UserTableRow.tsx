@@ -14,11 +14,23 @@ export type UserTableRowProps = {
 export const UserTableRow = ({ onDelete, onEdit, user }: UserTableRowProps) => {
   return (
     <tr className="h-[72px] border-b border-white">
-      <td className="px-6 py-4">
-        <input type="checkbox" className="size-5 rounded-md border-[#d4d4d4]" />
+      <td className="px-6 py-4 text-sm text-[#171717]">
+        {user.category === 'staff' ? (
+          <span className="flex min-w-0 items-center gap-3">
+            {user.avatarUrl ? (
+              <img src={user.avatarUrl} alt="" className="size-9 shrink-0 rounded-full object-cover" referrerPolicy="no-referrer" />
+            ) : (
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#fde5e5] text-xs font-semibold text-[#8f1c1e]">
+                {user.displayName.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'U'}
+              </span>
+            )}
+            <span className="truncate">{user.displayName}</span>
+          </span>
+        ) : user.displayName}
       </td>
-      <td className="px-6 py-4 text-sm text-[#171717]">{user.displayName}</td>
-      <td className="px-6 py-4 text-sm text-[#525252]">{user.username}</td>
+      {user.category === 'team' && (
+        <td className="px-6 py-4 text-sm text-[#525252]">{user.username}</td>
+      )}
       <td className="px-6 py-4">
         <Badge variant={user.status === 'active' ? 'success' : 'neutral'}>
           {user.status === 'active' ? 'Active' : 'Inactive'}

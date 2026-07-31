@@ -8,10 +8,11 @@ export type DrawerProps = PropsWithChildren<{
   icon?: ReactNode
   footer?: ReactNode
   panelClassName?: string
+  layerClassName?: string
   onClose: () => void
 }>
 
-export const Drawer = ({ children, footer, icon, onClose, open, panelClassName = '', title }: DrawerProps) => {
+export const Drawer = ({ children, footer, icon, layerClassName = '', onClose, open, panelClassName = '', title }: DrawerProps) => {
   useEffect(() => {
     if (!open) return
     const handleKeyDown = (event: KeyboardEvent) => event.key === 'Escape' && onClose()
@@ -21,7 +22,7 @@ export const Drawer = ({ children, footer, icon, onClose, open, panelClassName =
 
   return createPortal(
     <div
-      className={`fixed inset-0 z-50 transition-colors duration-200 ${open ? 'bg-black/10' : 'pointer-events-none bg-black/0'}`}
+      className={`fixed inset-0 ${layerClassName || 'z-50'} transition-colors duration-200 ${open ? 'bg-black/10' : 'pointer-events-none bg-black/0'}`}
       role="presentation"
       aria-hidden={!open}
       onMouseDown={(event) => event.target === event.currentTarget && onClose()}

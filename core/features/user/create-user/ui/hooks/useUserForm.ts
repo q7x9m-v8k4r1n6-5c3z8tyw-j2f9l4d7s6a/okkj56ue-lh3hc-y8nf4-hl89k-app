@@ -2,14 +2,10 @@ import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { StaffRole, UserStatus } from '@/core/entities/user'
 import { useToast } from '@/core/shared'
-import {
-  createEmptyUserForm,
-  DEFAULT_USER_PASSWORD,
-  type EditableUser,
-  type UserFormProps,
-} from '../../model/userForm'
+import { createEmptyUserForm, type EditableUser, type UserFormProps } from '../../model/userForm'
 import { prepareUserForm } from '../../model/userForm.validation'
 import { useSaveUserMutation } from '../../model/server/useSaveUserMutation'
+import { useResetTeamPasswordMutation } from '../../model/server/useResetTeamPasswordMutation'
 
 const getLabel = (category: UserFormProps['category']) =>
   category === 'staff' ? 'thành viên' : 'đội chơi'
@@ -23,10 +19,10 @@ export const useUserForm = (
   const navigate = useNavigate()
   const { toast } = useToast()
   const saveUser = useSaveUserMutation()
+  const resetTeamPassword = useResetTeamPasswordMutation()
   const [form, setForm] = useState<EditableUser>(
     initialForm ?? createEmptyUserForm,
   )
-  const [hint, setHint] = useState('')
   const [validationError, setValidationError] = useState('')
 
   const updateForm = <Key extends keyof EditableUser>(
@@ -42,11 +38,19 @@ export const useUserForm = (
     navigate('/users', { state: { activeTab: category } })
   }
 
-  const resetPassword = () => {
-    updateForm('password', DEFAULT_USER_PASSWORD)
-    setHint(
-      `Mật khẩu sẽ được đặt lại về ${DEFAULT_USER_PASSWORD} sau khi bạn nhấn Lưu.`,
-    )
+  const resetPassword = async () => {
+    if (!form.id) return
+    try {
+      await resetTeamPassword.mutateAsync(form.id)
+      toast({
+        title: 'Thông báo',
+        description: 'Đã cấp mật khẩu mới và gửi thông tin đăng nhập qua email đội trưởng.',
+      })
+    } catch (error) {
+      setValidationError(
+        error instanceof Error ? error.message : 'Không thể cấp lại mật khẩu.',
+      )
+    }
   }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -58,7 +62,12 @@ export const useUserForm = (
     }
 
     try {
-      await saveUser.mutateAsync({ category, mode, form: prepared.form })
+      await saveUser.mutateAsync({
+        category,
+        mode,
+        form: prepared.form,
+        resetPassword: false,
+      })
       const toastMessage = mode === 'edit'
         ? `Đã cập nhật ${getLabel(category)}.`
         : `Đã tạo ${getLabel(category)} mới.`
@@ -98,13 +107,15 @@ export const useUserForm = (
     error: validationError,
     form,
     handleSubmit,
-    hint,
+    hint: '',
+    isResettingPassword: resetTeamPassword.isPending,
     isSaving: saveUser.isPending,
     resetPassword,
     returnToList,
     setDisplayName: (value: string) => updateForm('displayName', value),
     setEmail: (value: string) => updateForm('email', value),
     setRole: (value: StaffRole) => updateForm('role', value),
+    setRoleIds: (value: string[]) => updateForm('roleIds', value),
     setStatus: (value: UserStatus) => updateForm('status', value),
     setUsername: (value: string) => updateForm('username', value),
     title,

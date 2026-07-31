@@ -14,6 +14,7 @@ export const useOrganizerInformationSection = () => {
         id: organizer.id,
         displayName: organizer.displayName ?? organizer.email,
         email: organizer.email,
+        avatarUrl: organizer.avatarUrl,
       })))
     },
     organizers: editor.form.organizers.map((organizer) => ({

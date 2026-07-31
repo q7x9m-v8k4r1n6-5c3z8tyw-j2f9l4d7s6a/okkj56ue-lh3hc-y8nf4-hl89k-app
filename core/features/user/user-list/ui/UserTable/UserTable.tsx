@@ -1,6 +1,6 @@
 import { PlusIcon, SearchIcon } from '@/core/assets'
 import { UserTableRow } from '@/core/entities/user'
-import { Button, Pagination, TableCard } from '@/core/shared'
+import { Button, Modal, Pagination, TableCard } from '@/core/shared'
 import { useUserTable } from '../hooks/useUserTable'
 
 /** Renders the management table from a hook-provided view-model. */
@@ -10,10 +10,12 @@ export const UserTable = () => {
     createUser,
     editUser,
     errorMessage,
-    handleDelete,
+    cancelDelete,
+    confirmDelete,
     handleSearchKeyDown,
     hideSearchTooltipLater,
     isError,
+    isDeleting,
     isLoading,
     labels,
     page,
@@ -26,6 +28,8 @@ export const UserTable = () => {
     setSearchTooltipOpen,
     tab,
     totalPages,
+    requestDelete,
+    userPendingDeletion,
   } = useUserTable()
 
   return (
@@ -39,7 +43,7 @@ export const UserTable = () => {
               onClick={() => selectTab('team')}
             >
               <span>Đội chơi</span>
-              <span className={`inline-flex min-w-[33px] items-center justify-center rounded-lg px-[3px] py-0.5 text-sm leading-[14px] tracking-[0.7px] ${tab === 'team' ? 'bg-[#e71313] text-white' : 'bg-[#f4f4f5] text-[#71717a]'}`}>{counts.team}</span>
+              <span className={`inline-flex w-fit items-center justify-center rounded-lg px-1.5 py-0.5 text-sm leading-[14px] tracking-[0.7px] ${tab === 'team' ? 'bg-[#e71313] text-white' : 'bg-[#f4f4f5] text-[#71717a]'}`}>{counts.team}</span>
             </button>
             <button
               type="button"
@@ -47,7 +51,7 @@ export const UserTable = () => {
               onClick={() => selectTab('staff')}
             >
               <span>Ban tổ chức</span>
-              <span className={`inline-flex min-w-[33px] items-center justify-center rounded-lg px-[3px] py-0.5 text-sm leading-[14px] tracking-[0.7px] ${tab === 'staff' ? 'bg-[#e71313] text-white' : 'bg-[#f4f4f5] text-[#71717a]'}`}>{counts.staff}</span>
+              <span className={`inline-flex w-fit items-center justify-center rounded-lg px-1.5 py-0.5 text-sm leading-[14px] tracking-[0.7px] ${tab === 'staff' ? 'bg-[#e71313] text-white' : 'bg-[#f4f4f5] text-[#71717a]'}`}>{counts.staff}</span>
             </button>
           </div>
 
@@ -56,7 +60,7 @@ export const UserTable = () => {
               <span className="sr-only">Tìm kiếm người dùng</span>
               <SearchIcon className="pointer-events-none absolute left-[10px] top-1/2 size-6 -translate-y-1/2 text-[#1a1c1c]" />
               <input
-                type="search"
+                type="text"
                 value={searchValue}
                 placeholder={labels.searchPlaceholder}
                 className="h-[34px] w-full rounded-lg border-[0.5px] border-[#d4d4d4] bg-white pl-11 pr-3 text-base leading-normal text-[#6b7280] outline-none placeholder:text-[#6b7280] focus:border-[#bdbdbd] focus:ring-2 focus:ring-[#de3336]/10"
@@ -85,14 +89,13 @@ export const UserTable = () => {
         </div>
       </div>
 
-    <TableCard className="flex min-h-0 w-full flex-1 flex-col rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
+    <TableCard className="px-2 flex min-h-0 w-full flex-1 flex-col rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
       <div className="min-h-0 flex-1 overflow-x-auto overflow-y-auto">
         <table className="min-w-full text-left">
           <thead>
             <tr className="h-11 bg-[#fafafa] text-xs font-medium leading-[18px] text-[#525252]">
-              <th className="w-[60px] px-6 py-3"><span className="block size-5 rounded-md border border-[#d4d4d4] bg-white" /></th>
               <th className="px-6 py-3">{labels.nameHeader}</th>
-              <th className="w-[224px] px-6 py-3">Tên đăng nhập</th>
+              {tab === 'team' && <th className="w-[224px] px-6 py-3">Tên đăng nhập</th>}
               <th className="w-[160px] px-6 py-3">Trạng thái</th>
               <th className="w-[224px] px-6 py-3">{labels.emailHeader}</th>
               <th className="w-[112px] px-4 py-3" />
@@ -101,13 +104,13 @@ export const UserTable = () => {
           <tbody className="text-sm leading-5 text-[#525252]">
             {isLoading ? (
               <tr>
-                <td colSpan={6} className="border-t border-[#f3eeeb] px-5 py-10 text-center text-sm text-[#9d9792]">
+                <td colSpan={tab === 'team' ? 5 : 4} className="border-t border-[#f3eeeb] px-5 py-10 text-center text-sm text-[#9d9792]">
                   Đang tải danh sách {labels.display}...
                 </td>
               </tr>
             ) : isError ? (
               <tr>
-                <td colSpan={6} className="border-t border-[#f3eeeb] px-5 py-10 text-center text-sm text-[#9d9792]">
+                <td colSpan={tab === 'team' ? 5 : 4} className="border-t border-[#f3eeeb] px-5 py-10 text-center text-sm text-[#9d9792]">
                   {errorMessage}
                 </td>
               </tr>
@@ -115,12 +118,12 @@ export const UserTable = () => {
               <UserTableRow
                 key={`${row.category}-${row.id}`}
                 user={row}
-                onDelete={(user) => handleDelete(user.category, user.id)}
+                onDelete={requestDelete}
                 onEdit={(user) => editUser(user.category, user.id)}
               />
             )) : (
               <tr>
-                <td colSpan={6} className="border-t border-[#f3eeeb] px-5 py-10 text-center text-sm text-[#9d9792]">
+                <td colSpan={tab === 'team' ? 5 : 4} className="border-t border-[#f3eeeb] px-5 py-10 text-center text-sm text-[#9d9792]">
                   Không tìm thấy {labels.display} phù hợp.
                 </td>
               </tr>
@@ -135,6 +138,23 @@ export const UserTable = () => {
         onChange={setPage}
       />
     </TableCard>
+    <Modal
+      open={Boolean(userPendingDeletion)}
+      title={`Xóa ${userPendingDeletion?.category === 'team' ? 'đội chơi' : 'thành viên Ban tổ chức'}?`}
+      onClose={cancelDelete}
+      footer={(
+        <>
+          <Button variant="secondary" onClick={cancelDelete}>Hủy</Button>
+          <Button variant="danger" disabled={isDeleting} onClick={() => void confirmDelete()}>
+            {isDeleting ? 'Đang xóa...' : 'Xóa'}
+          </Button>
+        </>
+      )}
+    >
+      <p className="text-sm text-[#525252]">
+        Bạn có chắc chắn muốn xóa <strong>{userPendingDeletion?.displayName}</strong> không?
+      </p>
+    </Modal>
     </div>
   )
 }
