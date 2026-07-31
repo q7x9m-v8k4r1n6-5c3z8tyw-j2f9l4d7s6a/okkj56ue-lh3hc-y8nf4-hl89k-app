@@ -17,6 +17,8 @@ export const useAppLayout = () => {
   const { isLoggingOut, logout } = useLogout()
   const raceId = /^\/races\/([^/]+)$/.exec(location.pathname)?.[1]
   const raceDetail = useRaceDetailQuery(raceId)
+  const [isPanelCollapsed, setIsPanelCollapsed] = useState(false)
+  const togglePanel = () => setIsPanelCollapsed((prev) => !prev)
 
   useEffect(() => {
     if (!isProfileOpen) return
@@ -54,5 +56,7 @@ export const useAppLayout = () => {
       ?? pageItems.find(({ to }) => to === location.pathname)?.title
       ?? 'Move',
     user,
+    isPanelCollapsed,
+    togglePanel
   }
 }

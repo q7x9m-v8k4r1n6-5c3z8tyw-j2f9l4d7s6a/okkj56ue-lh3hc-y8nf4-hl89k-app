@@ -4,8 +4,11 @@ import {
   ChevronIcon,
   GridMenuIcon,
   LogoutIcon,
+  PanelClose, // Đã import
+  PanelOpen,  // Đã import
 } from '@/core/assets'
 import { useAppLayout } from './useAppLayout'
+import { IconButton } from '@/core/shared'
 
 const ProfileAvatar = ({ name, src }: { name: string; src?: string | null }) => {
   const initials = name
@@ -39,15 +42,17 @@ export const AppLayout = ({ children }: PropsWithChildren) => {
     setIsProfileOpen,
     title,
     user,
+    isPanelCollapsed,
+    togglePanel
   } = useAppLayout()
 
   return (
     <div className="min-h-svh bg-[#f9f9f9] text-[#1a1c1c]">
-      <aside className="fixed inset-y-0 left-0 z-20 hidden w-[292px] border-r border-[#d4d4d4] bg-white py-5 md:flex md:flex-col">
+      <aside className={`fixed inset-y-0 left-0 z-20 hidden border-r border-[#d4d4d4] bg-white py-5 md:flex md:flex-col transition-all duration-300 ${isPanelCollapsed ? 'w-[80px]' : 'w-[292px]'}`}>
         <div className="flex items-center justify-center px-5 pb-[30px]">
           <NavLink
             to="/"
-            className="move-logo text-[40px] leading-[31.2px] tracking-[-0.24px] text-[#040000]"
+            className={`move-logo flex h-[31.2px] items-center font-bold tracking-[-0.24px] text-[#040000] transition-all duration-300 ${isPanelCollapsed ? 'text-[15px] leading-tight' : 'text-[40px] leading-[31.2px]'}`}
             aria-label="Move - Trang chủ"
           >
             Move
@@ -61,26 +66,34 @@ export const AppLayout = ({ children }: PropsWithChildren) => {
                 to={to}
                 end={to === '/'}
                 className={({ isActive }) =>
-                  `flex w-full items-center rounded-lg px-4 py-3 text-base leading-6 transition-colors ${isActive
+                  `flex w-full items-center rounded-lg py-3 text-base leading-6 transition-all duration-300 ${isPanelCollapsed ? 'justify-centor pl-6' : 'px-4'} ${isActive
                     ? 'bg-gradient-to-r from-[rgba(66,0,1,0.10)] to-[rgba(222,51,54,0.10)] text-[#420001]'
                     : 'text-[rgba(26,28,28,0.70)] hover:bg-[#f7f7f7] hover:text-[#420001]'
                   }`
                 }
               >
-                <span className="flex w-[34px] shrink-0 items-center">
+                <span className={`flex shrink-0 items-center transition-all ${isPanelCollapsed ? 'w-auto' : 'w-[34px]'}`}>
                   <Icon className={iconClassName} />
                 </span>
-                <span>{label}</span>
+                {!isPanelCollapsed && (
+                  <span className="truncate whitespace-nowrap opacity-100 transition-opacity duration-300">{label}</span>
+                )}
               </NavLink>
             </div>
           ))}
         </nav>
       </aside>
 
-      <div className="min-h-svh md:pl-[292px]">
+      <div className={`min-h-svh transition-all duration-300 ${isPanelCollapsed ? 'md:pl-[80px]' : 'md:pl-[292px]'}`}>
         <header className="sticky top-0 z-10 flex h-[61px] items-center justify-between bg-white px-[13px] shadow-[0_1px_1.4px_rgba(0,0,0,0.13)]">
-          <h1 className="pb-[7.9px] text-[28px] leading-[52.8px] tracking-[-0.96px]">{title}</h1>
-
+          <div className='flex flex-row items-center gap-3'>
+            <IconButton 
+              icon={isPanelCollapsed ? <PanelOpen className="size-6" /> : <PanelClose className="size-6" />}
+              onClick={togglePanel}
+              aria-label={isPanelCollapsed ? "Mở rộng menu" : "Thu gọn menu"}
+            />
+            <h1 className="text-[28px] leading-[52.8px] tracking-[-0.96px]">{title}</h1>
+          </div>
           <div className="relative" ref={profileRef}>
             <button
               type="button"

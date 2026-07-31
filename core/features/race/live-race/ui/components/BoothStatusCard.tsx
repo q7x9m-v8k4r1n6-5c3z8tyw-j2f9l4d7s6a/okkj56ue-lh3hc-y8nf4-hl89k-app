@@ -24,7 +24,7 @@ export const BoothStatusCard = ({ raceId }: { raceId?: string }) => {
   return (
     <div className="flex flex-col bg-white">
       <SectionHeader icon={<MapIcon className="size-6" />} title="Trạng Thái Các Trạm" />
-      <div className="overflow-y-auto px-2 pb-3">
+      <div className="overflow-y-auto px-1 pb-3">
         {isLoading ? (
           <Skeleton lines={2} className="h-[80px]" />
         ) : isError ? (
@@ -32,7 +32,7 @@ export const BoothStatusCard = ({ raceId }: { raceId?: string }) => {
         ) : items.length === 0 ? (
           <div className="text-sm italic text-gray-400">Chưa có trạm thiết lập.</div>
         ) : (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
+          <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 md:grid-cols-5">
             {items.map((booth) => {
               const isFree = booth.status.toLowerCase() === 'free'
               return (
@@ -40,14 +40,14 @@ export const BoothStatusCard = ({ raceId }: { raceId?: string }) => {
                   key={booth.boothId}
                   type="button"
                   onClick={() => openBoothDetail(booth)}
-                  className={`flex h-[140px] w-full cursor-pointer flex-col items-center justify-center rounded-lg p-2 text-center transition hover:shadow-[0_4px_10px_rgba(0,0,0,0.2)] ${
+                  className={`flex h-[120px] w-full cursor-pointer flex-col items-center justify-center rounded-lg p-2 text-center transition hover:shadow-[0_4px_10px_rgba(0,0,0,0.2)] ${
                     isFree ? 'bg-[#f0fdf4]' : 'bg-[#fcd0d1]'
                   }`}
                 >
-                  <span className={`text-sm font-bold ${isFree ? 'text-[#16a34a]' : 'text-[#de3336]'}`}>
+                  <span className={`text-[9px] font-extrabold ${isFree ? 'text-[#16a34a]' : 'text-[#de3336]'}`}>
                     {booth.boothName}
                   </span>
-                  <span className={`text-xs font-semibold ${isFree ? 'text-[#16a34a]' : 'text-[#de3336]'}`}>
+                  <span className={`text-[9px] font-medium ${isFree ? 'text-[#16a34a]' : 'text-[#de3336]'}`}>
                     {isFree ? 'Trống' : 'Bận'}
                   </span>
                 </button>
@@ -94,7 +94,7 @@ export const BoothStatusCard = ({ raceId }: { raceId?: string }) => {
               </BoothDetailRow>
             )}
             {selectedBooth.currentOrganizerName && (
-              <BoothDetailRow label="Trọng tài">
+              <BoothDetailRow label="Quản trạm">
                 <span>{selectedBooth.currentOrganizerName}</span>
               </BoothDetailRow>
             )}
