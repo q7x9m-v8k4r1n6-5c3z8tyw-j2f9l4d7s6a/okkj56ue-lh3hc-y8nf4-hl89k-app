@@ -8,8 +8,8 @@ export const TeamDetailsCard = () => {
   return (
     <div className="flex flex-col bg-white">
       <SectionHeader icon={<UsersIcon className="size-5" />} title="Chi tiết đội" />
-      <Table wrapperClassName="max-h-[332px] overflow-y-auto rounded-lg border border-[#eeeeee]">
-        <TableHead className="sticky top-0 z-10 bg-[#DE3336]">
+      <Table wrapperClassName="max-h-[332px] overflow-y-auto rounded-lg border border-[#e5e5e5]">
+        <TableHead className="sticky top-0 z-1 bg-[#DE3336]">
           <TableRow className="border-none">
             <TableHeaderCell className="font-bold text-white">TÊN ĐỘI</TableHeaderCell>
           </TableRow>
