@@ -25,7 +25,7 @@ export const TeamQrScanView = () => {
 
       {page.isSuccess && (
         <p className="mt-4 text-sm font-medium text-green-600">
-          ✅ {page.responseData?.message ?? 'Vào trạm thành công!'}
+          {page.responseData?.message ?? 'Vào trạm thành công!'}
         </p>
       )}
 

@@ -10,7 +10,7 @@ export const getOrganizerRaceDetail = async (
   signal?: AbortSignal,
 ): Promise<OrganizerRaceDetailResponse> => {
   const response = await client.request<unknown>({
-    path: `/api/v1/Race/${encodeURIComponent(raceId)}`,
+    path: `/Race/${encodeURIComponent(raceId)}`,
     signal,
   })
 

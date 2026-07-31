@@ -12,7 +12,7 @@ export const submitScanQr = async (
   const validatedPayload = scanQrRequestSchema.parse(request)
 
   const response = await client.request<unknown>({
-    path: '/api/v1/Booth/entry', // Endpoint Backend C#
+    path: '/Booth/entry', // Endpoint Backend C#
     method: 'POST',
     body: validatedPayload,
   })

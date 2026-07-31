@@ -13,7 +13,7 @@ export const listRaces = async (
 ): Promise<ListRacesResponse> => {
   const query = listRacesRequestSchema.parse(request)
   const response = await client.request<unknown>({
-    path: '/api/v1/Race',
+    path: '/Race',
     query,
     signal,
   })

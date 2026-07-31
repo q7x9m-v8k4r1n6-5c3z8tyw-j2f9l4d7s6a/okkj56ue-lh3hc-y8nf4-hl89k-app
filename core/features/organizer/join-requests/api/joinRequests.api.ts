@@ -16,7 +16,7 @@ export const submitScore = async (
 
   // 2. Thực hiện Request qua Client chung của dự án
   const response = await client.request<unknown, SubmitScoreRequest>({
-    path: '/api/v1/Booth/submit-score', // Endpoint Backend C#
+    path: '/Booth/submit-score', // Endpoint Backend C#
     method: 'POST',
     body: validatedPayload,
   })
@@ -26,7 +26,7 @@ export const submitScore = async (
 }
 export const acceptEntryToBooth = async (payload: { boothId: string; teamId: string }) => {
   return await client.request<{ message: string }>({
-    path: '/api/v1/Booth/accept-entry',
+    path: '/Booth/accept-entry',
     method: 'POST',
     body: payload,
   })
@@ -34,7 +34,7 @@ export const acceptEntryToBooth = async (payload: { boothId: string; teamId: str
 export const getMyBooth = async (raceId: string): Promise<string | null> => {
   try {
     const response = await client.request<unknown>({
-      path: `/api/v1/Booth/my-booth?raceId=${encodeURIComponent(raceId)}`,
+      path: `/Booth/my-booth?raceId=${encodeURIComponent(raceId)}`,
       method: 'GET',
     })
 

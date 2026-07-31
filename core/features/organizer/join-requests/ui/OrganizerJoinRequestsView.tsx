@@ -1,12 +1,8 @@
 import { EnterStationIcon } from '@/core/assets'
 import { useOrganizerJoinRequests } from './hooks/useOrganizerJoinRequests'
 
-interface OrganizerJoinRequestsViewProps {
-  boothId?: string
-}
-
-export const OrganizerJoinRequestsView = ({ boothId }: OrganizerJoinRequestsViewProps) => {
-  const joinRequests = useOrganizerJoinRequests({ boothId })
+export const OrganizerJoinRequestsView = () => {
+  const joinRequests = useOrganizerJoinRequests()
 
   if (joinRequests.acceptedRequest) {
     return (
