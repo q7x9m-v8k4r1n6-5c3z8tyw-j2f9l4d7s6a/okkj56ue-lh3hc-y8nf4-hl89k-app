@@ -23,7 +23,7 @@ export const getOrganizers = async (
   const query = searchQuery.trim()
   if (query) {
     const response = await client.request<unknown>({
-      path: '/Organizer/search',
+      path: '/api/v1/Organizer/search',
       query: { query },
       signal,
     })
@@ -31,7 +31,7 @@ export const getOrganizers = async (
   }
 
   const response = await client.request<unknown>({
-    path: '/Organizer',
+    path: '/api/v1/Organizer',
     query: { page: 1, pageSize: 20 },
     signal,
   })

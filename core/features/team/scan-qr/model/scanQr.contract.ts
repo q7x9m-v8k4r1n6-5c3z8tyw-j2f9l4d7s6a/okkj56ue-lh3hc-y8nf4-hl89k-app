@@ -1,13 +1,12 @@
 import { z } from 'zod'
 
 export const scanQrRequestSchema = z.object({
-  stationCode: z.string().min(1, 'Mã QR không được để trống'),
+  boothId: z.string().uuid('Mã trạm không hợp lệ'),
+  teamId: z.string().uuid('Mã đội không hợp lệ'),
 })
 
 export const scanQrResponseSchema = z.object({
-  success: z.boolean(),
-  message: z.string().optional(),
-  stationName: z.string().optional(),
+  message: z.string(),
 })
 
 export type ScanQrRequest = z.infer<typeof scanQrRequestSchema>

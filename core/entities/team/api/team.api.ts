@@ -23,7 +23,7 @@ export const getTeams = async (
   const query = searchQuery.trim()
   if (query) {
     const response = await client.request<unknown>({
-      path: '/Team/search',
+      path: '/api/v1/Team/search',
       query: { query },
       signal,
     })
@@ -31,7 +31,7 @@ export const getTeams = async (
   }
 
   const response = await client.request<unknown>({
-    path: '/Team',
+    path: '/api/v1/Team',
     query: { page: 1, pageSize: 20 },
     signal,
   })

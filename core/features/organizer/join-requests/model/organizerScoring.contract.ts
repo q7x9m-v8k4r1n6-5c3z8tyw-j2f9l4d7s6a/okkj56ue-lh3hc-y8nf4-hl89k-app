@@ -3,14 +3,14 @@ import { z } from 'zod'
 export const submitScoreRequestSchema = z.object({
   boothId: z.string().uuid('ID Trạm không hợp lệ'),
   teamId: z.string().uuid('ID Đội thi không hợp lệ'),
-  score: z.number().positive('Số điểm phải lớn hơn 0'),
+  score: z.coerce.number().min(0, 'Điểm số không được âm').max(100, 'Điểm số tối đa là 100'), 
   comment: z.string().optional(),
 })
 
 export type SubmitScoreRequest = z.infer<typeof submitScoreRequestSchema>
 
+// ⚡ Sửa Schema khớp với Response thực tế của C# BoothController
 export const submitScoreResponseSchema = z.object({
-  success: z.boolean(),
   message: z.string().optional(),
 })
 

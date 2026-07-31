@@ -63,9 +63,9 @@ export const OrganizerJoinRequestsView = ({ boothId }: OrganizerJoinRequestsView
     return (
       <section className="flex min-h-[calc(100svh-137px)] items-center justify-center px-5 text-center">
         <p className="text-sm text-[#525252]">
-          {joinRequests.submittedScore === null
+          {!joinRequests.score
             ? 'Chưa có yêu cầu nào xuất hiện'
-            : `Đã nhập ${joinRequests.submittedScore} điểm`}
+            : `Đã nhập ${joinRequests.score} điểm`}
         </p>
       </section>
     )

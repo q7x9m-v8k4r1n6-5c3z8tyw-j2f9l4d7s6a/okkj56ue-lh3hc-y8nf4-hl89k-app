@@ -16,7 +16,7 @@ export const createRace = async (
   if (coverImage) formData.append('coverImage', coverImage)
 
   const response = await client.request<unknown, FormData>({
-    path: '/Race',
+    path: '/api/v1/Race',
     method: 'POST',
     body: formData,
   })

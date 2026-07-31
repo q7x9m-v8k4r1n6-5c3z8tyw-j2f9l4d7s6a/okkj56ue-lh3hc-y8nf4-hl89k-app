@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import * as signalR from '@microsoft/signalr'
 
 export interface JoinRequestPayload {
@@ -8,7 +8,6 @@ export interface JoinRequestPayload {
 
 interface UseBoothSignalRProps {
   boothId?: string
-  /** Callback được gọi khi có đội thi quét QR vào trạm */
   onJoinRequestReceived: (data: JoinRequestPayload) => void
 }
 
@@ -16,26 +15,53 @@ export const useBoothSignalR = ({
   boothId,
   onJoinRequestReceived,
 }: UseBoothSignalRProps) => {
+  const callbackRef = useRef(onJoinRequestReceived)
+
+  useEffect(() => {
+    callbackRef.current = onJoinRequestReceived
+  }, [onJoinRequestReceived])
+
   useEffect(() => {
     if (!boothId) return
 
-    // Thiết lập đường truyền SignalR Hub với Backend C#
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl(`${import.meta.env.VITE_API_URL || ''}/hubs/booth`)
+      .withUrl(`${import.meta.env.VITE_API_BASE_URL || ''}/hubs/booth`)
       .withAutomaticReconnect()
       .build()
 
-    // Lắng nghe tín hiệu Realtime khi đội quét QR
-    connection.on('TeamJoinedStation', (data: JoinRequestPayload) => {
-      console.log('⚡ [SignalR] Nhận yêu cầu vào trạm từ đội:', data)
-      onJoinRequestReceived(data)
-    })
+    connection.on(
+      'ReceiveBoothStatusChanged',
+      (changedBoothId: string, status: string, teamId: string | null, teamName: string | null) => {
+        console.log('⚡ [SignalR] Nhận tín hiệu đổi trạng thái trạm:', {
+          changedBoothId,
+          status,
+          teamId,
+          teamName,
+        })
 
-    connection.start().catch((err) => console.error('❌ Lỗi kết nối SignalR Hub:', err))
+        if (changedBoothId === boothId && status === 'Pending' && teamId) {
+          callbackRef.current({
+            id: teamId,
+            teamName: teamName ?? 'Đội chưa xác định',
+          })
+        }
+      }
+    )
+
+    connection
+      .start()
+      .then(() => {
+        console.log(`🔌 [SignalR] Kết nối thành công! Đang tham gia: Booth_${boothId}`)
+        return connection.invoke('JoinBoothGroup', boothId)
+      })
+      .catch((err) => console.error('❌ Lỗi kết nối SignalR Hub:', err))
 
     return () => {
-      connection.off('TeamJoinedStation')
+      if (connection.state === signalR.HubConnectionState.Connected) {
+        connection.invoke('LeaveBoothGroup', boothId).catch(() => {})
+      }
+      connection.off('ReceiveBoothStatusChanged')
       connection.stop()
     }
-  }, [boothId, onJoinRequestReceived])
+  }, [boothId])
 }

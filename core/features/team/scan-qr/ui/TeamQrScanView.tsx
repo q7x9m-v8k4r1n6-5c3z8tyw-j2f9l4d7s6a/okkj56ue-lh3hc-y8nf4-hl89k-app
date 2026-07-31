@@ -1,4 +1,5 @@
 import { useTeamQrScanPage } from './hooks/useTeamQrScanPage'
+import { QrScannerBox } from './components/QrScannerBox'
 
 export const TeamQrScanView = () => {
   const page = useTeamQrScanPage()
@@ -9,31 +10,22 @@ export const TeamQrScanView = () => {
         Quét mã QR
       </h1>
 
-      <div className="relative mt-12 size-[250px]">
-        <div className="absolute inset-0 border border-[#5d0004]" />
-        <div className="absolute inset-[36px] border border-[#d5d5d5]" />
-        <span className="absolute -left-1 -top-1 h-10 w-10 border-l-4 border-t-4 border-[#5d0004]" />
-        <span className="absolute -right-1 -top-1 h-10 w-10 border-r-4 border-t-4 border-[#5d0004]" />
-        <span className="absolute -bottom-1 -left-1 h-10 w-10 border-b-4 border-l-4 border-[#5d0004]" />
-        <span className="absolute -bottom-1 -right-1 h-10 w-10 border-b-4 border-r-4 border-[#5d0004]" />
-      </div>
+      {/* Khung quét QR  */}
+      <QrScannerBox onScan={page.handleScan} />
 
-      {/* Thông báo lỗi nếu có */}
       {page.errorMessage && (
         <p className="mt-4 text-sm font-medium text-red-600">
           {page.errorMessage}
         </p>
       )}
 
-      {/* ⏳ Hiển thị trạng thái đang gửi tín hiệu lên Server */}
       {page.isPending && (
         <p className="mt-4 text-sm text-gray-500">Đang gửi dữ liệu trạm...</p>
       )}
 
-      {/* Hiển thị trạng thái thành công */}
       {page.isSuccess && (
         <p className="mt-4 text-sm font-medium text-green-600">
-          ✅ Vào trạm thành công! {page.responseData?.stationName}
+          ✅ {page.responseData?.message ?? 'Vào trạm thành công!'}
         </p>
       )}
 

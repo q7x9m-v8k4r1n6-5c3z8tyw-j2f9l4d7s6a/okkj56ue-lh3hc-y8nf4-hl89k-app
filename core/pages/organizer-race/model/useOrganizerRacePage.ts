@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useOrganizerRaceAccess } from '@/core/features/organizer/organizer-race'
+import { useMyBoothQuery } from '@/core/features/organizer/join-requests/model/server/useMyBoothQuery'
 import {
   isOrganizerPrimaryRaceTab,
   isOrganizerRaceTab,
@@ -16,6 +17,8 @@ export const useOrganizerRacePage = () => {
   const navigate = useNavigate()
   const { raceId } = useParams<{ raceId: string }>()
   const raceAccess = useOrganizerRaceAccess(raceId)
+  const myBoothQuery = useMyBoothQuery(raceId)
+
   const [activeTab, setActiveTab] = useState<OrganizerRaceTab>('rules')
   const [previousTab, setPreviousTab] = useState<OrganizerPrimaryRaceTab>('rules')
   const isMenuOpen = activeTab === 'menu'
@@ -27,6 +30,7 @@ export const useOrganizerRacePage = () => {
 
   return {
     activeTab,
+    boothId: myBoothQuery.data ?? undefined,
     closeMenu: () => setActiveTab(previousTab),
     errorMessage: raceAccess.errorMessage,
     isMenuOpen,
