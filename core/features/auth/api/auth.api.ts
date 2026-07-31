@@ -35,7 +35,7 @@ export const login = async (
 ): Promise<LoginResponse> => {
   const body = loginRequestSchema.parse(request)
   const response = await client.request<unknown, LoginRequest>({
-    path: '/auth/login',
+    path: '/Auth/login',
     method: 'POST',
     body,
   })
@@ -48,7 +48,7 @@ export const googleLogin = async (
 ): Promise<LoginResponse> => {
   const body = googleLoginRequestSchema.parse({ idToken })
   const response = await client.request<unknown, typeof body>({
-    path: '/auth/google-login',
+    path: '/Auth/google-login',
     method: 'POST',
     body,
   })
@@ -58,7 +58,7 @@ export const googleLogin = async (
 /** Fetches the authenticated session user. */
 export const getCurrentAuthUser = async (): Promise<UserProfile> => {
   const response = await client.request<unknown>({
-    path: '/auth/me',
+    path: '/Auth/me',
   })
   return userProfileSchema.parse(authMeResponseSchema.parse(response))
 }
@@ -66,7 +66,7 @@ export const getCurrentAuthUser = async (): Promise<UserProfile> => {
 /** Revokes the refresh-token session on the backend. */
 export const logout = async (): Promise<boolean> => {
   const response = await client.request<unknown>({
-    path: '/auth/logout',
+    path: '/Auth/logout',
     method: 'POST',
   })
   return logoutResponseSchema.parse(response)
@@ -75,7 +75,7 @@ export const logout = async (): Promise<boolean> => {
 /** Exchanges the refresh-token cookie for a new access token. */
 export const refreshAccessToken = async (): Promise<LoginResponse> => {
   const response = await client.request<unknown>({
-    path: '/auth/refresh-token',
+    path: '/Auth/refresh-token',
     method: 'POST',
   })
   return loginResponseSchema.parse(response)

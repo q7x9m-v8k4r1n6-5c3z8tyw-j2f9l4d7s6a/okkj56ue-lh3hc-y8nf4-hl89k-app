@@ -1,0 +1,52 @@
+import { useTeamQrScanForm } from '../../model/frontend/useTeamQrScanForm'
+import { useScanQrMutation } from '../../model/server/useScanQrMutation'
+import { mapQrToRequest } from '../../model/mapQrToRequest'
+import { validateQrCode } from '../../model/scanQr.validation'
+import { useAuthSession } from '@/core/features/auth' 
+
+export const useTeamQrScanPage = () => {
+  const form = useTeamQrScanForm()
+  const mutation = useScanQrMutation()
+
+  const authSession = useAuthSession()
+
+  const teamId = authSession?.user?.id
+
+  const handleScan = (qrCode: string) => {
+    // Validate định dạng mã QR
+    const error = validateQrCode(qrCode)
+    if (error) {
+      form.setErrorMessage(error)
+      return
+    }
+
+    if (!teamId) {
+      form.setErrorMessage('Không tìm thấy thông tin đội chơi. Vui lòng đăng nhập lại!')
+      return
+    }
+
+    form.setErrorMessage(null)
+    form.setRawQrCode(qrCode)
+
+    const requestPayload = mapQrToRequest(qrCode, teamId)
+
+    mutation.mutate(requestPayload, {
+      onSuccess: (data) => {
+        console.log('⚡ Quét QR vào trạm thành công:', data)
+      },
+      onError: (err: any) => {
+        form.setErrorMessage(err?.message || 'Không thể gửi mã QR. Vui lòng thử lại!')
+      },
+    })
+  }
+
+  return {
+    rawQrCode: form.rawQrCode,
+    errorMessage: form.errorMessage,
+    handleScan,
+    isPending: mutation.isPending,
+    isSuccess: mutation.isSuccess,
+    responseData: mutation.data,
+    form,
+  }
+}
