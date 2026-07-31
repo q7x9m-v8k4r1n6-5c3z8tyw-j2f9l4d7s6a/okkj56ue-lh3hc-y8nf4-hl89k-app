@@ -31,11 +31,11 @@ export const LeaderboardCard = ({ raceId }: { raceId?: string }) => {
           ) : (
             items.map((team, index) => (
               <TableRow key={index} className="border-[#f5f5f5]">
-                <TableCell className="text-center text-[#525252]">
+                <TableCell className="text-center font-light">
                   #{String(index + 1).padStart(2, '0')}
                 </TableCell>
-                <TableCell className="font-medium text-[#333333]">{team.displayName}</TableCell>
-                <TableCell className="text-[#525252]">{team.totalScore}</TableCell>
+                <TableCell className="font-light">{team.displayName}</TableCell>
+                <TableCell className="font-semibold">{team.totalScore}</TableCell>
               </TableRow>
             ))
           )}
