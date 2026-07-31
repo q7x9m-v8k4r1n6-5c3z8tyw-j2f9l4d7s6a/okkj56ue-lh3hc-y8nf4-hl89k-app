@@ -1,4 +1,5 @@
 import { EditRaceView } from '@/core/features/race/edit-race'
+import { LiveRaceView } from '@/core/features/race/live-race'
 import { Tabs } from '@/core/shared'
 import { useDetailRacePage } from './model/useDetailRacePage'
 
@@ -18,10 +19,12 @@ export const DetailRacePage = () => {
       <div className="flex min-h-0 flex-1 flex-col gap-3">
         <Tabs items={tabs} value={activeTab} onChange={onTabChange} />
         <div className="min-h-0 flex-1 overflow-y-auto pb-8">
-          {activeTab === 'basic' ? (
-            <EditRaceView />
-          ) : (
-            <div className="flex h-full items-center justify-center text-gray-400">{activeTabLabel}</div>
+          {activeTab === 'basic' && <EditRaceView />}
+          {activeTab === 'live' && <LiveRaceView />}
+          {activeTab !== 'basic' && activeTab !== 'live' && (
+            <div className="flex h-full items-center justify-center text-gray-400">
+              {activeTabLabel}
+            </div>
           )}
         </div>
       </div>
