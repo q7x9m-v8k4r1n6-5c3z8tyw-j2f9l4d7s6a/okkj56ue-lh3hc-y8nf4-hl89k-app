@@ -6,7 +6,7 @@ import { useScoringLogQuery } from '../../model/server/useLiveQueries'
  */
 export const useScoringLogSection = (raceId?: string) => {
   const [page, setPage] = useState(1)
-  const pageSize = 10 // Số item trên mỗi trang
+  const pageSize = 10 
 
   const query = useScoringLogQuery(raceId, page, pageSize)
 
