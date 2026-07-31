@@ -66,7 +66,7 @@ export const AppLayout = ({ children }: PropsWithChildren) => {
                 to={to}
                 end={to === '/'}
                 className={({ isActive }) =>
-                  `flex w-full items-center rounded-lg py-3 text-base leading-6 transition-all duration-300 ${isPanelCollapsed ? 'justify-left px-4' : 'px-4'} ${isActive
+                  `flex w-full items-center rounded-lg py-3 text-base leading-6 transition-all duration-300 ${isPanelCollapsed ? 'justify-centor pl-6' : 'px-4'} ${isActive
                     ? 'bg-gradient-to-r from-[rgba(66,0,1,0.10)] to-[rgba(222,51,54,0.10)] text-[#420001]'
                     : 'text-[rgba(26,28,28,0.70)] hover:bg-[#f7f7f7] hover:text-[#420001]'
                   }`
@@ -92,7 +92,7 @@ export const AppLayout = ({ children }: PropsWithChildren) => {
               onClick={togglePanel}
               aria-label={isPanelCollapsed ? "Mở rộng menu" : "Thu gọn menu"}
             />
-            <h1 className="pb-[7.9px] text-[28px] leading-[52.8px] tracking-[-0.96px]">{title}</h1>
+            <h1 className="text-[28px] leading-[52.8px] tracking-[-0.96px]">{title}</h1>
           </div>
           <div className="relative" ref={profileRef}>
             <button
