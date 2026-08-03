@@ -2,9 +2,10 @@ import { HistoryIcon } from '@/core/assets/icons'
 import { Skeleton, Table, TableBody, TableCell, TableRow, Button } from '@/core/shared'
 import { useScoringLogSection } from '../hooks/useScoringLogSection'
 import { SectionHeader } from './SectionHeader'
+import { formatGmt7DateTime } from '@/core/shared/utils/dateTime' 
 
 export const ScoringLogsCard = ({ raceId }: { raceId?: string }) => {
-  const { logs, isLoading, onViewAll, formatLogTime } = useScoringLogSection(raceId)
+  const { logs, isLoading, onViewAll } = useScoringLogSection(raceId)
 
   return (
     <div className="flex flex-col bg-white">
@@ -34,7 +35,7 @@ export const ScoringLogsCard = ({ raceId }: { raceId?: string }) => {
                             ({log.scoreDelta > 0 ? '+' : ''}{log.scoreDelta} điểm)
                           </span>
                         </span>
-                        <span className="text-xs text-[#a6a6a6]">{formatLogTime(log.createdAt)}</span>
+                        <span className="text-xs text-[#a6a6a6]">{formatGmt7DateTime(log.createdAt)}</span>
                       </div>
                     </TableCell>
                   </TableRow>

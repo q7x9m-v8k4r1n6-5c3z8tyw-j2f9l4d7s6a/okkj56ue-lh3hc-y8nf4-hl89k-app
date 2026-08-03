@@ -9,21 +9,6 @@ export const useScoringLogSection = (raceId?: string) => {
   const [page, setPage] = useState(1)
   const pageSize = 10 
   const query = useScoringLogQuery(raceId, page, pageSize)
-  
-  const formatLogTime = (dateStr: string) => {
-  let normalizedStr = dateStr.trim().replace(' ', 'T')
-  if (!normalizedStr.endsWith('Z')) {
-    normalizedStr += 'Z'
-  }
-  const date = new Date(normalizedStr)
-  return date.toLocaleTimeString('vi-VN', { 
-    timeZone: 'Asia/Ho_Chi_Minh',
-    hour: '2-digit', 
-    minute: '2-digit', 
-    second: '2-digit' 
-  })
-}
-  
   const [, setSearchParams] = useSearchParams()
 
   return {
@@ -32,7 +17,6 @@ export const useScoringLogSection = (raceId?: string) => {
     totalPages: query.data?.totalPages ?? 0,
     isLoading: query.isLoading,
     isError: query.isError,
-    formatLogTime,
     onNextPage: () => setPage((current) => current + 1),
     onPrevPage: () => setPage((current) => Math.max(1, current - 1)),
     
