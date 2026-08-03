@@ -3,6 +3,7 @@ import type { LiveRaceSelectedTeam } from '../../../model/liveRace.selection'
 import { useScoringLogQuery } from '../../../model/server/useLiveQueries'
 import { useEditScoreState } from '../../model/frontend/useEditScoreState'
 import { useUpdateTeamScoreMutation } from '../../model/server/useUpdateTeamScoreMutation'
+import { formatGmt7DateTime } from '@/core/shared/utils/dateTime'
 
 type UseEditScoreOptions = {
   raceId?: string
@@ -26,11 +27,7 @@ export const useEditScore = ({ raceId, team, onBack }: UseEditScoreOptions) => {
       title: log.boothName
         ? `${log.teamName} hoàn thành ${log.boothName} (${log.scoreDelta > 0 ? '+' : ''}${log.scoreDelta} điểm).`
         : `${log.teamName} ${log.reason.trim() || log.eventName} (${log.scoreDelta > 0 ? '+' : ''}${log.scoreDelta} điểm).`,
-      time: new Date(log.createdAt).toLocaleTimeString('vi-VN', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-      }),
+      time: formatGmt7DateTime(log.createdAt),
     })),
     [teamLogs],
   )
