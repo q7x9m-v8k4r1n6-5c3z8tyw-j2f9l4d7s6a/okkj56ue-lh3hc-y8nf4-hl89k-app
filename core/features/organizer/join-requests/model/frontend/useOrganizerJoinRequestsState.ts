@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useToast } from '@/core/shared/ui/Toast' // sửa đúng đường dẫn theo cấu trúc thật của shared/toast
 import { mapScoringFormToRequest } from '../mapScoringFormToRequest'
 import { useSubmitScoreMutation } from '../server/useSubmitScoreMutation'
 import { acceptEntryToBooth } from '../../api/joinRequests.api'
@@ -10,20 +11,17 @@ export type JoinRequest = {
 
 const scoreOptions = [0, 10, 20, 30, 40, 50] as const
 
-/**
- * Hook quản lý State duyệt đội thi và gửi điểm chấm trạm cho Organizer
- */
 export const useOrganizerJoinRequestsState = (boothId: string) => {
+  const { toast } = useToast()
   const [request, setRequest] = useState<JoinRequest | null>(null)
   const [acceptedRequest, setAcceptedRequest] = useState<JoinRequest | null>(null)
   const [score, setScore] = useState('')
-  const [isAccepting, setIsAccepting] = useState(false) // Thêm State loading khi bấm Cho vô
+  const [isAccepting, setIsAccepting] = useState(false)
 
-  // Mutation gửi API chấm điểm lên Backend
   const submitScoreMutation = useSubmitScoreMutation()
 
   const normalizedScore = Number(score)
-  
+
   const canSubmitScore =
     score.trim() !== '' &&
     Number.isFinite(normalizedScore) &&
@@ -44,15 +42,16 @@ export const useOrganizerJoinRequestsState = (boothId: string) => {
       setAcceptedRequest(request)
       setRequest(null)
       setScore('')
-      console.log('✅ Đã duyệt cho đội vào trạm thành công!')
     } catch (error) {
-      console.error('❌ Lỗi khi duyệt đội vào trạm:', error)
-      alert('Không thể duyệt cho đội vào trạm. Vui lòng kiểm tra lại!')
+      toast({
+        title: 'Không thể duyệt cho đội vào trạm',
+        description: 'Vui lòng kiểm tra lại!',
+        variant: 'danger',
+      })
     } finally {
       setIsAccepting(false)
     }
   }
-
 
   const handleRejectRequest = () => {
     setRequest(null)
@@ -71,11 +70,20 @@ export const useOrganizerJoinRequestsState = (boothId: string) => {
 
       await submitScoreMutation.mutateAsync(payload)
 
+      toast({
+        title: 'Chấm điểm thành công',
+        description: `Đã ghi nhận ${normalizedScore} điểm cho ${acceptedRequest.teamName}`,
+        variant: 'success',
+      })
+
       setAcceptedRequest(null)
       setScore('')
-      console.log('✅ Chấm điểm thành công!')
     } catch (error) {
-      console.error('❌ Chấm điểm thất bại:', error)
+      toast({
+        title: 'Chấm điểm thất bại',
+        description: 'Vui lòng thử lại.',
+        variant: 'danger',
+      })
     }
   }
 
@@ -83,10 +91,10 @@ export const useOrganizerJoinRequestsState = (boothId: string) => {
     request,
     setRequest,
     acceptedRequest,
-    
+
     acceptRequest: handleAcceptRequest,
     isAccepting,
-    
+
     rejectRequest: handleRejectRequest,
 
     score,

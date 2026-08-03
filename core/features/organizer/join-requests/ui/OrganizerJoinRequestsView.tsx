@@ -1,12 +1,21 @@
+import { useSearchParams } from 'react-router-dom'
 import { EnterStationIcon } from '@/core/assets'
+import {
+  ORGANIZER_RACE_TAB_PARAM,
+  ORGANIZER_RACE_REQUESTS_TAB,
+} from '@/core/shared/utils/organizerRaceRoute'
 import { useOrganizerJoinRequests } from './hooks/useOrganizerJoinRequests'
 
 export const OrganizerJoinRequestsView = () => {
+  const [searchParams] = useSearchParams()
+  const isActiveTab = searchParams.get(ORGANIZER_RACE_TAB_PARAM) === ORGANIZER_RACE_REQUESTS_TAB
   const joinRequests = useOrganizerJoinRequests()
+
+  const visibilityClassName = isActiveTab ? '' : 'hidden'
 
   if (joinRequests.acceptedRequest) {
     return (
-      <section className="flex min-h-[calc(100svh-137px)] flex-col justify-between px-6 pb-5 pt-7">
+      <section className={`flex min-h-[calc(100svh-137px)] flex-col justify-between px-6 pb-5 pt-7 ${visibilityClassName}`}>
         <div>
           <label className="sr-only" htmlFor="organizer-score-input">
             Nhập điểm cho đội
@@ -57,7 +66,7 @@ export const OrganizerJoinRequestsView = () => {
 
   if (!joinRequests.request) {
     return (
-      <section className="flex min-h-[calc(100svh-137px)] items-center justify-center px-5 text-center">
+      <section className={`flex min-h-[calc(100svh-137px)] items-center justify-center px-5 text-center ${visibilityClassName}`}>
         <p className="text-sm text-[#525252]">
           {!joinRequests.score
             ? 'Chưa có yêu cầu nào xuất hiện'
@@ -68,7 +77,7 @@ export const OrganizerJoinRequestsView = () => {
   }
 
   return (
-    <section className="flex min-h-[calc(100svh-137px)] flex-col px-5 py-10">
+    <section className={`flex min-h-[calc(100svh-137px)] flex-col px-5 py-10 ${visibilityClassName}`}>
       <div className="flex flex-1 flex-col items-center justify-center text-center">
         <EnterStationIcon className="mb-6 size-[50px] text-[#de3336]" />
         <h1 className="text-[32px] font-bold leading-10 text-[#5e5e5e]">
