@@ -44,10 +44,10 @@ export const BoothStatusCard = ({ raceId }: { raceId?: string }) => {
                     isFree ? 'bg-[#f0fdf4]' : 'bg-[#fcd0d1]'
                   }`}
                 >
-                  <span className={`text-[9px] font-extrabold ${isFree ? 'text-[#16a34a]' : 'text-[#de3336]'}`}>
+                  <span className={`text-xs font-extrabold ${isFree ? 'text-[#16a34a]' : 'text-[#de3336]'}`}>
                     {booth.boothName}
                   </span>
-                  <span className={`text-[9px] font-medium ${isFree ? 'text-[#16a34a]' : 'text-[#de3336]'}`}>
+                  <span className={`text-xs font-medium ${isFree ? 'text-[#16a34a]' : 'text-[#de3336]'}`}>
                     {isFree ? 'Trống' : 'Bận'}
                   </span>
                 </button>
@@ -79,9 +79,6 @@ export const BoothStatusCard = ({ raceId }: { raceId?: string }) => {
             </BoothDetailRow>
             <BoothDetailRow label="Địa điểm">
               <span>{selectedBooth.boothLocation}</span>
-            </BoothDetailRow>
-            <BoothDetailRow label="Mô tả">
-              <span>{selectedBooth.description || 'Không có mô tả.'}</span>
             </BoothDetailRow>
             <BoothDetailRow label="Trạng thái">
               <span className={`font-semibold ${selectedBooth.status.toLowerCase() === 'free' ? 'text-[#16a34a]' : 'text-[#de3336]'}`}>

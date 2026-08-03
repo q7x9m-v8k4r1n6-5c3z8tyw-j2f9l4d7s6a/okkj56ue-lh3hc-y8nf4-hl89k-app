@@ -11,9 +11,18 @@ export const useScoringLogSection = (raceId?: string) => {
   const query = useScoringLogQuery(raceId, page, pageSize)
   
   const formatLogTime = (dateStr: string) => {
-    const date = new Date(dateStr)
-    return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  let normalizedStr = dateStr.trim().replace(' ', 'T')
+  if (!normalizedStr.endsWith('Z')) {
+    normalizedStr += 'Z'
   }
+  const date = new Date(normalizedStr)
+  return date.toLocaleTimeString('vi-VN', { 
+    timeZone: 'Asia/Ho_Chi_Minh',
+    hour: '2-digit', 
+    minute: '2-digit', 
+    second: '2-digit' 
+  })
+}
   
   const [, setSearchParams] = useSearchParams()
 
