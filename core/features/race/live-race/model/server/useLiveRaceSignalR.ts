@@ -43,6 +43,7 @@ export const useLiveRaceSignalR = ({ raceId }: UseLiveRaceSignalRProps) => {
     void connection
       .start()
       .then(() => connection.invoke('JoinRaceGroup', raceId))
+      .catch((err) => console.error('Loi ket noi realtime live race:', err))
 
     return () => {
       if (connection.state === signalR.HubConnectionState.Connected) {
