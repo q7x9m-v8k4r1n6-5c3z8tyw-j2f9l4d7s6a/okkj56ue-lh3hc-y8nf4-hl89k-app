@@ -31,10 +31,18 @@ export const useLiveRaceSignalR = ({ raceId }: UseLiveRaceSignalRProps) => {
       })
     })
 
+    connection.on('ReceiveBoothStatusChanged', () => {
+      const currentRaceId = raceIdRef.current
+      if (!currentRaceId) return
+
+      void queryClient.invalidateQueries({
+        queryKey: liveRaceQueryKeys.booths(currentRaceId),
+      })
+    })
+
     void connection
       .start()
       .then(() => connection.invoke('JoinRaceGroup', raceId))
-      .catch((err) => console.error('Lỗi kết nối realtime điểm:', err))
 
     return () => {
       if (connection.state === signalR.HubConnectionState.Connected) {
@@ -42,6 +50,7 @@ export const useLiveRaceSignalR = ({ raceId }: UseLiveRaceSignalRProps) => {
       }
 
       connection.off('ReceiveRaceScoreChanged')
+      connection.off('ReceiveBoothStatusChanged')
       void connection.stop()
     }
   }, [queryClient, raceId])
