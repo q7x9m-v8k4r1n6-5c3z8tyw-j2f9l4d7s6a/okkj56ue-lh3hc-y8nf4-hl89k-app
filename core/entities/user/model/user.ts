@@ -40,6 +40,7 @@ export const userProfileSchema = z.object({
   email: z.string().email(),
   role: z.string().min(1),
   roles: z.array(z.string().min(1)),
+  permissions: z.array(z.string().min(1)).default([]),
   userType: z.string().min(1).transform((value) => value.toLowerCase()),
   displayName: z.string().nullable(),
   avatarUrl: z.string().url().or(z.literal('')).nullable().optional(),

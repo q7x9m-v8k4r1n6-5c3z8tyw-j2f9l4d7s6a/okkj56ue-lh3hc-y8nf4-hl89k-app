@@ -6,6 +6,13 @@ const isOrganizerUser = (userType?: string) => userType?.toLowerCase() === 'orga
 const hasAdminRole = (roles: readonly string[] = []) => (
   roles.some((role) => role.toLowerCase() === 'admin')
 )
+const hasAdminAccess = (
+  roles: readonly string[] = [],
+  permissions: readonly string[] = [],
+) => (
+  hasAdminRole(roles) ||
+  permissions.some((permission) => permission.toLowerCase() === 'race.manage')
+)
 
 export const ProtectedRoute = () => {
   const { isAuthenticated } = useAuthSession()
@@ -23,7 +30,11 @@ export const AdminRoute = () => {
   if (isTeamUser(user?.userType)) {
     return <Navigate to="/team" replace />
   }
-  if (!isOrganizerUser(user?.userType) && !hasAdminRole(user?.roles)) {
+  if (!hasAdminAccess(user?.roles, user?.permissions)) {
+    if (isOrganizerUser(user?.userType)) {
+      return <Navigate to="/organizer/select" replace />
+    }
+
     return <Navigate to="/login" replace />
   }
 
