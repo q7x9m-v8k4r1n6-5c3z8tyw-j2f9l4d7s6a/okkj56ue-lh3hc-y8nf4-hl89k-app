@@ -21,10 +21,14 @@ const authMeResponseSchema = z.object({
   roles: z.array(z.object({
     code: z.string().min(1),
   })).default([]),
+  permissions: z.array(z.object({
+    code: z.string().min(1),
+  })).default([]),
   displayName: z.string().nullable(),
   avatarUrl: z.string().url().or(z.literal('')).nullable().optional(),
-}).transform(({ roles, ...user }) => ({
+}).transform(({ permissions, roles, ...user }) => ({
   ...user,
+  permissions: permissions.map((permission) => permission.code),
   role: roles[0]?.code ?? '',
   roles: roles.map((role) => role.code),
 }))

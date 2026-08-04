@@ -31,6 +31,9 @@ export const setAuthToken = (token: string | null) => {
   currentAccessToken = token
 }
 
+/** Returns the current in-memory access token for non-Axios transports. */
+export const getAuthToken = () => currentAccessToken
+
 /** Injects an optional feature-owned strategy for recovering unauthorized requests. */
 export const configureUnauthorizedRecovery = (
   recovery: UnauthorizedRecovery | null,

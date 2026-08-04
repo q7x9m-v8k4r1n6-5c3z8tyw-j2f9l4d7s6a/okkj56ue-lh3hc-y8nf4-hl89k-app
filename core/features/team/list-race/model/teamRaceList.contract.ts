@@ -4,6 +4,7 @@ import { raceSummarySchema } from '@/core/entities/race'
 export const listTeamRacesRequestSchema = z.object({
   page: z.number().int().positive().optional(),
   pageSize: z.number().int().positive().max(100).optional(),
+  teamId: z.string().uuid().optional(),
 })
 
 export const listTeamRacesResponseSchema = z.object({
