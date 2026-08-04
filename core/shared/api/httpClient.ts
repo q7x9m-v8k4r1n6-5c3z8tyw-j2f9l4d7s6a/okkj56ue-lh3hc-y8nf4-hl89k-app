@@ -90,21 +90,25 @@ const apiClient = () => {
         !canRecover
       ) {
         
-        // --- XỬ LÝ LỖI 429 & Display Toast ---
-        if (error.response?.status === 429 && globalToast) {
-          const now = Date.now()
-          if (now >= rateLimitUnlockTime) {
-            const retryAfterHeader = error.response.headers['retry-after']
-            const retryAfterSeconds = parseInt(retryAfterHeader, 10) || 5
-            
-            rateLimitUnlockTime = now + (retryAfterSeconds * 1000)
+        let retryAfterSeconds: number | undefined = undefined
 
-            globalToast({
-              title: 'Cảnh báo',
-              description: `Gọi quá nhiều request. Thử lại sau ${retryAfterSeconds} giây.`,
-              variant: 'warning',
-              duration: retryAfterSeconds * 1000,
-            })
+        // --- XỬ LÝ LỖI 429 & Display Toast ---
+        if (error.response?.status === 429) {
+          const retryAfterHeader = error.response.headers['retry-after']
+          retryAfterSeconds = parseInt(retryAfterHeader as string, 10) || 5
+          
+          if (globalToast) {
+            const now = Date.now()
+            if (now >= rateLimitUnlockTime) {
+              rateLimitUnlockTime = now + (retryAfterSeconds * 1000)
+  
+              globalToast({
+                title: 'Cảnh báo',
+                description: `Gọi quá nhiều request. Thử lại sau ${retryAfterSeconds} giây.`,
+                variant: 'warning',
+                duration: retryAfterSeconds * 1000,
+              })
+            }
           }
         }
 
@@ -116,6 +120,7 @@ const apiClient = () => {
             responseData?.message ??
             error.message,
           data: error.response?.data,
+          retryAfterSeconds,
         })
       }
 
