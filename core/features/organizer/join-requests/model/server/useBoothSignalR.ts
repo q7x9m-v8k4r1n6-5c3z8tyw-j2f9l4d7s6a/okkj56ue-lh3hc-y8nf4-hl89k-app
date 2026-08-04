@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import * as signalR from '@microsoft/signalr'
+import { getAuthToken } from '@/core/shared/api'
 
 export interface JoinRequestPayload {
   id: string
@@ -25,7 +26,9 @@ export const useBoothSignalR = ({
     if (!boothId) return
 
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl(`${import.meta.env.VITE_API_BASE_URL || ''}/hubs/booth`)
+      .withUrl(`${import.meta.env.VITE_API_BASE_URL || ''}/hubs/booth`, {
+        accessTokenFactory: () => getAuthToken() ?? '',
+      })
       .withAutomaticReconnect()
       .build()
 

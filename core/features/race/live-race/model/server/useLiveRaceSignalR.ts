@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import * as signalR from '@microsoft/signalr'
 import { useQueryClient } from '@tanstack/react-query'
+import { getAuthToken } from '@/core/shared/api'
 import { liveRaceQueryKeys } from './liveRace.queryKeys'
 
 interface UseLiveRaceSignalRProps {
@@ -19,7 +20,9 @@ export const useLiveRaceSignalR = ({ raceId }: UseLiveRaceSignalRProps) => {
     if (!raceId) return
 
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl(`${import.meta.env.VITE_API_BASE_URL || ''}/hubs/booth`)
+      .withUrl(`${import.meta.env.VITE_API_BASE_URL || ''}/hubs/booth`, {
+        accessTokenFactory: () => getAuthToken() ?? '',
+      })
       .withAutomaticReconnect()
       .build()
 
@@ -31,10 +34,19 @@ export const useLiveRaceSignalR = ({ raceId }: UseLiveRaceSignalRProps) => {
       })
     })
 
+    connection.on('ReceiveBoothStatusChanged', () => {
+      const currentRaceId = raceIdRef.current
+      if (!currentRaceId) return
+
+      void queryClient.invalidateQueries({
+        queryKey: liveRaceQueryKeys.booths(currentRaceId),
+      })
+    })
+
     void connection
       .start()
       .then(() => connection.invoke('JoinRaceGroup', raceId))
-      .catch((err) => console.error('Lỗi kết nối realtime điểm:', err))
+      .catch((err) => console.error('Lỗi kết nối realtime live race:', err))
 
     return () => {
       if (connection.state === signalR.HubConnectionState.Connected) {
@@ -42,6 +54,7 @@ export const useLiveRaceSignalR = ({ raceId }: UseLiveRaceSignalRProps) => {
       }
 
       connection.off('ReceiveRaceScoreChanged')
+      connection.off('ReceiveBoothStatusChanged')
       void connection.stop()
     }
   }, [queryClient, raceId])
