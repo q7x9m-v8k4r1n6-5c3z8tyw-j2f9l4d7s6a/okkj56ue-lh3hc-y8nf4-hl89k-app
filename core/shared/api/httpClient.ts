@@ -100,8 +100,8 @@ const apiClient = () => {
             rateLimitUnlockTime = now + (retryAfterSeconds * 1000)
 
             globalToast({
-              title: 'Thao tác quá nhanh',
-              description: `Cảnh báo: Gọi quá nhiều request. Thử lại sau ${retryAfterSeconds} giây.`,
+              title: 'Cảnh báo',
+              description: `Gọi quá nhiều request. Thử lại sau ${retryAfterSeconds} giây.`,
               variant: 'warning',
               duration: retryAfterSeconds * 1000,
             })
