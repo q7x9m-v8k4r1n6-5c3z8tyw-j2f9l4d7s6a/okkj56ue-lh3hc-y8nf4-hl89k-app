@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 const SCORE_STEP = 10
-const INITIAL_DELTA = -50
+const INITIAL_DELTA = 0
 
 export type EditScorePanelTab = 'cards' | 'secret'
 
