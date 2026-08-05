@@ -22,6 +22,7 @@ export {
   Badge,
   Button,
   Checkbox,
+  ConfirmDialogProvider,
   Drawer,
   Dropdown,
   IconButton,
@@ -45,11 +46,13 @@ export {
   Tabs,
   ToastProvider,
   Tooltip,
+  useConfirmDialog,
   useToast,
 } from './ui'
 export type {
   BadgeVariant,
   CheckboxProps,
+  ConfirmDialogOptions,
   DrawerProps,
   DropdownOption,
   DropdownProps,

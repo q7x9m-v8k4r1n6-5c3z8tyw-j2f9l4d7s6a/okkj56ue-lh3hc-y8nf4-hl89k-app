@@ -8,4 +8,6 @@ export const editRaceQueryKeys = {
   all: ['races'] as const,
   detail: (raceId?: string) =>
     [...editRaceQueryKeys.all, 'detail', raceId] as const,
+  rules: (raceId?: string) =>
+    [...editRaceQueryKeys.all, 'rules', raceId] as const,
 }

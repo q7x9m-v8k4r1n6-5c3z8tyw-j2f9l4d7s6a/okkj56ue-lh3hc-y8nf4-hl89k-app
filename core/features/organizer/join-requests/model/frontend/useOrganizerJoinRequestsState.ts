@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useToast } from '@/core/shared/ui/Toast' // sửa đúng đường dẫn theo cấu trúc thật của shared/toast
+import { useToast, useConfirmDialog } from '@/core/shared'
 import { mapScoringFormToRequest } from '../mapScoringFormToRequest'
 import { useSubmitScoreMutation } from '../server/useSubmitScoreMutation'
 import { acceptEntryToBooth } from '../../api/joinRequests.api'
@@ -11,8 +11,13 @@ export type JoinRequest = {
 
 const scoreOptions = [0, 10, 20, 30, 40, 50] as const
 
+/**
+ * Hook quản lý State duyệt đội thi và gửi điểm chấm trạm cho Organizer
+ */
 export const useOrganizerJoinRequestsState = (boothId: string) => {
   const { toast } = useToast()
+  const { confirm } = useConfirmDialog()
+
   const [request, setRequest] = useState<JoinRequest | null>(null)
   const [acceptedRequest, setAcceptedRequest] = useState<JoinRequest | null>(null)
   const [score, setScore] = useState('')
@@ -30,6 +35,12 @@ export const useOrganizerJoinRequestsState = (boothId: string) => {
 
   const handleAcceptRequest = async () => {
     if (!request) return
+
+    const isConfirmed = await confirm({
+      title: 'Xác nhận cho đội vào trạm',
+      description: `Bạn có chắc chắn muốn cho đội ${request.teamName} vào trạm này không?`,
+    })
+    if (!isConfirmed) return
 
     try {
       setIsAccepting(true)
@@ -61,6 +72,12 @@ export const useOrganizerJoinRequestsState = (boothId: string) => {
 
   const handleSubmitScore = async () => {
     if (!canSubmitScore || !acceptedRequest) return
+
+    const isConfirmed = await confirm({
+      title: 'Xác nhận chấm điểm',
+      description: `Bạn có chắc chắn muốn chấm ${normalizedScore} điểm cho ${acceptedRequest.teamName} không?`,
+    })
+    if (!isConfirmed) return
 
     try {
       const payload = mapScoringFormToRequest(boothId, acceptedRequest.id, {

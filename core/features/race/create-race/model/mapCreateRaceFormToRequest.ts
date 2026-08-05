@@ -17,6 +17,7 @@ export const mapCreateRaceFormToRequest = (
       ? toGmt7ApiDateTime(form.basic.endAt)
       : getCurrentGmt7DateTime(),
   },
+  rules: form.basic.rules?.trim() || undefined, 
   organizerId: form.organizers.map((organizer) => organizer.id),
   raceTeam: form.teams.map((team) => team.id),
   booths: form.stations.filter(hasStationContent).map((station) => ({

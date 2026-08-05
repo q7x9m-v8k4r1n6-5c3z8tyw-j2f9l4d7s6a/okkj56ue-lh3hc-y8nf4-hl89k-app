@@ -47,3 +47,5 @@ export type {
   ToastOptions,
   ToastVariant,
 } from './Toast'
+export { ConfirmDialogProvider, useConfirmDialog } from './ConfirmDialog'
+export type { ConfirmDialogOptions } from './ConfirmDialog'

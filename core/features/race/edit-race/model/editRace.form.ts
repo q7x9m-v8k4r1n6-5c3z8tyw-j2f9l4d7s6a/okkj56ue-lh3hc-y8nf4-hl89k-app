@@ -35,6 +35,7 @@ export type EditRaceForm = {
   coverFileName: string
   place: string
   status: EditRaceStatus
+  rules: string
   modifiedAt: string
   booths: EditRaceBooth[]
   teams: EditRaceTeam[]
