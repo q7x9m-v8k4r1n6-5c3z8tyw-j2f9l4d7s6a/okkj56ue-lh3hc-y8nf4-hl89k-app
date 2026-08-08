@@ -1,6 +1,6 @@
 # Page Pattern Instruction
 
-Tài liệu này định nghĩa pattern chuẩn cho `core/pages`.
+Tài liệu này định nghĩa pattern chuẩn cho `src/app/pages`.
 
 ---
 
