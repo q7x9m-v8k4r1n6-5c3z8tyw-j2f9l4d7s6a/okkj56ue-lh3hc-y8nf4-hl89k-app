@@ -18,6 +18,7 @@ describe('user form validation', () => {
       ...createEmptyUserForm(),
       email: 'john.doe@example.com',
       role: 'support',
+      roleIds: ['some-role-id'], 
     })
 
     expect(result.error).toBeUndefined()
@@ -26,6 +27,7 @@ describe('user form validation', () => {
       username: 'john.doe',
       email: 'john.doe@example.com',
       role: 'support',
+      roleIds: ['some-role-id'],
     })
   })
 
