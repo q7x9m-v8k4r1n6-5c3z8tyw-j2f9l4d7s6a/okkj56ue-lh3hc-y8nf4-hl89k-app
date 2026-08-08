@@ -11,7 +11,7 @@ export const router = createBrowserRouter([
   {
     path: 'login',
     lazy: async () => {
-      const { LoginPage } = await import('@/core/pages/login')
+      const { LoginPage } = await import('@/src/app/pages/login')
       return { Component: LoginPage }
     },
   },
@@ -25,7 +25,7 @@ export const router = createBrowserRouter([
             path: 'team',
             handle: { title: 'Đội chơi' },
             lazy: async () => {
-              const { TeamRaceListPage } = await import('@/core/pages/team-race-list')
+              const { TeamRaceListPage } = await import('@/src/app/pages/team-race-list')
               return { Component: TeamRaceListPage }
             },
           },
@@ -33,7 +33,7 @@ export const router = createBrowserRouter([
             path: 'team/races/:raceId',
             handle: { title: 'Chi tiết trận đấu' },
             lazy: async () => {
-              const { TeamDetailRacePage } = await import('@/core/pages/team-detail-race')
+              const { TeamDetailRacePage } = await import('@/src/app/pages/team-detail-race')
               return { Component: TeamDetailRacePage }
             },
           },
@@ -46,7 +46,7 @@ export const router = createBrowserRouter([
             path: 'organizer/select',
             handle: { title: 'Chọn khu vực làm việc' },
             lazy: async () => {
-              const { OrganizerEntryPage } = await import('@/core/pages/organizer-entry')
+              const { OrganizerEntryPage } = await import('@/src/app/pages/organizer-entry')
               return { Component: OrganizerEntryPage }
             },
           },
@@ -54,7 +54,7 @@ export const router = createBrowserRouter([
             path: 'organizer',
             handle: { title: 'Quản trạm' },
             lazy: async () => {
-              const { OrganizerRaceListPage } = await import('@/core/pages/organizer-race-list')
+              const { OrganizerRaceListPage } = await import('@/src/app/pages/organizer-race-list')
               return { Component: OrganizerRaceListPage }
             },
           },
@@ -62,7 +62,7 @@ export const router = createBrowserRouter([
             path: 'organizer/races/:raceId',
             handle: { title: 'Chi tiết trận đấu' },
             lazy: async () => {
-              const { OrganizerRacePage } = await import('@/core/pages/organizer-race')
+              const { OrganizerRacePage } = await import('@/src/app/pages/organizer-race')
               return { Component: OrganizerRacePage }
             },
           },
@@ -78,7 +78,7 @@ export const router = createBrowserRouter([
                 index: true,
                 handle: { title: 'Danh sách trận đấu' },
                 lazy: async () => {
-                  const { RaceListPage } = await import('@/core/pages/race-list')
+                  const { RaceListPage } = await import('@/src/app/pages/race-list')
                   return { Component: RaceListPage }
                 },
               },
@@ -86,7 +86,7 @@ export const router = createBrowserRouter([
                 path: 'races/new',
                 handle: { title: 'Tạo trận đấu mới' },
                 lazy: async () => {
-                  const { CreateRacePage } = await import('@/core/pages/create-race')
+                  const { CreateRacePage } = await import('@/src/app/pages/create-race')
                   return { Component: CreateRacePage }
                 },
               },
@@ -94,7 +94,7 @@ export const router = createBrowserRouter([
                 path: 'races/:raceId',
                 handle: { title: 'Chi tiết trận đấu' },
                 lazy: async () => {
-                  const { DetailRacePage } = await import('@/core/pages/detail-race')
+                  const { DetailRacePage } = await import('@/src/app/pages/detail-race')
                   return { Component: DetailRacePage }
                 },
               },
@@ -102,7 +102,7 @@ export const router = createBrowserRouter([
                 path: 'users',
                 handle: { title: 'Người dùng' },
                 lazy: async () => {
-                  const { UserListPage } = await import('@/core/pages/user-list')
+                  const { UserListPage } = await import('@/src/app/pages/user-list')
                   return { Component: UserListPage }
                 },
               },
@@ -110,7 +110,7 @@ export const router = createBrowserRouter([
                 path: 'settings',
                 handle: { title: 'Cài đặt' },
                 lazy: async () => {
-                  const { SettingsPage } = await import('@/core/pages/settings')
+                  const { SettingsPage } = await import('@/src/app/pages/settings')
                   return { Component: SettingsPage }
                 },
               },
@@ -118,7 +118,7 @@ export const router = createBrowserRouter([
                 path: 'prototype',
                 handle: { title: 'Common UI Prototype' },
                 lazy: async () => {
-                  const { PrototypePage } = await import('@/core/pages/prototype')
+                  const { PrototypePage } = await import('@/src/app/pages/prototype')
                   return { Component: PrototypePage }
                 },
               },
@@ -131,7 +131,7 @@ export const router = createBrowserRouter([
   {
     path: '*',
     lazy: async () => {
-      const { NotFoundPage } = await import('@/core/pages/not-found')
+      const { NotFoundPage } = await import('@/src/app/pages/not-found')
       return { Component: NotFoundPage }
     },
   },
