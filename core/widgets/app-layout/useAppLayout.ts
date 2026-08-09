@@ -15,7 +15,8 @@ export const useAppLayout = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
   const { isLoggingOut, logout } = useLogout()
-  const raceId = /^\/races\/([^/]+)$/.exec(location.pathname)?.[1]
+  const raceIdMatch = /^\/races\/([^/]+)$/.exec(location.pathname)?.[1]
+  const raceId = raceIdMatch !== 'new' ? raceIdMatch : undefined
   const raceDetail = useRaceDetailQuery(raceId)
   const [isPanelCollapsed, setIsPanelCollapsed] = useState(false)
   const togglePanel = () => setIsPanelCollapsed((prev) => !prev)

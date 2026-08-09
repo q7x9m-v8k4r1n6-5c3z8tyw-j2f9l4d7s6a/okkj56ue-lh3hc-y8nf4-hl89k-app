@@ -1,72 +1,105 @@
-import { UploadIcon } from '@/core/assets'
-import {
-  formatDateTime,
-  Input,
-} from '@/core/shared'
-import { ReadonlyField } from './ReadonlyField'
-import { SectionCard } from './SectionCard'
-import { SectionTitle } from './SectionTitle'
+import { useState } from 'react'
+import { Button, Drawer, Input, RichTextEditor } from '@/core/shared'
 import { useBasicInformationSection } from '../hooks/useBasicInformationSection'
 
 export const BasicInformationSection = () => {
   const section = useBasicInformationSection()
+  const [isRulesOpen, setIsRulesOpen] = useState(false)
+
+  const getPlainText = (html: string) => {
+    if (!html) return ''
+    const doc = new DOMParser().parseFromString(html, 'text/html')
+    return doc.body.textContent?.replace(/\s+/g, ' ').trim() || ''
+  }
+
+  const rulesPreviewText = getPlainText(section.rules || '')
+
+  const inputDisabledStyle = "disabled:bg-[#fcfcfc] disabled:opacity-100 disabled:cursor-default disabled:text-[#171717] disabled:border-[#eeeeee]"
 
   return (
-    <SectionCard>
-      <SectionTitle index={1} title="Thông tin cơ bản" />
-      <div className="mt-5 grid grid-cols-1 gap-x-5 gap-y-4 lg:grid-cols-2">
-        <div className="lg:col-span-2">
-          {section.isEditing ? (
-            <Input error={section.errors.raceName} label="Tên trận đấu" requiredMark value={section.raceName} onChange={section.onRaceNameChange} />
-          ) : (
-            <ReadonlyField label="Tên trận đấu" requiredMark value={section.raceName} />
-          )}
+    <div className="space-y-4">
+      <h2 className="text-lg font-bold uppercase tracking-tight text-[#1a1c1c]">
+        <span className="text-[#de3336]">(1) </span>THÔNG TIN CƠ BẢN
+      </h2>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="md:col-span-2">
+          <Input
+            label="Tên trận đấu"
+            disabled={!section.isEditing}
+            className={inputDisabledStyle}
+            value={section.raceName}
+            onChange={section.onRaceNameChange}
+          />
         </div>
-        {section.isEditing ? (
-          <>
-            <Input error={section.errors.timeStart} type="datetime-local" step={1} label="Thời gian bắt đầu" requiredMark value={section.timeStart} onChange={section.onTimeStartChange} />
-            <Input error={section.errors.timeEnd} type="datetime-local" step={1} label="Thời gian kết thúc" requiredMark value={section.timeEnd} onChange={section.onTimeEndChange} />
-          </>
-        ) : (
-          <>
-            <ReadonlyField label="Thời gian bắt đầu" requiredMark value={formatDateTime(section.timeStart)} />
-            <ReadonlyField label="Thời gian kết thúc" requiredMark value={formatDateTime(section.timeEnd)} />
-          </>
-        )}
-        <div>
-          <span className="mb-2 block text-xs font-semibold uppercase leading-[14px] tracking-[0.15px] text-[#1a1c1c]">
-            Ảnh bìa <span className="text-[#de3336]">(*)</span>
-          </span>
+
+        <Input
+          type="datetime-local"
+          label="Thời gian bắt đầu"
+          disabled={!section.isEditing}
+          className={inputDisabledStyle}
+          value={section.timeStart}
+          onChange={section.onTimeStartChange}
+        />
+
+        <Input
+          type="datetime-local"
+          label="Thời gian kết thúc"
+          disabled={!section.isEditing}
+          className={inputDisabledStyle}
+          value={section.timeEnd}
+          onChange={section.onTimeEndChange}
+        />
+
+        <Input
+          label="Địa điểm"
+          disabled={!section.isEditing}
+          className={inputDisabledStyle}
+          value={section.place}
+          onChange={section.onPlaceChange}
+        />
+
+        <div className="md:col-span-2">
+          <label className="mb-2 block text-xs font-semibold uppercase leading-[14px] tracking-[0.15px] text-[#1a1c1c]">
+            Luật trận đấu
+          </label>
+          
           {section.isEditing ? (
-            <>
-              <input id={section.coverInputId} className="sr-only" type="file" accept="image/jpeg,image/png,image/webp" onChange={section.onCoverFileChange} />
-              <label
-                htmlFor={section.coverInputId}
-                className="flex h-10 w-full items-center gap-3 rounded-lg border border-[#e2e2e2] bg-white px-4 text-left text-sm text-[#737373] transition hover:border-[#de3336] focus:outline-none focus:ring-2 focus:ring-[#de3336]/10"
-              >
-                <UploadIcon className="size-5 shrink-0 text-[#525252]" />
-                <span className="min-w-0 truncate">{section.coverFileName || 'Upload file ảnh bìa tại đây'}</span>
-              </label>
-              {section.errors.coverFile ? <span className="mt-1.5 block text-xs text-[#de3336]">{section.errors.coverFile}</span> : null}
-            </>
+            <button
+              type="button"
+              onClick={() => setIsRulesOpen(true)}
+              className="flex h-10 w-full items-center justify-between rounded-lg border border-[#e2e2e2] bg-white px-3 text-left text-sm transition hover:border-[#de3336] focus:outline-none focus:ring-2 focus:ring-[#de3336]/10"
+            >
+              <span className={rulesPreviewText ? 'truncate text-[#171717]' : 'text-[#6b7280]'}>
+                {rulesPreviewText || 'Nhập luật trận đấu...'}
+              </span>
+            </button>
           ) : (
-            <div className="flex h-10 w-full items-center gap-3 rounded-lg border border-[#e2e2e2] bg-[#fafafa] px-4 text-sm text-[#8a8f98]">
-              <UploadIcon className="size-5 shrink-0 text-[#525252]" />
-              <span className="min-w-0 truncate">{section.coverFileName || 'Upload file ảnh bìa tại đây'}</span>
+            <div className="flex h-10 w-full items-center rounded-lg border border-[#eeeeee] bg-[#fcfcfc] px-3 text-sm text-[#171717] cursor-default">
+              <span className="truncate">{rulesPreviewText || 'Chưa có thông tin luật trận đấu.'}</span>
             </div>
           )}
         </div>
-        {section.isEditing ? (
-          <Input error={section.errors.place} label="Địa điểm" requiredMark value={section.place} onChange={section.onPlaceChange} />
-        ) : (
-          <ReadonlyField label="Địa điểm" requiredMark value={section.place} />
-        )}
-        {section.coverUrl ? (
-          <div className="lg:col-span-2">
-            <img src={section.coverUrl} alt="Xem trước ảnh bìa" className="h-48 w-full rounded-lg border border-[#e5e5e5] object-cover" />
-          </div>
-        ) : null}
       </div>
-    </SectionCard>
+
+      <Drawer
+        open={isRulesOpen}
+        panelClassName="!max-w-[760px]"
+        title="Luật trận đấu"
+        onClose={() => setIsRulesOpen(false)}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setIsRulesOpen(false)}>Hủy</Button>
+            <Button onClick={() => setIsRulesOpen(false)}>Lưu</Button>
+          </>
+        }
+      >
+        <RichTextEditor
+          value={section.rules}
+          placeholder="Nhập luật trận đấu..."
+          onChange={section.onRulesChange}
+        />
+      </Drawer>
+    </div>
   )
 }

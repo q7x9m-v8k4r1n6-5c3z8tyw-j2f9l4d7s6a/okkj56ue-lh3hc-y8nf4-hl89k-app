@@ -51,6 +51,7 @@ export type EditRaceFormErrors = {
   timeStart?: string
   timeEnd?: string
   place?: string
+  rules?: string
   coverFile?: string
   booths: Record<
     string,

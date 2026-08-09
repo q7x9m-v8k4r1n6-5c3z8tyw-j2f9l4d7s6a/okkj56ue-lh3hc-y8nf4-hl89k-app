@@ -3,6 +3,7 @@ import { useToast, useConfirmDialog } from '@/core/shared'
 import { mapScoringFormToRequest } from '../mapScoringFormToRequest'
 import { useSubmitScoreMutation } from '../server/useSubmitScoreMutation'
 import { acceptEntryToBooth } from '../../api/joinRequests.api'
+import type { BannerVariant } from '@/core/shared/ui/StatusBanner'
 
 export type JoinRequest = {
   id: string
@@ -11,9 +12,6 @@ export type JoinRequest = {
 
 const scoreOptions = [0, 10, 20, 30, 40, 50] as const
 
-/**
- * Hook quản lý State duyệt đội thi và gửi điểm chấm trạm cho Organizer
- */
 export const useOrganizerJoinRequestsState = (boothId: string) => {
   const { toast } = useToast()
   const { confirm } = useConfirmDialog()
@@ -23,8 +21,11 @@ export const useOrganizerJoinRequestsState = (boothId: string) => {
   const [score, setScore] = useState('')
   const [isAccepting, setIsAccepting] = useState(false)
 
-  const submitScoreMutation = useSubmitScoreMutation()
+  // State lưu thông báo và màu sắc banner
+  const [statusMessage, setStatusMessage] = useState<string>('')
+  const [statusVariant, setStatusVariant] = useState<BannerVariant>('success')
 
+  const submitScoreMutation = useSubmitScoreMutation()
   const normalizedScore = Number(score)
 
   const canSubmitScore =
@@ -44,11 +45,10 @@ export const useOrganizerJoinRequestsState = (boothId: string) => {
 
     try {
       setIsAccepting(true)
+      await acceptEntryToBooth({ boothId, teamId: request.id })
 
-      await acceptEntryToBooth({
-        boothId,
-        teamId: request.id,
-      })
+      setStatusMessage(`Đội ${request.teamName} đã vào trạm`)
+      setStatusVariant('success')
 
       setAcceptedRequest(request)
       setRequest(null)
@@ -64,7 +64,19 @@ export const useOrganizerJoinRequestsState = (boothId: string) => {
     }
   }
 
-  const handleRejectRequest = () => {
+  const handleRejectRequest = async () => {
+    if (!request) return
+
+    const isConfirmed = await confirm({
+      title: 'Xác nhận hủy yêu cầu',
+      description: `Bạn có chắc chắn muốn hủy yêu cầu vào trạm của đội ${request.teamName} không?`,
+    })
+    if (!isConfirmed) return
+
+    // Hiện thông báo màu xám theo Figma
+    setStatusMessage(`Hủy yêu cầu vào trạm của team ${request.teamName}`)
+    setStatusVariant('neutral')
+
     setRequest(null)
     setAcceptedRequest(null)
     setScore('')
@@ -87,11 +99,8 @@ export const useOrganizerJoinRequestsState = (boothId: string) => {
 
       await submitScoreMutation.mutateAsync(payload)
 
-      toast({
-        title: 'Chấm điểm thành công',
-        description: `Đã ghi nhận ${normalizedScore} điểm cho ${acceptedRequest.teamName}`,
-        variant: 'success',
-      })
+      setStatusMessage(`+${normalizedScore} điểm cho đội ${acceptedRequest.teamName}`)
+      setStatusVariant('success')
 
       setAcceptedRequest(null)
       setScore('')
@@ -108,19 +117,19 @@ export const useOrganizerJoinRequestsState = (boothId: string) => {
     request,
     setRequest,
     acceptedRequest,
-
     acceptRequest: handleAcceptRequest,
     isAccepting,
-
     rejectRequest: handleRejectRequest,
-
     score,
     setScore,
     scoreOptions,
     selectScore: (nextScore: number) => setScore(String(nextScore)),
-
     canSubmitScore,
     submitScore: handleSubmitScore,
     isSubmitting: submitScoreMutation.isPending,
+
+    statusMessage,
+    statusVariant,
+    clearStatusMessage: () => setStatusMessage(''),
   }
 }

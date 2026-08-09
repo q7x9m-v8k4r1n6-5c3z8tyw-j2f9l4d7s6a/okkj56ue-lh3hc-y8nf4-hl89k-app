@@ -12,8 +12,8 @@ export const createRaceRequestSchema = z.object({
     place: z.string().min(1).max(255),
     timeStart: z.string().min(1),
     timeEnd: z.string().min(1),
+    rules: z.string().optional(),
   }),
-  rules: z.string().optional(),
   organizerId: z.array(z.string().min(1)),
   raceTeam: z.array(z.string().min(1)),
   booths: z.array(z.object({
