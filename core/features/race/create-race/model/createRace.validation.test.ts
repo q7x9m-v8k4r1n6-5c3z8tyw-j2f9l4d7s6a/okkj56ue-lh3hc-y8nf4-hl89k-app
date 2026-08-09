@@ -13,6 +13,7 @@ describe('create-race validation', () => {
       endAt: '2026-01-02T09:00',
       imageName: '',
       location: '',
+      rules: '',
     })).toEqual({
       name: 'Vui lòng nhập tên trận đấu.',
       endAt: 'Thời gian kết thúc phải sau thời gian bắt đầu.',

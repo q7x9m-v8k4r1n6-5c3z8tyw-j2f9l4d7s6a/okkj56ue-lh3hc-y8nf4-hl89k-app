@@ -1,16 +1,12 @@
 import { client } from '@/core/shared/api'
 import {
   editRaceDetailResponseSchema,
+  editRaceRulesResponseSchema,
   type EditRaceDetailResponse,
+  type EditRaceRulesResponse,
   type EditRaceRequest,
 } from '../model/editRace.contract'
 
-/**
- * Fetches the details of a specific race.
- * @param raceId The unique identifier of the race to retrieve
- * @param signal An optional AbortSignal to cancel the request if needed
- * @returns A promise resolving to the race details
- */
 export const getRaceDetail = async (
   raceId: string,
   signal?: AbortSignal,
@@ -22,13 +18,18 @@ export const getRaceDetail = async (
   return editRaceDetailResponseSchema.parse(response)
 }
 
-/**
- * Updates the details of a specific race.
- * @param raceId The unique identifier of the race to update
- * @param payload The updated race information
- * @param coverImage The new cover image for the race
- * @returns A promise resolving to the updated race details
- */
+/** Fetches the race rules text, only reachable by an admin-permissioned actor. */
+export const getRaceRules = async (
+  raceId: string,
+  signal?: AbortSignal,
+): Promise<EditRaceRulesResponse> => {
+  const response = await client.request<unknown>({
+    path: `/Race/${raceId}/rules/admin`,
+    signal,
+  })
+  return editRaceRulesResponseSchema.parse(response)
+}
+
 export const patchRace = async (
   raceId: string,
   payload: EditRaceRequest,

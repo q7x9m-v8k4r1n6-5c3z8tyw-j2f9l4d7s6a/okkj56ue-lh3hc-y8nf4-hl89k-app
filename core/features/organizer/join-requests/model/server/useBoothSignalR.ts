@@ -42,7 +42,7 @@ export const useBoothSignalR = ({
           teamName,
         })
 
-        if (changedBoothId === boothId && status === 'Pending' && teamId) {
+        if (changedBoothId === boothId && status === 'pending' && teamId) {
           callbackRef.current({
             id: teamId,
             teamName: teamName ?? 'Đội chưa xác định',

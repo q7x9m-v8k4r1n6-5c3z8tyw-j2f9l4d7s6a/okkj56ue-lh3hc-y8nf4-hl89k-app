@@ -6,7 +6,7 @@ import type {
 } from '../editRace.form'
 
 export type BasicInformationChanges = Partial<
-  Pick<EditRaceForm, 'raceName' | 'timeStart' | 'timeEnd' | 'place'>
+  Pick<EditRaceForm, 'raceName' | 'timeStart' | 'timeEnd' | 'place' | 'rules'>
 >
 
 export type EditRaceFormState = {

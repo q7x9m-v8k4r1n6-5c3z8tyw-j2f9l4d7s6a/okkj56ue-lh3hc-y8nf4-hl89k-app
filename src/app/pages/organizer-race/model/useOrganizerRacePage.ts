@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useOrganizerRaceAccess } from '@/core/features/organizer/organizer-race'
+import { ORGANIZER_RACE_TAB_PARAM } from '@/core/shared/utils/organizerRaceRoute'
 import {
   isOrganizerPrimaryRaceTab,
   isOrganizerRaceTab,
@@ -9,26 +10,41 @@ import {
   type OrganizerRaceTab,
 } from './organizerRace.tabs'
 
+const DEFAULT_TAB: OrganizerPrimaryRaceTab = 'rules'
+
 /**
- * Owns presentation-only tab and menu state for the organizer route.
+ * Owns presentation-only tab state for the organizer route, persisted in the
+ * URL so features can read the active tab without page-passed props.
  */
 export const useOrganizerRacePage = () => {
   const navigate = useNavigate()
   const { raceId } = useParams<{ raceId: string }>()
   const raceAccess = useOrganizerRaceAccess(raceId)
+  const [searchParams, setSearchParams] = useSearchParams()
 
-  const [activeTab, setActiveTab] = useState<OrganizerRaceTab>('rules')
-  const [previousTab, setPreviousTab] = useState<OrganizerPrimaryRaceTab>('rules')
+  const tabParam = searchParams.get(ORGANIZER_RACE_TAB_PARAM)
+  const activeTab: OrganizerRaceTab = tabParam && isOrganizerRaceTab(tabParam) ? tabParam : DEFAULT_TAB
+  const [previousTab, setPreviousTab] = useState<OrganizerPrimaryRaceTab>(
+    isOrganizerPrimaryRaceTab(activeTab) ? activeTab : DEFAULT_TAB,
+  )
   const isMenuOpen = activeTab === 'menu'
+
+  const setTab = (tab: OrganizerRaceTab) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev)
+      next.set(ORGANIZER_RACE_TAB_PARAM, tab)
+      return next
+    })
+  }
 
   const openMenu = () => {
     if (isOrganizerPrimaryRaceTab(activeTab)) setPreviousTab(activeTab)
-    setActiveTab('menu')
+    setTab('menu')
   }
 
   return {
     activeTab,
-    closeMenu: () => setActiveTab(previousTab),
+    closeMenu: () => setTab(previousTab),
     errorMessage: raceAccess.errorMessage,
     isMenuOpen,
     isRaceAccessError: raceAccess.isError,
@@ -42,7 +58,7 @@ export const useOrganizerRacePage = () => {
         return
       }
       setPreviousTab(value)
-      setActiveTab(value)
+      setTab(value)
     },
     openMenu,
     raceName: raceAccess.raceName,

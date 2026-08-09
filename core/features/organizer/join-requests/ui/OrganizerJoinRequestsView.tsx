@@ -1,13 +1,32 @@
+import { useSearchParams } from 'react-router-dom'
 import { EnterStationIcon } from '@/core/assets'
+import { StatusBanner } from '@/core/shared/ui/StatusBanner'
+import {
+  ORGANIZER_RACE_TAB_PARAM,
+  ORGANIZER_RACE_REQUESTS_TAB,
+} from '@/core/shared/utils/organizerRaceRoute'
 import { useOrganizerJoinRequests } from './hooks/useOrganizerJoinRequests'
 
 export const OrganizerJoinRequestsView = () => {
+  const [searchParams] = useSearchParams()
+  const isActiveTab = searchParams.get(ORGANIZER_RACE_TAB_PARAM) === ORGANIZER_RACE_REQUESTS_TAB
   const joinRequests = useOrganizerJoinRequests()
+
+  const visibilityClassName = isActiveTab ? '' : 'hidden'
 
   if (joinRequests.acceptedRequest) {
     return (
-      <section className="flex min-h-[calc(100svh-137px)] flex-col justify-between px-6 pb-5 pt-7">
+      <section className={`flex min-h-[calc(100svh-137px)] flex-col justify-between px-6 pb-5 pt-4 ${visibilityClassName}`}>
         <div>
+          {joinRequests.statusMessage && (
+            <StatusBanner
+              message={joinRequests.statusMessage}
+              variant={joinRequests.statusVariant}
+              onClose={joinRequests.clearStatusMessage}
+              className="mb-4"
+            />
+          )}
+
           <label className="sr-only" htmlFor="organizer-score-input">
             Nhập điểm cho đội
           </label>
@@ -57,18 +76,37 @@ export const OrganizerJoinRequestsView = () => {
 
   if (!joinRequests.request) {
     return (
-      <section className="flex min-h-[calc(100svh-137px)] items-center justify-center px-5 text-center">
-        <p className="text-sm text-[#525252]">
-          {!joinRequests.score
-            ? 'Chưa có yêu cầu nào xuất hiện'
-            : `Đã nhập ${joinRequests.score} điểm`}
-        </p>
+      <section className={`flex min-h-[calc(100svh-137px)] flex-col px-5 pt-4 pb-5 ${visibilityClassName}`}>
+        {/* Đưa Banner lên đỉnh, phần chữ "Chưa có yêu cầu" nằm ở giữa */}
+        {joinRequests.statusMessage && (
+          <StatusBanner
+            message={joinRequests.statusMessage}
+            variant={joinRequests.statusVariant}
+            onClose={joinRequests.clearStatusMessage}
+            className="mb-4"
+          />
+        )}
+        <div className="flex flex-1 items-center justify-center text-center">
+          <p className="text-sm text-[#525252]">
+            {!joinRequests.score
+              ? 'Chưa có yêu cầu nào xuất hiện'
+              : `Đã nhập ${joinRequests.score} điểm`}
+          </p>
+        </div>
       </section>
     )
   }
 
   return (
-    <section className="flex min-h-[calc(100svh-137px)] flex-col px-5 py-10">
+    <section className={`flex min-h-[calc(100svh-137px)] flex-col px-5 pt-4 pb-10 ${visibilityClassName}`}>
+      {joinRequests.statusMessage && (
+        <StatusBanner
+          message={joinRequests.statusMessage}
+          variant={joinRequests.statusVariant}
+          onClose={joinRequests.clearStatusMessage}
+          className="mb-4"
+        />
+      )}
       <div className="flex flex-1 flex-col items-center justify-center text-center">
         <EnterStationIcon className="mb-6 size-[50px] text-[#de3336]" />
         <h1 className="text-[32px] font-bold leading-10 text-[#5e5e5e]">

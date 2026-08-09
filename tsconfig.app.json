@@ -28,5 +28,5 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "core", "plugin"]
+  "include": ["src", "core", "plugin", "core/entities/booth/model/myBooth.ts"]
 }

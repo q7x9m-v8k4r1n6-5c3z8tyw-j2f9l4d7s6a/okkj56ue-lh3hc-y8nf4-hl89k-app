@@ -41,7 +41,7 @@ export const useEditRaceEditor = (raceId?: string) => {
       },
       {
         onSuccess: (detail) => {
-          editor.finishEditing(mapRaceDetailToForm(detail))
+          editor.finishEditing(mapRaceDetailToForm(detail, editor.form.rules))
           toast({
             title: 'Đã lưu thay đổi thành công.',
             variant: 'success',

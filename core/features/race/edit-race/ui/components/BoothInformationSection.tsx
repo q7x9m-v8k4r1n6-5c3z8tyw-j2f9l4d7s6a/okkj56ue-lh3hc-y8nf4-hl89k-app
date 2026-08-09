@@ -52,7 +52,7 @@ export const BoothInformationSection = () => {
                 <TableCell className="min-w-[230px]">
                   {section.isEditing ? (
                     <OrganizerSearchBox
-                      type="multiple"
+                      type="single"
                       value={booth.managers}
                       onChange={booth.onManagersChange}
                     />
@@ -111,7 +111,7 @@ export const BoothInformationSection = () => {
                 </TableCell>
                 <TableCell className="min-w-[230px]">
                   <OrganizerSearchBox
-                    type="multiple"
+                    type="single"
                     onChange={(managers) => section.createBooth({
                       managers: managers.map((manager) => ({
                         id: manager.id,
