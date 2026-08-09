@@ -10,7 +10,7 @@ export const getRaceRules = async (
   signal?: AbortSignal,
 ): Promise<RaceRulesResponse> => {
   const response = await client.request<unknown>({
-    path: `/api/v1/Race/${raceId}/rules`,
+    path: `/Race/${raceId}/rules`,
     signal,
   })
 

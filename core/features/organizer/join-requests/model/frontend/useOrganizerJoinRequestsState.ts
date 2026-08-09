@@ -73,7 +73,6 @@ export const useOrganizerJoinRequestsState = (boothId: string) => {
     })
     if (!isConfirmed) return
 
-    // Hiện thông báo màu xám theo Figma
     setStatusMessage(`Hủy yêu cầu vào trạm của team ${request.teamName}`)
     setStatusVariant('neutral')
 

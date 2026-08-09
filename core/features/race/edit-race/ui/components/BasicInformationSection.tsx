@@ -14,7 +14,8 @@ export const BasicInformationSection = () => {
 
   const rulesPreviewText = getPlainText(section.rules || '')
 
-  const inputDisabledStyle = "disabled:bg-[#fcfcfc] disabled:opacity-100 disabled:cursor-default disabled:text-[#171717] disabled:border-[#eeeeee]"
+  const inputDisabledStyle = "disabled:bg-[#fcfcfc] disabled:opacity-100 disabled:cursor-not-allowed disabled:text-[#171717] disabled:border-[#eeeeee]"
+  const readOnlyFieldStyle = "flex h-10 w-full items-center rounded-lg border bg-[#fcfcfc] px-3 text-sm text-[#171717] opacity-100 cursor-not-allowed border-[#eeeeee]"
 
   return (
     <div className="space-y-4">
@@ -63,7 +64,7 @@ export const BasicInformationSection = () => {
           <label className="mb-2 block text-xs font-semibold uppercase leading-[14px] tracking-[0.15px] text-[#1a1c1c]">
             Luật trận đấu
           </label>
-          
+
           {section.isEditing ? (
             <button
               type="button"
@@ -75,7 +76,7 @@ export const BasicInformationSection = () => {
               </span>
             </button>
           ) : (
-            <div className="flex h-10 w-full items-center rounded-lg border border-[#eeeeee] bg-[#fcfcfc] px-3 text-sm text-[#171717] cursor-default">
+            <div className={readOnlyFieldStyle}>
               <span className="truncate">{rulesPreviewText || 'Chưa có thông tin luật trận đấu.'}</span>
             </div>
           )}
