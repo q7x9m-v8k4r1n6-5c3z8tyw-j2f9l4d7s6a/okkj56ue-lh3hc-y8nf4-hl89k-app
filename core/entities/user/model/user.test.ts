@@ -37,8 +37,15 @@ describe('user entity schemas', () => {
       id: 'user-id',
       email: 'user@example.com',
       role: 'admin',
+      roles: ['admin'],
+      userType: 'staff',
       displayName: 'Admin',
       avatarUrl: '',
-    })).toMatchObject({ id: 'user-id', role: 'admin' })
+    })).toMatchObject({ 
+      id: 'user-id', 
+      role: 'admin',
+      roles: ['admin'], 
+      userType: 'staff' 
+    })
   })
 })

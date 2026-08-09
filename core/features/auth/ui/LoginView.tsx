@@ -18,6 +18,8 @@ export const LoginView = () => {
     handleStandardLogin,
     handleUsernameChange,
     isLoading,
+    isSubmitDisabled,
+    lockoutSeconds,  
     password,
     username,
   } = useLogin()
@@ -53,7 +55,7 @@ export const LoginView = () => {
             value={username}
             onChange={handleUsernameChange}
             leadingIcon={<UserIcon className="h-4 w-4" />}
-            disabled={isLoading}
+            disabled={isSubmitDisabled}
             requiredMark
             error={fieldErrors.username}
             placeholder="Điền tên đăng nhập vào đây"
@@ -66,7 +68,7 @@ export const LoginView = () => {
             onChange={handlePasswordChange}
             placeholder="Điền mật khẩu vào đây"
             leadingIcon={<LockIcon className="h-4 w-4" />}
-            disabled={isLoading}
+            disabled={isSubmitDisabled}
             requiredMark
             error={fieldErrors.password}
           />
@@ -85,10 +87,14 @@ export const LoginView = () => {
             size="md"
             variant="primary"
             className="w-full text-base"
-            trailingIcon={<ArrowRightIcon className="h-5 w-5" />}
-            disabled={isLoading}
+            trailingIcon={!lockoutSeconds ? <ArrowRightIcon className="h-5 w-5" /> : undefined}
+            disabled={isSubmitDisabled}
           >
-            {isLoading ? 'Đang xử lý...' : 'Đăng nhập'}
+            {lockoutSeconds > 0 
+              ? `còn ${lockoutSeconds} giây` 
+              : isLoading 
+                ? 'Đang xử lý...' 
+                : 'Đăng nhập'}
           </Button>
         </form>
 

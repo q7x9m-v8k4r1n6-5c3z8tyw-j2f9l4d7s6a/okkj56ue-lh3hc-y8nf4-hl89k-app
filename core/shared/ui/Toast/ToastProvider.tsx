@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { CloseIcon } from '@/core/assets'
 import { ToastContext } from './ToastContext'
 import type { ToastItem, ToastOptions, ToastVariant } from './toast.type'
+import { configureGlobalToast } from '../../api/httpClient'
 
 const variantClasses: Record<ToastVariant, string> = {
   success: 'border-[#bbf7d0] bg-white text-[#15803d] before:bg-[#22c55e]',
@@ -45,10 +46,15 @@ export const ToastProvider = ({ children }: PropsWithChildren) => {
     return id
   }, [dismiss])
 
-  useEffect(() => () => {
-    timersRef.current.forEach(clearTimeout)
-    timersRef.current.clear()
-  }, [])
+  // --- ĐĂNG KÝ HÀM TOAST VÀO AXIOS ---
+  useEffect(() => {
+    configureGlobalToast(toast)
+    return () => {
+      configureGlobalToast(null)
+      timersRef.current.forEach(clearTimeout)
+      timersRef.current.clear()
+    }
+  }, [toast])
 
   const contextValue = useMemo(() => ({ dismiss, dismissAll, toast }), [dismiss, dismissAll, toast])
 

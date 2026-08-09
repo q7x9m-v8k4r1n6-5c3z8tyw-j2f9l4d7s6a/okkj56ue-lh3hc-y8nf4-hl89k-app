@@ -1,5 +1,6 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios'
 import type { ApiEnvelope } from './api.types'
+import type { ToastOptions } from '../ui/Toast'
 
 type RetryableRequestConfig = InternalAxiosRequestConfig & { _retry?: boolean }
 type RefreshQueueItem = {
@@ -23,7 +24,9 @@ let isRefreshing = false
 let refreshQueue: RefreshQueueItem[] = []
 let unauthorizedRecovery: UnauthorizedRecovery | null = null
 
-/** Updates the bearer token attached to subsequent API requests. */
+let globalToast: ((options: ToastOptions) => void) | null = null
+let rateLimitUnlockTime = 0
+
 export const setAuthToken = (token: string | null) => {
   currentAccessToken = token
 }
@@ -36,6 +39,11 @@ export const configureUnauthorizedRecovery = (
   recovery: UnauthorizedRecovery | null,
 ) => {
   unauthorizedRecovery = recovery
+}
+
+/** Cài đặt hàm Toast toàn cục cho HTTP Client */
+export const configureGlobalToast = (toastFn: ((options: ToastOptions) => void) | null) => {
+  globalToast = toastFn
 }
 
 const processRefreshQueue = (error: unknown, token?: string) => {
@@ -81,6 +89,29 @@ const apiClient = () => {
         !recovery ||
         !canRecover
       ) {
+        
+        let retryAfterSeconds: number | undefined = undefined
+
+        // --- XỬ LÝ LỖI 429 & Display Toast ---
+        if (error.response?.status === 429) {
+          const retryAfterHeader = error.response.headers['retry-after']
+          retryAfterSeconds = parseInt(retryAfterHeader as string, 10) || 5
+          
+          if (globalToast) {
+            const now = Date.now()
+            if (now >= rateLimitUnlockTime) {
+              rateLimitUnlockTime = now + (retryAfterSeconds * 1000)
+  
+              globalToast({
+                title: 'Cảnh báo',
+                description: `Gọi quá nhiều request. Thử lại sau ${retryAfterSeconds} giây.`,
+                variant: 'warning',
+                duration: retryAfterSeconds * 1000,
+              })
+            }
+          }
+        }
+
         const responseData = error.response?.data as ApiErrorPayload | undefined
         return Promise.reject({
           status: error.response?.status,
@@ -89,6 +120,7 @@ const apiClient = () => {
             responseData?.message ??
             error.message,
           data: error.response?.data,
+          retryAfterSeconds,
         })
       }
 
