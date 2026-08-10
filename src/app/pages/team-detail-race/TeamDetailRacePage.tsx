@@ -1,3 +1,4 @@
+import { RaceMessageNotificationBanner } from '@/core/features/race/race-message-notification'
 import { TeamLeaderboardView } from '@/core/features/team/leaderboard'
 import { TeamMapView } from '@/core/features/team/map'
 import { TeamRaceMenuView } from '@/core/features/team/race-menu'
@@ -30,6 +31,9 @@ export const TeamDetailRacePage = () => {
           onCancel={page.closeMenu}
           onReturnToRaceList={page.returnToRaceList}
         />
+      ) : null}
+      {canShowRaceTabs && page.activeTab !== 'more' ? (
+        <RaceMessageNotificationBanner />
       ) : null}
       {page.activeTab !== 'more' && page.isRaceAccessLoading ? (
         <section className="flex min-h-full items-center justify-center px-5 py-12 text-center text-sm text-[#737373]">

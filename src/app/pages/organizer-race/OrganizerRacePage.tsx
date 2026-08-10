@@ -3,6 +3,7 @@ import { OrganizerJoinRequestsView } from '@/core/features/organizer/join-reques
 import { OrganizerMenuView } from '@/core/features/organizer/menu'
 import { OrganizerRaceUnavailableView } from '@/core/features/organizer/organizer-race'
 import { OrganizerRaceRulesView } from '@/core/features/organizer/race-rules'
+import { RaceMessageNotificationBanner } from '@/core/features/race/race-message-notification'
 import { OrganizerRouteLayout } from '@/core/widgets/organizer-layout'
 import { useOrganizerRacePage } from './model/useOrganizerRacePage'
 
@@ -29,6 +30,9 @@ export const OrganizerRacePage = () => {
           onCancel={page.closeMenu}
           onReturnToRaceList={page.returnToRaceList}
         />
+      ) : null}
+      {canShowRaceTabs && page.activeTab !== 'menu' ? (
+        <RaceMessageNotificationBanner />
       ) : null}
       {page.activeTab !== 'menu' && page.isRaceAccessLoading ? (
         <section className="flex min-h-full items-center justify-center px-5 py-12 text-center text-sm text-[#737373]">
