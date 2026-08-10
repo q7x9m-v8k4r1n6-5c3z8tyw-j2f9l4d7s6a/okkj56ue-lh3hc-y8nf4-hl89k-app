@@ -1,34 +1,25 @@
 import { useEffect, useRef } from 'react'
 import * as signalR from '@microsoft/signalr'
 import { getAuthToken } from '@/core/shared/api'
-import { mapBoothStatusToJoinRequest } from '../mapBoothStatusToJoinRequest'
-import type { OrganizerJoinRequest } from '../organizerJoinRequest'
 
-interface UseBoothSignalRProps {
-  boothIds: readonly string[]
-  raceId?: string
-  onJoinRequestReceived: (data: OrganizerJoinRequest) => void
+type UseBoothSignalRProps = {
+  boothId?: string
+  onBoothStatusChanged: () => void
 }
 
-/** Subscribes to race events and keeps only booths assigned to the organizer. */
+/** Uses realtime only to invalidate the database-backed booth session query. */
 export const useBoothSignalR = ({
-  boothIds,
-  raceId,
-  onJoinRequestReceived,
+  boothId,
+  onBoothStatusChanged,
 }: UseBoothSignalRProps) => {
-  const callbackRef = useRef(onJoinRequestReceived)
-  const assignedBoothIdsRef = useRef<readonly string[]>(boothIds)
+  const callbackRef = useRef(onBoothStatusChanged)
 
   useEffect(() => {
-    callbackRef.current = onJoinRequestReceived
-  }, [onJoinRequestReceived])
+    callbackRef.current = onBoothStatusChanged
+  }, [onBoothStatusChanged])
 
   useEffect(() => {
-    assignedBoothIdsRef.current = boothIds
-  }, [boothIds])
-
-  useEffect(() => {
-    if (!raceId) return
+    if (!boothId) return
 
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(`${import.meta.env.VITE_API_BASE_URL || ''}/hubs/booth`, {
@@ -37,37 +28,36 @@ export const useBoothSignalR = ({
       .withAutomaticReconnect()
       .build()
 
-    const joinRaceGroup = () => connection.invoke('JoinRaceGroup', raceId)
+    const joinBoothGroup = async () => {
+      await connection.invoke('JoinBoothGroup', boothId)
+      callbackRef.current()
+    }
 
     connection.on(
       'ReceiveBoothStatusChanged',
-      (changedBoothId: string, status: string, teamId: string | null, teamName: string | null) => {
-        const request = mapBoothStatusToJoinRequest(assignedBoothIdsRef.current, {
-          boothId: changedBoothId,
-          status,
-          teamId,
-          teamName,
-        })
-
-        if (request) callbackRef.current(request)
-      }
+      (changedBoothId: string) => {
+        if (changedBoothId.toLowerCase() === boothId.toLowerCase()) {
+          callbackRef.current()
+        }
+      },
     )
 
     connection.onreconnected(() => {
-      void joinRaceGroup()
+      void joinBoothGroup()
     })
 
     connection
       .start()
-      .then(joinRaceGroup)
-      .catch((error: unknown) => console.error('Không thể kết nối Booth Hub:', error))
+      .then(joinBoothGroup)
+      .catch((error: unknown) =>
+        console.error('Không thể kết nối Booth Hub:', error))
 
     return () => {
       if (connection.state === signalR.HubConnectionState.Connected) {
-        connection.invoke('LeaveRaceGroup', raceId).catch(() => {})
+        connection.invoke('LeaveBoothGroup', boothId).catch(() => {})
       }
       connection.off('ReceiveBoothStatusChanged')
       void connection.stop()
     }
-  }, [raceId])
+  }, [boothId])
 }

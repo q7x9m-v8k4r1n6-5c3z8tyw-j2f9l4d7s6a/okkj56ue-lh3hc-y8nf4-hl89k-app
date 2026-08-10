@@ -1,12 +1,12 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { useOrganizerAssignedBooths } from '@/core/features/organizer/organizer-race'
 import { useOrganizerJoinRequestsState } from '../../model/frontend/useOrganizerJoinRequestsState'
 import { mapScoringFormToRequest } from '../../model/mapScoringFormToRequest'
-import type { OrganizerJoinRequest } from '../../model/organizerJoinRequest'
 import { useAcceptEntryMutation } from '../../model/server/useAcceptEntryMutation'
 import { useBoothSignalR } from '../../model/server/useBoothSignalR'
 import { useCancelBoothSessionMutation } from '../../model/server/useCancelBoothSessionMutation'
+import { useMyBoothQuery } from '../../model/server/useMyBoothQuery'
+import { useRejectEntryMutation } from '../../model/server/useRejectEntryMutation'
 import { useSubmitScoreMutation } from '../../model/server/useSubmitScoreMutation'
 
 const getErrorMessage = (error: unknown) => {
@@ -24,23 +24,34 @@ const getErrorMessage = (error: unknown) => {
  */
 export const useOrganizerJoinRequests = () => {
   const { raceId } = useParams<{ raceId: string }>()
-  const { boothIds } = useOrganizerAssignedBooths(raceId)
-
   const state = useOrganizerJoinRequestsState()
+  const myBoothQuery = useMyBoothQuery(raceId)
+  const {
+    data: myBooth,
+    error: myBoothError,
+    isPending: isMyBoothLoading,
+    refetch: refetchMyBooth,
+  } = myBoothQuery
+  const { syncBoothSession } = state
   const acceptEntryMutation = useAcceptEntryMutation()
   const cancelSessionMutation = useCancelBoothSessionMutation()
+  const rejectEntryMutation = useRejectEntryMutation()
   const submitScoreMutation = useSubmitScoreMutation()
   const [errorMessage, setErrorMessage] = useState('')
 
-  const handleJoinRequestReceived = (newRequest: OrganizerJoinRequest) => {
-    setErrorMessage('')
-    state.setRequest(newRequest)
-  }
+  useEffect(() => {
+    if (myBooth) {
+      syncBoothSession(myBooth)
+    }
+  }, [myBooth, syncBoothSession])
+
+  const refreshBoothSession = useCallback(() => {
+    void refetchMyBooth()
+  }, [refetchMyBooth])
 
   useBoothSignalR({
-    boothIds,
-    raceId,
-    onJoinRequestReceived: handleJoinRequestReceived,
+    boothId: myBooth?.boothId,
+    onBoothStatusChanged: refreshBoothSession,
   })
 
   const acceptRequest = async () => {
@@ -52,7 +63,22 @@ export const useOrganizerJoinRequests = () => {
         boothId: state.request.boothId,
         teamId: state.request.id,
       })
-      state.acceptCurrentRequest()
+      await refetchMyBooth()
+    } catch (error) {
+      setErrorMessage(getErrorMessage(error))
+    }
+  }
+
+  const rejectRequest = async () => {
+    if (!state.request) return
+
+    setErrorMessage('')
+    try {
+      await rejectEntryMutation.mutateAsync({
+        boothId: state.request.boothId,
+        teamId: state.request.id,
+      })
+      await refetchMyBooth()
     } catch (error) {
       setErrorMessage(getErrorMessage(error))
     }
@@ -73,7 +99,7 @@ export const useOrganizerJoinRequests = () => {
       )
 
       await submitScoreMutation.mutateAsync(payload)
-      state.finishSession()
+      await refetchMyBooth()
     } catch (error) {
       setErrorMessage(getErrorMessage(error))
     }
@@ -87,7 +113,7 @@ export const useOrganizerJoinRequests = () => {
       await cancelSessionMutation.mutateAsync({
         boothId: state.acceptedRequest.boothId,
       })
-      state.finishSession()
+      await refetchMyBooth()
     } catch (error) {
       state.dismissCancelConfirmation()
       setErrorMessage(getErrorMessage(error))
@@ -98,10 +124,15 @@ export const useOrganizerJoinRequests = () => {
     ...state,
     acceptRequest,
     cancelSession,
-    errorMessage,
+    errorMessage: errorMessage || (
+      myBoothError ? getErrorMessage(myBoothError) : ''
+    ),
     isAccepting: acceptEntryMutation.isPending,
     isCancelling: cancelSessionMutation.isPending,
+    isRejecting: rejectEntryMutation.isPending,
     isSubmitting: submitScoreMutation.isPending,
+    isLoading: isMyBoothLoading,
+    rejectRequest,
     submitScore,
   }
 }

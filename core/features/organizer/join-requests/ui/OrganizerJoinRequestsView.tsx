@@ -105,7 +105,9 @@ export const OrganizerJoinRequestsView = () => {
     return (
       <section className="flex min-h-[calc(100svh-137px)] items-center justify-center px-5 text-center">
         <p className="text-sm text-[#525252]">
-          {!joinRequests.score
+          {joinRequests.isLoading
+            ? 'Đang tải trạng thái trạm...'
+            : !joinRequests.score
             ? 'Chưa có yêu cầu nào xuất hiện'
             : `Đã nhập ${joinRequests.score} điểm`}
         </p>
@@ -127,7 +129,7 @@ export const OrganizerJoinRequestsView = () => {
         <button
           type="button"
           className="h-[42px] w-full rounded-md bg-[#de3336] text-sm font-bold text-white transition-colors hover:bg-[#c92d30]"
-          disabled={joinRequests.isAccepting}
+          disabled={joinRequests.isAccepting || joinRequests.isRejecting}
           onClick={joinRequests.acceptRequest}
         >
           {joinRequests.isAccepting ? 'Đang duyệt...' : 'Đồng ý'}
@@ -135,10 +137,10 @@ export const OrganizerJoinRequestsView = () => {
         <button
           type="button"
           className="h-11 w-full rounded-md border border-[#e5e5e5] bg-white text-sm font-bold text-[#564240] transition-colors hover:bg-[#fafafa]"
-          disabled={joinRequests.isAccepting}
-          onClick={joinRequests.dismissRequest}
+          disabled={joinRequests.isAccepting || joinRequests.isRejecting}
+          onClick={joinRequests.rejectRequest}
         >
-          Hủy
+          {joinRequests.isRejecting ? 'Đang từ chối...' : 'Hủy'}
         </button>
         {joinRequests.errorMessage ? (
           <p className="text-center text-sm font-medium text-red-600" role="alert">

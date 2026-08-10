@@ -68,6 +68,27 @@ export const validateStationStep = (
     if (Object.keys(rowErrors).length) errors[station.id] = rowErrors
   })
 
+  const managerStations = new Map<string, string[]>()
+  stations.forEach((station) => {
+    new Set(station.managers.map((manager) => manager.id)).forEach(
+      (managerId) => {
+        managerStations.set(
+          managerId,
+          [...(managerStations.get(managerId) ?? []), station.id],
+        )
+      },
+    )
+  })
+  managerStations.forEach((stationIds) => {
+    if (stationIds.length < 2) return
+    stationIds.forEach((stationId) => {
+      errors[stationId] = {
+        ...errors[stationId],
+        managers: 'Mỗi quản trạm chỉ được quản lý một trạm.',
+      }
+    })
+  })
+
   return errors
 }
 

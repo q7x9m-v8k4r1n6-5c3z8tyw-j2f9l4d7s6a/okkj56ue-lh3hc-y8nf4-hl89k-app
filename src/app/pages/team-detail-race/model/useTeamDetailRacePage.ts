@@ -39,9 +39,19 @@ export const useTeamDetailRacePage = () => {
     })
   }, [toast])
 
+  const handleEntryRejected = useCallback(() => {
+    setBoothSessionVersion((current) => current + 1)
+    toast({
+      title: 'Yêu cầu vào trạm bị từ chối',
+      description: 'Quản trạm đã từ chối yêu cầu. Vui lòng chọn trạm khác.',
+      variant: 'warning',
+    })
+  }, [toast])
+
   useTeamBoothSignalR({
     raceId,
     teamId: authSession.user?.id,
+    onEntryRejected: handleEntryRejected,
     onSessionCancelled: handleSessionCancelled,
   })
 

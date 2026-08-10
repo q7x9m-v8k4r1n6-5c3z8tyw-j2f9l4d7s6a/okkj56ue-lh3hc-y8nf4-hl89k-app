@@ -22,6 +22,10 @@ export const acceptEntryRequestSchema = z.object({
 
 export type AcceptEntryRequest = z.infer<typeof acceptEntryRequestSchema>
 
+export const rejectEntryRequestSchema = acceptEntryRequestSchema
+
+export type RejectEntryRequest = z.infer<typeof rejectEntryRequestSchema>
+
 export const cancelBoothSessionRequestSchema = z.object({
   boothId: z.string().uuid('ID Trạm không hợp lệ'),
 })

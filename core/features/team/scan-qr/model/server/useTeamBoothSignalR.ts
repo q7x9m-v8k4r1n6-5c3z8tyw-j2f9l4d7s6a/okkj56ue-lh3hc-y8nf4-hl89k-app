@@ -5,20 +5,27 @@ import { getAuthToken } from '@/core/shared/api'
 type UseTeamBoothSignalRProps = {
   raceId?: string
   teamId?: string
+  onEntryRejected: (boothId: string) => void
   onSessionCancelled: (boothId: string) => void
 }
 
-/** Keeps the QR workflow aware when an organizer kicks the current team. */
+/** Keeps the QR workflow aware when an organizer rejects or kicks the team. */
 export const useTeamBoothSignalR = ({
   raceId,
   teamId,
+  onEntryRejected,
   onSessionCancelled,
 }: UseTeamBoothSignalRProps) => {
   const callbackRef = useRef(onSessionCancelled)
+  const rejectedCallbackRef = useRef(onEntryRejected)
 
   useEffect(() => {
     callbackRef.current = onSessionCancelled
   }, [onSessionCancelled])
+
+  useEffect(() => {
+    rejectedCallbackRef.current = onEntryRejected
+  }, [onEntryRejected])
 
   useEffect(() => {
     if (!raceId || !teamId) return
@@ -41,6 +48,15 @@ export const useTeamBoothSignalR = ({
       },
     )
 
+    connection.on(
+      'ReceiveBoothEntryRejected',
+      (boothId: string, rejectedTeamId: string) => {
+        if (rejectedTeamId.toLowerCase() === teamId.toLowerCase()) {
+          rejectedCallbackRef.current(boothId)
+        }
+      },
+    )
+
     connection.onreconnected(() => {
       void joinRaceGroup()
     })
@@ -55,6 +71,7 @@ export const useTeamBoothSignalR = ({
         connection.invoke('LeaveRaceGroup', raceId).catch(() => {})
       }
       connection.off('ReceiveBoothEntryCancelled')
+      connection.off('ReceiveBoothEntryRejected')
       void connection.stop()
     }
   }, [raceId, teamId])

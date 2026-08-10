@@ -3,12 +3,30 @@ import {
   acceptEntryRequestSchema,
   boothOperationResponseSchema,
   cancelBoothSessionRequestSchema,
+  rejectEntryRequestSchema,
   submitScoreRequestSchema,
   type AcceptEntryRequest,
   type BoothOperationResponse,
   type CancelBoothSessionRequest,
+  type RejectEntryRequest,
   type SubmitScoreRequest,
 } from '../model/organizerScoring.contract'
+import { myBoothDataSchema, type MyBoothData } from '../model/myBooth.contract'
+
+/** Loads the organizer's single booth and its durable pending/occupied state. */
+export const getMyBooth = async (
+  raceId: string,
+  signal?: AbortSignal,
+): Promise<MyBoothData> => {
+  const response = await client.request<unknown>({
+    path: '/Booth/my-booth',
+    method: 'GET',
+    query: { raceId },
+    signal,
+  })
+
+  return myBoothDataSchema.parse(response)
+}
 
 /** Gửi điểm chấm trạm thi và validate dữ liệu ở 2 đầu ranh giới API */
 export const submitScore = async (
@@ -32,6 +50,20 @@ export const acceptEntryToBooth = async (
   const validatedPayload = acceptEntryRequestSchema.parse(request)
   const response = await client.request<unknown, AcceptEntryRequest>({
     path: '/Booth/accept-entry',
+    method: 'POST',
+    body: validatedPayload,
+  })
+
+  return boothOperationResponseSchema.parse(response)
+}
+
+/** Rejects a pending booth-entry request and notifies the requesting team. */
+export const rejectEntryToBooth = async (
+  request: RejectEntryRequest,
+): Promise<BoothOperationResponse> => {
+  const validatedPayload = rejectEntryRequestSchema.parse(request)
+  const response = await client.request<unknown, RejectEntryRequest>({
+    path: '/Booth/reject-entry',
     method: 'POST',
     body: validatedPayload,
   })
