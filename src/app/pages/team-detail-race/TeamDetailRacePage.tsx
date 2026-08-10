@@ -1,4 +1,5 @@
 import { TeamLeaderboardView } from '@/core/features/team/leaderboard'
+import { TeamMapView } from '@/core/features/team/map'
 import { TeamRaceMenuView } from '@/core/features/team/race-menu'
 import { TeamRaceRulesView } from '@/core/features/team/race-rules'
 import { TeamQrScanView } from '@/core/features/team/scan-qr'
@@ -48,6 +49,7 @@ export const TeamDetailRacePage = () => {
         />
       ) : null}
       {canShowRaceTabs && page.activeTab === 'rules' ? <TeamRaceRulesView /> : null}
+      {canShowRaceTabs && page.activeTab === 'map' ? <TeamMapView /> : null}
       {canShowRaceTabs && page.activeTab === 'scan' ? <TeamQrScanView /> : null}
       {canShowRaceTabs && page.activeTab === 'leaderboard' ? <TeamLeaderboardView /> : null}
     </TeamRouteLayout>
