@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import * as signalR from '@microsoft/signalr'
 import { getAuthToken } from '@/core/shared/api'
+import { startTeamBoothSignalRSession } from './teamBoothSignalRSession'
 
 type UseTeamBoothSignalRProps = {
   raceId?: string
@@ -37,42 +38,12 @@ export const useTeamBoothSignalR = ({
       .withAutomaticReconnect()
       .build()
 
-    const joinRaceGroup = () => connection.invoke('JoinRaceGroup', raceId)
-
-    connection.on(
-      'ReceiveBoothEntryCancelled',
-      (boothId: string, cancelledTeamId: string) => {
-        if (cancelledTeamId.toLowerCase() === teamId.toLowerCase()) {
-          callbackRef.current(boothId)
-        }
-      },
-    )
-
-    connection.on(
-      'ReceiveBoothEntryRejected',
-      (boothId: string, rejectedTeamId: string) => {
-        if (rejectedTeamId.toLowerCase() === teamId.toLowerCase()) {
-          rejectedCallbackRef.current(boothId)
-        }
-      },
-    )
-
-    connection.onreconnected(() => {
-      void joinRaceGroup()
+    return startTeamBoothSignalRSession({
+      connection,
+      onEntryRejected: (boothId) => rejectedCallbackRef.current(boothId),
+      onSessionCancelled: (boothId) => callbackRef.current(boothId),
+      raceId,
+      teamId,
     })
-
-    connection
-      .start()
-      .then(joinRaceGroup)
-      .catch((error: unknown) => console.error('Không thể kết nối Booth Hub:', error))
-
-    return () => {
-      if (connection.state === signalR.HubConnectionState.Connected) {
-        connection.invoke('LeaveRaceGroup', raceId).catch(() => {})
-      }
-      connection.off('ReceiveBoothEntryCancelled')
-      connection.off('ReceiveBoothEntryRejected')
-      void connection.stop()
-    }
   }, [raceId, teamId])
 }
