@@ -48,7 +48,9 @@ export const TeamDetailRacePage = () => {
         />
       ) : null}
       {canShowRaceTabs && page.activeTab === 'rules' ? <TeamRaceRulesView /> : null}
-      {canShowRaceTabs && page.activeTab === 'scan' ? <TeamQrScanView /> : null}
+      {canShowRaceTabs && page.activeTab === 'scan' ? (
+        <TeamQrScanView key={page.boothSessionVersion} />
+      ) : null}
       {canShowRaceTabs && page.activeTab === 'leaderboard' ? <TeamLeaderboardView /> : null}
     </TeamRouteLayout>
   )

@@ -5,3 +5,4 @@ export {
 export { OrganizerRaceUnavailableView } from './ui/OrganizerRaceUnavailableView'
 export type { OrganizerRaceUnavailableViewProps } from './ui/OrganizerRaceUnavailableView'
 export { useOrganizerRaceAccess } from './ui/hooks/useOrganizerRaceAccess'
+export { useOrganizerAssignedBooths } from './ui/hooks/useOrganizerAssignedBooths'
