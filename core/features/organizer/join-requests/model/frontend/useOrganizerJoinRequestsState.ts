@@ -53,7 +53,7 @@ export const useOrganizerJoinRequestsState = (boothId: string) => {
       setAcceptedRequest(request)
       setRequest(null)
       setScore('')
-    } catch (error) {
+    } catch {
       toast({
         title: 'Không thể duyệt cho đội vào trạm',
         description: 'Vui lòng kiểm tra lại!',
@@ -103,7 +103,7 @@ export const useOrganizerJoinRequestsState = (boothId: string) => {
 
       setAcceptedRequest(null)
       setScore('')
-    } catch (error) {
+    } catch {
       toast({
         title: 'Chấm điểm thất bại',
         description: 'Vui lòng thử lại.',
