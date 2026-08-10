@@ -1,11 +1,12 @@
 import { useCallback, useState } from 'react'
-import type { MyBoothData } from '../myBooth.contract'
+import type { MyBooth } from '@/core/entities/booth'
+import type { BannerVariant } from '@/core/shared/ui/StatusBanner'
 import type { OrganizerJoinRequest } from '../organizerJoinRequest'
 
 const scoreOptions = [0, 10, 20, 30, 40, 50] as const
 
-export const mapMyBoothToOrganizerSession = (booth: MyBoothData) => {
-  const activeTeam = booth.teamId
+export const mapMyBoothToOrganizerSession = (booth: MyBooth) => {
+  const activeTeam: OrganizerJoinRequest | null = booth.teamId
     ? {
         boothId: booth.boothId,
         id: booth.teamId,
@@ -19,14 +20,13 @@ export const mapMyBoothToOrganizerSession = (booth: MyBoothData) => {
   }
 }
 
-/**
- * Hook quản lý State duyệt đội thi và gửi điểm chấm trạm cho Organizer
- */
+/** Owns presentation-only state for the organizer booth workflow. */
 export const useOrganizerJoinRequestsState = () => {
   const [request, setRequest] = useState<OrganizerJoinRequest | null>(null)
   const [acceptedRequest, setAcceptedRequest] = useState<OrganizerJoinRequest | null>(null)
   const [score, setScore] = useState('')
-  const [isCancelConfirmationOpen, setIsCancelConfirmationOpen] = useState(false)
+  const [statusMessage, setStatusMessage] = useState('')
+  const [statusVariant, setStatusVariant] = useState<BannerVariant>('success')
 
   const normalizedScore = Number(score)
   const canSubmitScore =
@@ -35,26 +35,33 @@ export const useOrganizerJoinRequestsState = () => {
     normalizedScore >= 0 &&
     normalizedScore <= 100
 
-  const syncBoothSession = useCallback((booth: MyBoothData) => {
+  const syncBoothSession = useCallback((booth: MyBooth) => {
     const session = mapMyBoothToOrganizerSession(booth)
     setRequest(session.request)
     setAcceptedRequest(session.acceptedRequest)
     if (!session.acceptedRequest) setScore('')
-    if (!session.acceptedRequest) setIsCancelConfirmationOpen(false)
   }, [])
 
+  const showStatus = useCallback((message: string, variant: BannerVariant) => {
+    setStatusMessage(message)
+    setStatusVariant(variant)
+  }, [])
+
+  const clearStatusMessage = useCallback(() => setStatusMessage(''), [])
+
   return {
-    request,
     acceptedRequest,
     canSubmitScore,
-    dismissCancelConfirmation: () => setIsCancelConfirmationOpen(false),
-    isCancelConfirmationOpen,
+    clearStatusMessage,
     normalizedScore,
-    openCancelConfirmation: () => setIsCancelConfirmationOpen(true),
+    request,
     score,
-    setScore,
     scoreOptions,
     selectScore: (nextScore: number) => setScore(String(nextScore)),
+    setScore,
+    showStatus,
+    statusMessage,
+    statusVariant,
     syncBoothSession,
   }
 }

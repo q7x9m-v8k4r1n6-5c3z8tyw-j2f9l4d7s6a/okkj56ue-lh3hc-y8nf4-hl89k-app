@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import type { MyBoothData } from '../myBooth.contract'
+import type { MyBooth } from '@/core/entities/booth'
 import { mapMyBoothToOrganizerSession } from './useOrganizerJoinRequestsState'
 
-const booth = (status: MyBoothData['status']): MyBoothData => ({
+const booth = (status: MyBooth['status']): MyBooth => ({
   boothId: 'ee0fd25b-e9b5-42ba-9e25-187fe5c471ea',
   name: 'Booth 1',
   place: 'BK',

@@ -48,7 +48,7 @@ export const OrganizerRacePage = () => {
         />
       ) : null}
       {canShowRaceTabs && page.activeTab === 'rules' ? <OrganizerRaceRulesView /> : null}
-      {canShowRaceTabs && page.activeTab === 'requests' ? <OrganizerJoinRequestsView /> : null}
+      {canShowRaceTabs ? <OrganizerJoinRequestsView /> : null}
       {canShowRaceTabs && page.activeTab === 'history' ? <OrganizerHistoryView /> : null}
     </OrganizerRouteLayout>
   )

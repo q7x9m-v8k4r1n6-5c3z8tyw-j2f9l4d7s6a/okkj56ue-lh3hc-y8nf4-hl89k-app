@@ -13,6 +13,7 @@ const createValidForm = (): EditRaceForm => ({
   coverFileName: '',
   place: 'HCMC',
   status: 'draft',
+  rules: 'Rules',
   modifiedAt: '2026-07-26T01:00:00Z',
   booths: [],
   teams: [],

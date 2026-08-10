@@ -32,6 +32,7 @@ export const editRaceRequestSchema = z.object({
     timeEnd: z.string().min(1).optional(),
     place: z.string().min(1).max(255).optional(),
     status: editRaceStatusSchema.optional(),
+    rules: z.string().nullable().optional(),
   }).optional(),
   raceSettings: z.object({
     isToggledLeaderboard: z.boolean().optional(),
@@ -96,7 +97,11 @@ export const editRaceDetailResponseSchema = z.object({
   raceTeam: z.array(editRaceTeamSchema),
   booth: z.array(editRaceBoothSchema),
 })
+export const editRaceRulesResponseSchema = z.object({
+  rules: z.string().nullable(),
+})
 
 export type EditRaceStatus = z.infer<typeof editRaceStatusSchema>
 export type EditRaceDetailResponse = z.infer<typeof editRaceDetailResponseSchema>
 export type EditRaceRequest = z.infer<typeof editRaceRequestSchema>
+export type EditRaceRulesResponse = z.infer<typeof editRaceRulesResponseSchema>

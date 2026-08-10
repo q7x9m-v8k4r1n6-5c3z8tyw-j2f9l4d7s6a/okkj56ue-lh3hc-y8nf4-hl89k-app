@@ -23,10 +23,12 @@ const findOrganizer = (
   }
 
 /**
- * Converts the backend race detail DTO into the frontend editor model.
+ * Converts the backend race detail DTO and the separately-fetched rules text
+ * into the frontend editor model.
  */
 export const mapRaceDetailToForm = (
   detail: EditRaceDetailResponse,
+  rules: string,
 ): EditRaceForm => {
   const organizerLookup = detail.organizers ?? detail.organizerId.map((id, index) => ({
     id,
@@ -43,6 +45,7 @@ export const mapRaceDetailToForm = (
     place: detail.place,
     status: detail.status,
     modifiedAt: detail.modifiedAt,
+    rules,
     booths: detail.booth.map((booth) => ({
       id: booth.id,
       name: booth.name,

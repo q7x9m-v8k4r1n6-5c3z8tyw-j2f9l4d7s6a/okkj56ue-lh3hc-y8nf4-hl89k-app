@@ -96,6 +96,7 @@ export const mapEditRaceFormToRequest = (
       : {}),
     ...(place !== original.place ? { place } : {}),
     ...(nextStatus !== original.status ? { status: nextStatus } : {}),
+    ...(form.rules !== original.rules ? { rules: form.rules } : {}),
   }
   const raceSettings = {
     ...(form.settings.isToggledLeaderboard !==

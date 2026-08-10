@@ -1,8 +1,12 @@
+import { useCallback } from 'react'
+import { useParams } from 'react-router-dom'
 import { useAuthSession } from '@/core/features/auth'
+import { useToast } from '@/core/shared'
 import { useTeamQrScanForm } from '../../model/frontend/useTeamQrScanForm'
-import { useScanQrMutation } from '../../model/server/useScanQrMutation'
 import { mapQrToRequest } from '../../model/mapQrToRequest'
 import { validateQrCode } from '../../model/scanQr.validation'
+import { useScanQrMutation } from '../../model/server/useScanQrMutation'
+import { useTeamBoothSignalR } from '../../model/server/useTeamBoothSignalR'
 
 const getErrorMessage = (error: unknown) => {
   if (error instanceof Error) return error.message
@@ -17,7 +21,40 @@ export const useTeamQrScanPage = () => {
   const form = useTeamQrScanForm()
   const mutation = useScanQrMutation()
   const authSession = useAuthSession()
-  const teamId = authSession?.user?.id
+  const { raceId } = useParams<{ raceId: string }>()
+  const { toast } = useToast()
+  const teamId = authSession.user?.id
+
+  const resetBoothRequest = useCallback(() => {
+    mutation.reset()
+    form.setRawQrCode('')
+    form.setErrorMessage(null)
+  }, [form, mutation])
+
+  const handleEntryRejected = useCallback(() => {
+    resetBoothRequest()
+    toast({
+      title: 'Yêu cầu vào trạm bị từ chối',
+      description: 'Quản trạm đã từ chối yêu cầu. Vui lòng chọn trạm khác.',
+      variant: 'warning',
+    })
+  }, [resetBoothRequest, toast])
+
+  const handleSessionCancelled = useCallback(() => {
+    resetBoothRequest()
+    toast({
+      title: 'Lượt chơi đã bị hủy',
+      description: 'Quản trạm đã hủy lượt chơi. Vui lòng chọn trạm khác.',
+      variant: 'warning',
+    })
+  }, [resetBoothRequest, toast])
+
+  useTeamBoothSignalR({
+    raceId,
+    teamId,
+    onEntryRejected: handleEntryRejected,
+    onSessionCancelled: handleSessionCancelled,
+  })
 
   const handleScan = (qrCode: string) => {
     if (mutation.isPending || mutation.isSuccess) return
@@ -36,25 +73,22 @@ export const useTeamQrScanPage = () => {
     form.setErrorMessage(null)
     form.setRawQrCode(qrCode)
 
-    const requestPayload = mapQrToRequest(qrCode, teamId)
-
-    mutation.mutate(requestPayload, {
-      onSuccess: (data) => {
-        console.log('Quét QR vào trạm thành công:', data)
-      },
-      onError: (err: unknown) => {
-        form.setErrorMessage(getErrorMessage(err) || 'Không thể gửi mã QR. Vui lòng thử lại!')
+    mutation.mutate(mapQrToRequest(qrCode, teamId), {
+      onError: (requestError: unknown) => {
+        form.setErrorMessage(
+          getErrorMessage(requestError) || 'Không thể gửi mã QR. Vui lòng thử lại!',
+        )
       },
     })
   }
 
   return {
-    rawQrCode: form.rawQrCode,
     errorMessage: form.errorMessage,
+    form,
     handleScan,
     isPending: mutation.isPending,
     isSuccess: mutation.isSuccess,
+    rawQrCode: form.rawQrCode,
     responseData: mutation.data,
-    form,
   }
 }

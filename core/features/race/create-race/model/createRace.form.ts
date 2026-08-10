@@ -7,6 +7,7 @@ export type CreateRaceBasicForm = {
   endAt: string
   imageName: string
   location: string
+  rules: string
 }
 
 export type CreateRaceStationForm = {
@@ -40,7 +41,7 @@ export type CreateRaceFormState = {
 /** Creates a new form value so different provider instances never share state. */
 export const createInitialRaceForm = (): CreateRaceFormState => ({
   step: 1,
-  basic: { name: '', startAt: '', endAt: '', imageName: '', location: '' },
+  basic: { name: '', startAt: '', endAt: '', imageName: '', location: '', rules: '' },
   stations: [],
   teams: [],
   organizers: [],

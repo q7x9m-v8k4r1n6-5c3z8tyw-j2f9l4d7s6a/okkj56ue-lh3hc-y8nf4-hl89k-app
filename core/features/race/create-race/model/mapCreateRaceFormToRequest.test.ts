@@ -11,6 +11,7 @@ describe('mapCreateRaceFormToRequest', () => {
       location: '  Ho Chi Minh City  ',
       startAt: '2026-07-28T08:00',
       endAt: '2026-07-28T10:00',
+      rules: '  Some rules for the race  ',
     }
     form.teams = [{
       id: '11111111-1111-4111-8111-111111111111',

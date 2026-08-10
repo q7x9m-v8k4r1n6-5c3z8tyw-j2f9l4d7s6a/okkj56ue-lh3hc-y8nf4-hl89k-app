@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-/** Schema định nghĩa trạng thái trạm: Trống hoặc Đang thi đấu */
-export const boothStatusSchema = z.enum(['free', 'occupied'])
+/** Canonical booth lifecycle returned by the backend. */
+export const boothStatusSchema = z.enum(['free', 'pending', 'occupied'])
 
 export const boothSchema = z.object({
   id: z.string().uuid('ID trạm phải là dạng UUID hợp lệ'),

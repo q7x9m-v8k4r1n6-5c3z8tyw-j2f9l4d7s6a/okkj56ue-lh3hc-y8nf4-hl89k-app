@@ -61,17 +61,44 @@ export const TeamLayout = ({
 
     {navItems.length > 0 ? (
       <nav className="sticky bottom-0 z-20 bg-white px-3 pb-3" aria-label="Điều hướng đội chơi">
-        <div className="grid h-16 grid-cols-4 overflow-hidden rounded-[18px] bg-[#f7f7f7] shadow-[0_3px_14px_rgba(0,0,0,0.08)]">
-          {navItems.map((item) => {
+        <div
+          className="relative grid h-16 rounded-[15px] bg-[#fafafa] shadow-[0_3px_14px_rgba(0,0,0,0.08)]"
+          style={{ gridTemplateColumns: `repeat(${navItems.length}, minmax(0, 1fr))` }}
+        >
+          {navItems.map((item, index) => {
             const isActive = item.id === activeNavId
+            const isScan = item.id === 'scan'
+            const isFirst = index === 0
+            const isLast = index === navItems.length - 1
+
+            if (isScan) {
+              return (
+                <div key={item.id} className="relative flex items-center justify-center">
+                  <button
+                    type="button"
+                    className="absolute -top-4 flex size-[62px] items-center justify-center rounded-full bg-[#de3336] text-white shadow-[0_4px_14px_rgba(0,0,0,0.15)] transition-transform active:scale-95"
+                    aria-current={isActive ? 'page' : undefined}
+                    aria-label={item.label || 'Quét mã QR'}
+                    onClick={() => onNavChange?.(item.id)}
+                  >
+                    <span className="flex items-center justify-center [&>svg]:size-7">
+                      {item.icon}
+                    </span>
+                  </button>
+                </div>
+              )
+            }
 
             return (
               <button
                 key={item.id}
                 type="button"
-                className={`flex min-w-0 flex-col items-center justify-center gap-1 text-[13px] leading-4 transition-colors ${isActive
-                  ? 'bg-[#de3336] text-white'
-                  : 'bg-white/55 text-[#5e5e5e] hover:bg-white'
+                className={`flex min-w-0 flex-col items-center justify-center gap-1 text-[12px] leading-4 tracking-[0.24px] transition-colors ${
+                  isFirst ? 'rounded-l-[15px]' : ''
+                } ${isLast ? 'rounded-r-[15px]' : ''} ${
+                  isActive
+                    ? 'bg-[#de3336] text-white'
+                    : 'text-[#5e5e5e] hover:bg-black/5'
                 }`}
                 aria-current={isActive ? 'page' : undefined}
                 onClick={() => onNavChange?.(item.id)}

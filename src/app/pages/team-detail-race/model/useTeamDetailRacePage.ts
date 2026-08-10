@@ -1,9 +1,6 @@
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { useAuthSession } from '@/core/features/auth'
-import { useTeamBoothSignalR } from '@/core/features/team/scan-qr'
 import { useTeamRaceAccess } from '@/core/features/team/team-race'
-import { useToast } from '@/core/shared'
 import {
   isTeamDetailRaceTab,
   isTeamPrimaryDetailRaceTab,
@@ -25,35 +22,7 @@ export const useTeamDetailRacePage = () => {
     initialTab && isTeamDetailRaceTab(initialTab) && initialTab !== 'more' ? initialTab : 'rules',
   )
   const [previousTab, setPreviousTab] = useState<TeamPrimaryDetailRaceTab>('rules')
-  const [boothSessionVersion, setBoothSessionVersion] = useState(0)
-  const authSession = useAuthSession()
-  const { toast } = useToast()
   const isMenuOpen = activeTab === 'more'
-
-  const handleSessionCancelled = useCallback(() => {
-    setBoothSessionVersion((current) => current + 1)
-    toast({
-      title: 'Lượt chơi đã bị hủy',
-      description: 'Quản trạm đã hủy lượt chơi. Vui lòng chọn trạm khác.',
-      variant: 'warning',
-    })
-  }, [toast])
-
-  const handleEntryRejected = useCallback(() => {
-    setBoothSessionVersion((current) => current + 1)
-    toast({
-      title: 'Yêu cầu vào trạm bị từ chối',
-      description: 'Quản trạm đã từ chối yêu cầu. Vui lòng chọn trạm khác.',
-      variant: 'warning',
-    })
-  }, [toast])
-
-  useTeamBoothSignalR({
-    raceId,
-    teamId: authSession.user?.id,
-    onEntryRejected: handleEntryRejected,
-    onSessionCancelled: handleSessionCancelled,
-  })
 
   const openMenu = () => {
     if (isTeamPrimaryDetailRaceTab(activeTab)) setPreviousTab(activeTab)
@@ -62,7 +31,6 @@ export const useTeamDetailRacePage = () => {
 
   return {
     activeTab,
-    boothSessionVersion,
     closeMenu: () => setActiveTab(previousTab),
     errorMessage: raceAccess.errorMessage,
     isMenuOpen,
