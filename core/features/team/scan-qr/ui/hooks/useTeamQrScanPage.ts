@@ -1,5 +1,6 @@
-import { useCallback } from 'react'
+import { useCallback, type ChangeEvent, type KeyboardEvent } from 'react'
 import { useParams } from 'react-router-dom'
+import { useTeamBoothSessionQuery } from '@/core/entities/booth'
 import { useAuthSession } from '@/core/features/auth'
 import { useToast } from '@/core/shared'
 import { useTeamQrScanForm } from '../../model/frontend/useTeamQrScanForm'
@@ -18,12 +19,14 @@ const getErrorMessage = (error: unknown) => {
 }
 
 export const useTeamQrScanPage = () => {
-  const form = useTeamQrScanForm()
-  const mutation = useScanQrMutation()
-  const authSession = useAuthSession()
   const { raceId } = useParams<{ raceId: string }>()
+  const form = useTeamQrScanForm()
+  const mutation = useScanQrMutation(raceId)
+  const sessionQuery = useTeamBoothSessionQuery(raceId)
+  const authSession = useAuthSession()
   const { toast } = useToast()
   const teamId = authSession.user?.id
+  const session = sessionQuery.data ?? null
 
   const resetBoothRequest = useCallback(() => {
     mutation.reset()
@@ -50,14 +53,22 @@ export const useTeamQrScanPage = () => {
   }, [resetBoothRequest, toast])
 
   useTeamBoothSignalR({
+    activeBoothId: session?.boothId,
     raceId,
     teamId,
     onEntryRejected: handleEntryRejected,
     onSessionCancelled: handleSessionCancelled,
+    onSessionReleased: resetBoothRequest,
   })
 
   const handleScan = (qrCode: string) => {
-    if (mutation.isPending || mutation.isSuccess) return
+    if (
+      mutation.isPending ||
+      mutation.isSuccess ||
+      sessionQuery.isLoading ||
+      sessionQuery.isError ||
+      session
+    ) return
 
     const error = validateQrCode(qrCode)
     if (error) {
@@ -82,13 +93,44 @@ export const useTeamQrScanPage = () => {
     })
   }
 
+  const handleQrCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
+    form.setRawQrCode(event.target.value)
+  }
+
+  const handleQrCodeKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') handleScan(form.rawQrCode)
+  }
+
+  const retrySession = () => {
+    void sessionQuery.refetch()
+  }
+
+  const statusMessage = session?.status === 'occupied'
+    ? `Ban tổ chức đã chấp nhận. Bạn có thể bắt đầu chơi tại ${session.boothName}.`
+    : session?.status === 'pending'
+      ? `Đã gửi yêu cầu vào ${session.boothName}. Vui lòng chờ Ban tổ chức xác nhận!`
+      : mutation.isPending
+        ? 'Đang gửi dữ liệu trạm...'
+        : mutation.isSuccess
+          ? mutation.data?.message ?? 'Đã gửi yêu cầu vào trạm.'
+          : ''
+
   return {
+    canScan: Boolean(raceId) &&
+      !sessionQuery.isLoading &&
+      !sessionQuery.isError &&
+      !session &&
+      !mutation.isPending &&
+      !mutation.isSuccess,
     errorMessage: form.errorMessage,
-    form,
     handleScan,
-    isPending: mutation.isPending,
-    isSuccess: mutation.isSuccess,
+    handleQrCodeChange,
+    handleQrCodeKeyDown,
+    isCheckingSession: sessionQuery.isLoading,
+    isSessionError: sessionQuery.isError,
     rawQrCode: form.rawQrCode,
-    responseData: mutation.data,
+    retrySession,
+    sessionStatus: session?.status ?? null,
+    statusMessage,
   }
 }

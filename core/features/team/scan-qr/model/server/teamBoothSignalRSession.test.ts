@@ -38,12 +38,17 @@ const flushPromises = async () => {
 describe('startTeamBoothSignalRSession', () => {
   it('handles rejected and cancelled events only for the current team', () => {
     const realtime = createConnection()
+    const onBoothStatusChanged = vi.fn()
     const onEntryRejected = vi.fn()
+    const onReconnected = vi.fn()
     const onSessionCancelled = vi.fn()
 
     startTeamBoothSignalRSession({
       connection: realtime.connection,
+      getActiveBoothId: () => undefined,
+      onBoothStatusChanged,
       onEntryRejected,
+      onReconnected,
       onSessionCancelled,
       raceId: 'race-1',
       teamId: 'TEAM-A',
@@ -60,12 +65,61 @@ describe('startTeamBoothSignalRSession', () => {
     expect(onSessionCancelled).toHaveBeenCalledWith('booth-2')
   })
 
-  it('joins the race group again after reconnect', async () => {
+  it('forwards booth status changes so the query layer can refresh DB state', () => {
     const realtime = createConnection()
+    const onBoothStatusChanged = vi.fn()
 
     startTeamBoothSignalRSession({
       connection: realtime.connection,
+      getActiveBoothId: () => 'booth-1',
+      onBoothStatusChanged,
       onEntryRejected: vi.fn(),
+      onReconnected: vi.fn(),
+      onSessionCancelled: vi.fn(),
+      raceId: 'race-1',
+      teamId: 'team-a',
+    })
+
+    realtime.handlers.get('ReceiveBoothStatusChanged')?.(
+      'booth-unrelated',
+      'occupied',
+      'team-b',
+    )
+    realtime.handlers.get('ReceiveBoothStatusChanged')?.(
+      'booth-1',
+      'free',
+    )
+    realtime.handlers.get('ReceiveBoothStatusChanged')?.(
+      'booth-2',
+      'occupied',
+      'TEAM-A',
+    )
+
+    expect(onBoothStatusChanged).toHaveBeenCalledTimes(2)
+    expect(onBoothStatusChanged).toHaveBeenNthCalledWith(
+      1,
+      'booth-1',
+      'free',
+      undefined,
+    )
+    expect(onBoothStatusChanged).toHaveBeenNthCalledWith(
+      2,
+      'booth-2',
+      'occupied',
+      'TEAM-A',
+    )
+  })
+
+  it('joins the race group again after reconnect', async () => {
+    const realtime = createConnection()
+    const onReconnected = vi.fn()
+
+    startTeamBoothSignalRSession({
+      connection: realtime.connection,
+      getActiveBoothId: () => undefined,
+      onBoothStatusChanged: vi.fn(),
+      onEntryRejected: vi.fn(),
+      onReconnected,
       onSessionCancelled: vi.fn(),
       raceId: 'race-1',
       teamId: 'team-a',
@@ -77,5 +131,6 @@ describe('startTeamBoothSignalRSession', () => {
     expect(realtime.invoke).toHaveBeenCalledTimes(2)
     expect(realtime.invoke).toHaveBeenNthCalledWith(1, 'JoinRaceGroup', 'race-1')
     expect(realtime.invoke).toHaveBeenNthCalledWith(2, 'JoinRaceGroup', 'race-1')
+    expect(onReconnected).toHaveBeenCalledOnce()
   })
 })
