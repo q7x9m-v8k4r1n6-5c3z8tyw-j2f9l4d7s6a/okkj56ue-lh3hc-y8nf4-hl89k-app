@@ -54,6 +54,7 @@ export const BoothInformationSection = () => {
                     <OrganizerSearchBox
                       type="single"
                       value={booth.managers}
+                      error={section.errors[booth.id]?.managers}
                       onChange={booth.onManagersChange}
                     />
                   ) : (

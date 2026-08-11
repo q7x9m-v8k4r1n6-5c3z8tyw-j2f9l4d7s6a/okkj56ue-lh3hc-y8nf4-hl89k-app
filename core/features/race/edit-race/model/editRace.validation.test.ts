@@ -57,4 +57,29 @@ describe('validateEditRaceForm', () => {
       place: 'Vui lòng nhập địa điểm trạm.',
     })
   })
+
+  it('rejects one organizer assigned to multiple booths', () => {
+    const form = createValidForm()
+    const manager = {
+      id: '11111111-1111-4111-8111-111111111111',
+      displayName: 'Organizer',
+      email: 'organizer@example.com',
+    }
+    form.booths = ['one', 'two'].map((id) => ({
+      id,
+      name: `Booth ${id}`,
+      place: 'BK',
+      description: '',
+      managers: [manager],
+    }))
+
+    const errors = validateEditRaceForm(form, null)
+
+    expect(errors.booths.one?.managers).toBe(
+      'Mỗi quản trạm chỉ được quản lý một trạm.',
+    )
+    expect(errors.booths.two?.managers).toBe(
+      'Mỗi quản trạm chỉ được quản lý một trạm.',
+    )
+  })
 })

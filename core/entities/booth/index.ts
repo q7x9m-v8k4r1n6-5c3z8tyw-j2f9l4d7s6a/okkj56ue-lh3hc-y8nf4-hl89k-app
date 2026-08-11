@@ -1,4 +1,6 @@
 export { boothSchema, boothStatusSchema } from './model/booth'
 export type { Booth, BoothStatus } from './model/booth'
 export { useMyBoothQuery } from './model/server/useMyBoothQuery'
+export { invalidateMyBooth } from './model/server/invalidateMyBooth'
+export { myBoothQueryKeys } from './model/server/myBooth.queryKeys'
 export type { MyBooth } from './model/myBooth'

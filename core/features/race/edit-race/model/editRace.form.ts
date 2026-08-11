@@ -55,6 +55,6 @@ export type EditRaceFormErrors = {
   coverFile?: string
   booths: Record<
     string,
-    Partial<Record<'name' | 'place' | 'description', string>>
+    Partial<Record<'name' | 'place' | 'managers' | 'description', string>>
   >
 }
