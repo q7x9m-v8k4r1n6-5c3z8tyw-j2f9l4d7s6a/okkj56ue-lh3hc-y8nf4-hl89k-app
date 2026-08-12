@@ -6,6 +6,7 @@ import {
   IconButton,
   Input,
   RichTextEditor,
+  Switch,
   Table,
   TableBody,
   TableCell,
@@ -33,6 +34,7 @@ export const BoothInformationSection = () => {
               <TableHeaderCell>Địa điểm</TableHeaderCell>
               <TableHeaderCell>Quản trạm</TableHeaderCell>
               <TableHeaderCell>Mô tả trạm</TableHeaderCell>
+              <TableHeaderCell className="min-w-24 text-center">Loại trạm</TableHeaderCell>
               {section.isEditing ? <TableHeaderCell className="w-12" /> : null}
             </TableRow>
           </TableHead>
@@ -72,6 +74,18 @@ export const BoothInformationSection = () => {
                       <span className="block truncate">{booth.descriptionText}</span>
                     </button>
                   ) : booth.descriptionText}
+                </TableCell>
+                <TableCell className="min-w-24 text-center">
+                  {section.isEditing && !booth.isPersisted ? (
+                    <div className="flex justify-center">
+                      <Switch
+                        checked={booth.isHidden}
+                        onChange={booth.onHiddenChange}
+                      />
+                    </div>
+                  ) : (
+                    <Switch checked={booth.isHidden} disabled onChange={() => undefined} />
+                  )}
                 </TableCell>
                 {section.isEditing ? (
                   <TableCell>
@@ -130,6 +144,11 @@ export const BoothInformationSection = () => {
                   >
                     Thêm mô tả
                   </button>
+                </TableCell>
+                <TableCell className="min-w-24">
+                  <div className="flex justify-center">
+                    <Switch checked={false} onChange={section.createHiddenBooth} />
+                  </div>
                 </TableCell>
                 <TableCell />
               </TableRow>

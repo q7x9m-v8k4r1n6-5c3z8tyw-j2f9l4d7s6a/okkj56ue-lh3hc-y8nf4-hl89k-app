@@ -21,6 +21,7 @@ const createForm = (): EditRaceForm => ({
     name: 'Booth 1',
     place: 'Floor 1',
     description: 'Description',
+    isHidden: false,
     managers: [{
       id: organizerId,
       displayName: 'Organizer',
@@ -81,6 +82,32 @@ describe('mapEditRaceFormToRequest', () => {
       raceTeams: {
         add: [nextTeamId],
         remove: [teamId],
+      },
+    })
+  })
+
+  it('includes the hidden flag when adding a booth', () => {
+    const original = createForm()
+    const form = structuredClone(original)
+    form.booths.push({
+      id: '44444444-4444-4444-8444-444444444444',
+      name: 'Hidden booth',
+      place: 'Floor 2',
+      description: '',
+      isHidden: true,
+      managers: [],
+    })
+
+    expect(mapEditRaceFormToRequest(form, original)).toEqual({
+      expectedModifiedAt: original.modifiedAt,
+      booths: {
+        add: [{
+          name: 'Hidden booth',
+          place: 'Floor 2',
+          description: '',
+          isHidden: true,
+          organizerIds: [],
+        }],
       },
     })
   })

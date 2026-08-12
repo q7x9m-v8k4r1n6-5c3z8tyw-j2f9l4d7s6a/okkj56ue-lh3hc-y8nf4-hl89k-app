@@ -48,6 +48,7 @@ describe('validateEditRaceForm', () => {
       name: '',
       place: '',
       description: '',
+      isHidden: false,
       managers: [],
     })
 
@@ -70,6 +71,7 @@ describe('validateEditRaceForm', () => {
       name: `Booth ${id}`,
       place: 'BK',
       description: '',
+      isHidden: false,
       managers: [manager],
     }))
 
