@@ -1,8 +1,13 @@
+import { useCallback, type ChangeEvent, type KeyboardEvent } from 'react'
+import { useParams } from 'react-router-dom'
+import { useTeamBoothSessionQuery } from '@/core/entities/booth'
 import { useAuthSession } from '@/core/features/auth'
+import { useToast } from '@/core/shared'
 import { useTeamQrScanForm } from '../../model/frontend/useTeamQrScanForm'
-import { useScanQrMutation } from '../../model/server/useScanQrMutation'
 import { mapQrToRequest } from '../../model/mapQrToRequest'
 import { validateQrCode } from '../../model/scanQr.validation'
+import { useScanQrMutation } from '../../model/server/useScanQrMutation'
+import { useTeamBoothSignalR } from '../../model/server/useTeamBoothSignalR'
 
 const getErrorMessage = (error: unknown) => {
   if (error instanceof Error) return error.message
@@ -14,13 +19,56 @@ const getErrorMessage = (error: unknown) => {
 }
 
 export const useTeamQrScanPage = () => {
+  const { raceId } = useParams<{ raceId: string }>()
   const form = useTeamQrScanForm()
-  const mutation = useScanQrMutation()
+  const mutation = useScanQrMutation(raceId)
+  const sessionQuery = useTeamBoothSessionQuery(raceId)
   const authSession = useAuthSession()
-  const teamId = authSession?.user?.id
+  const { toast } = useToast()
+  const teamId = authSession.user?.id
+  const session = sessionQuery.data ?? null
+
+  const resetBoothRequest = useCallback(() => {
+    mutation.reset()
+    form.setRawQrCode('')
+    form.setErrorMessage(null)
+  }, [form, mutation])
+
+  const handleEntryRejected = useCallback(() => {
+    resetBoothRequest()
+    toast({
+      title: 'Yêu cầu vào trạm bị từ chối',
+      description: 'Quản trạm đã từ chối yêu cầu. Vui lòng chọn trạm khác.',
+      variant: 'warning',
+    })
+  }, [resetBoothRequest, toast])
+
+  const handleSessionCancelled = useCallback(() => {
+    resetBoothRequest()
+    toast({
+      title: 'Lượt chơi đã bị hủy',
+      description: 'Quản trạm đã hủy lượt chơi. Vui lòng chọn trạm khác.',
+      variant: 'warning',
+    })
+  }, [resetBoothRequest, toast])
+
+  useTeamBoothSignalR({
+    activeBoothId: session?.boothId,
+    raceId,
+    teamId,
+    onEntryRejected: handleEntryRejected,
+    onSessionCancelled: handleSessionCancelled,
+    onSessionReleased: resetBoothRequest,
+  })
 
   const handleScan = (qrCode: string) => {
-    if (mutation.isPending || mutation.isSuccess) return
+    if (
+      mutation.isPending ||
+      mutation.isSuccess ||
+      sessionQuery.isLoading ||
+      sessionQuery.isError ||
+      session
+    ) return
 
     const error = validateQrCode(qrCode)
     if (error) {
@@ -36,25 +84,53 @@ export const useTeamQrScanPage = () => {
     form.setErrorMessage(null)
     form.setRawQrCode(qrCode)
 
-    const requestPayload = mapQrToRequest(qrCode, teamId)
-
-    mutation.mutate(requestPayload, {
-      onSuccess: (data) => {
-        console.log('Quét QR vào trạm thành công:', data)
-      },
-      onError: (err: unknown) => {
-        form.setErrorMessage(getErrorMessage(err) || 'Không thể gửi mã QR. Vui lòng thử lại!')
+    mutation.mutate(mapQrToRequest(qrCode, teamId), {
+      onError: (requestError: unknown) => {
+        form.setErrorMessage(
+          getErrorMessage(requestError) || 'Không thể gửi mã QR. Vui lòng thử lại!',
+        )
       },
     })
   }
 
+  const handleQrCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
+    form.setRawQrCode(event.target.value)
+  }
+
+  const handleQrCodeKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') handleScan(form.rawQrCode)
+  }
+
+  const retrySession = () => {
+    void sessionQuery.refetch()
+  }
+
+  const statusMessage = session?.status === 'occupied'
+    ? `Ban tổ chức đã chấp nhận. Bạn có thể bắt đầu chơi tại ${session.boothName}.`
+    : session?.status === 'pending'
+      ? `Đã gửi yêu cầu vào ${session.boothName}. Vui lòng chờ Ban tổ chức xác nhận!`
+      : mutation.isPending
+        ? 'Đang gửi dữ liệu trạm...'
+        : mutation.isSuccess
+          ? mutation.data?.message ?? 'Đã gửi yêu cầu vào trạm.'
+          : ''
+
   return {
-    rawQrCode: form.rawQrCode,
+    canScan: Boolean(raceId) &&
+      !sessionQuery.isLoading &&
+      !sessionQuery.isError &&
+      !session &&
+      !mutation.isPending &&
+      !mutation.isSuccess,
     errorMessage: form.errorMessage,
     handleScan,
-    isPending: mutation.isPending,
-    isSuccess: mutation.isSuccess,
-    responseData: mutation.data,
-    form,
+    handleQrCodeChange,
+    handleQrCodeKeyDown,
+    isCheckingSession: sessionQuery.isLoading,
+    isSessionError: sessionQuery.isError,
+    rawQrCode: form.rawQrCode,
+    retrySession,
+    sessionStatus: session?.status ?? null,
+    statusMessage,
   }
 }

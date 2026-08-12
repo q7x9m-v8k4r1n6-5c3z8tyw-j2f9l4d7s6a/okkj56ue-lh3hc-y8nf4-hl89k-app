@@ -31,7 +31,7 @@ export const validateBasicStep = (
   if (!basic.startAt) errors.startAt = 'Vui lòng chọn thời gian bắt đầu.'
   if (!basic.endAt) errors.endAt = 'Vui lòng chọn thời gian kết thúc.'
   if (!basic.location.trim()) errors.location = 'Vui lòng nhập địa điểm trận đấu.'
-  if(!basic.rules.trim()) errors.rules = 'Vui lòng nhập luật trận đấu.'
+  if (!basic.rules.trim()) errors.rules = 'Vui lòng nhập luật trận đấu.'
   if (basic.startAt && Number.isNaN(startAt.getTime())) {
     errors.startAt = 'Thời gian bắt đầu không hợp lệ.'
   }
@@ -67,6 +67,27 @@ export const validateStationStep = (
       rowErrors.managers = 'Vui lòng chọn ít nhất một quản trạm.'
     }
     if (Object.keys(rowErrors).length) errors[station.id] = rowErrors
+  })
+
+  const managerStations = new Map<string, string[]>()
+  stations.forEach((station) => {
+    new Set(station.managers.map((manager) => manager.id)).forEach(
+      (managerId) => {
+        managerStations.set(
+          managerId,
+          [...(managerStations.get(managerId) ?? []), station.id],
+        )
+      },
+    )
+  })
+  managerStations.forEach((stationIds) => {
+    if (stationIds.length < 2) return
+    stationIds.forEach((stationId) => {
+      errors[stationId] = {
+        ...errors[stationId],
+        managers: 'Mỗi quản trạm chỉ được quản lý một trạm.',
+      }
+    })
   })
 
   return errors

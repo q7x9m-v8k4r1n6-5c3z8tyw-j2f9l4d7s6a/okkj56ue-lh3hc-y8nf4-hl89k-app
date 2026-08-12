@@ -65,6 +65,27 @@ export const validateEditRaceForm = (
     }
   })
 
+  const managerBooths = new Map<string, string[]>()
+  form.booths.forEach((booth) => {
+    new Set(booth.managers.map((manager) => manager.id)).forEach(
+      (managerId) => {
+        managerBooths.set(
+          managerId,
+          [...(managerBooths.get(managerId) ?? []), booth.id],
+        )
+      },
+    )
+  })
+  managerBooths.forEach((boothIds) => {
+    if (boothIds.length < 2) return
+    boothIds.forEach((boothId) => {
+      errors.booths[boothId] = {
+        ...errors.booths[boothId],
+        managers: 'Mỗi quản trạm chỉ được quản lý một trạm.',
+      }
+    })
+  })
+
   return errors
 }
 
