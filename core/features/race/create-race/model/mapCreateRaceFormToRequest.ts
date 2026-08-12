@@ -25,6 +25,7 @@ export const mapCreateRaceFormToRequest = (
     place: station.location.trim(),
     description: station.description || undefined,
     organizerIds: station.managers.map((manager) => manager.id),
+    isHidden: station.isHidden,
   })),
   raceSettings: {
     isToggledLeaderboard: form.settings.showLeaderboard,

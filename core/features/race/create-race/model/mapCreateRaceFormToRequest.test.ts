@@ -23,6 +23,14 @@ describe('mapCreateRaceFormToRequest', () => {
       displayName: 'Coordinator',
       email: 'coordinator@example.com',
     }]
+    form.stations = [{
+      id: '33333333-3333-4333-8333-333333333333',
+      name: '  Hidden station  ',
+      location: '  Campus B  ',
+      managers: [form.organizers[0]],
+      description: '<p>Secret mission</p>',
+      isHidden: true,
+    }]
     form.settings = { showLeaderboard: true, showScores: false }
 
     const request = mapCreateRaceFormToRequest(form)
@@ -30,6 +38,13 @@ describe('mapCreateRaceFormToRequest', () => {
     expect(request.basicInfo.place).toBe('Ho Chi Minh City')
     expect(request.raceTeam).toEqual([form.teams[0].id])
     expect(request.organizerId).toEqual([form.organizers[0].id])
+    expect(request.booths).toEqual([{
+      name: 'Hidden station',
+      place: 'Campus B',
+      description: '<p>Secret mission</p>',
+      organizerIds: [form.organizers[0].id],
+      isHidden: true,
+    }])
     expect(request.raceSettings).toEqual({
       isToggledLeaderboard: true,
       isHiddenPoint: true,
