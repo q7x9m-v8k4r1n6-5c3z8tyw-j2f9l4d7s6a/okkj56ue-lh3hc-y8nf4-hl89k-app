@@ -46,12 +46,12 @@ export const useRaceMessageSignalR = ({
 
     void connection
       .start()
-      .then(() => connection.invoke('JoinRaceGroup', raceId))
+      .then(() => connection.invoke('JoinRaceMessageGroups', raceId))
       .catch((error) => console.error('Lỗi kết nối realtime tin nhắn:', error))
 
     return () => {
       if (connection.state === signalR.HubConnectionState.Connected) {
-        void connection.invoke('LeaveRaceGroup', raceId).catch(() => {})
+        void connection.invoke('LeaveRaceMessageGroups', raceId).catch(() => {})
       }
 
       connection.off('ReceiveRaceMessage')
