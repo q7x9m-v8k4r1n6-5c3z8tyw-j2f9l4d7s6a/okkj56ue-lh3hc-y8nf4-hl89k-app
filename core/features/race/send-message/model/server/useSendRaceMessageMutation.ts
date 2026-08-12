@@ -7,15 +7,14 @@ type SendRaceMessageVariables = {
   raceId: string
   recipients: SendRaceMessageRecipient[]
   body: string
-  senderName?: string
 }
 
 export const useSendRaceMessageMutation = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ raceId, recipients, body, senderName }: SendRaceMessageVariables) =>
-      sendRaceMessage(raceId, { recipients, body, senderName }),
+    mutationFn: ({ raceId, recipients, body }: SendRaceMessageVariables) =>
+      sendRaceMessage(raceId, { recipients, body }),
     onSuccess: (_, variables) => {
       void queryClient.invalidateQueries({
         queryKey: sendMessageQueryKeys.messages(variables.raceId),

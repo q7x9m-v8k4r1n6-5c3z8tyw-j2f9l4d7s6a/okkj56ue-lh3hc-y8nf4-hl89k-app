@@ -9,7 +9,6 @@ import {
 type SendRaceMessagePayload = {
   recipients: SendRaceMessageRecipient[]
   body: string
-  senderName?: string
 }
 
 export const getRaceMessages = async (
@@ -38,7 +37,6 @@ export const sendRaceMessage = async (
     body: {
       recipients,
       body: payload.body,
-      senderName: payload.senderName,
     },
   })
 

@@ -1,7 +1,5 @@
 import { useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { useMyBoothQuery } from '@/core/entities/booth'
-import { useAuthSession } from '@/core/features/auth'
 import {
   sendMessageDraftSchema,
   type MessageRecipient,
@@ -38,13 +36,10 @@ const formatFullMessageTime = (value: string | Date) =>
 /** Owns browser-only compose state and delegates server work to message hooks. */
 export const useSendMessageState = () => {
   const { raceId } = useParams<{ raceId: string }>()
-  const auth = useAuthSession()
-  const isOrganizer = auth.user?.userType === 'organizer'
   const [body, setBody] = useState('')
   const [recipientSearch, setRecipientSearch] = useState('')
   const [selectedRecipients, setSelectedRecipients] = useState<MessageRecipient[]>([])
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null)
-  const myBoothQuery = useMyBoothQuery(isOrganizer ? raceId : undefined)
   const recipientsQuery = useMessageRecipientsQuery()
   const messagesQuery = useRaceMessagesQuery(raceId)
   const sendMutation = useSendRaceMessageMutation()
@@ -62,26 +57,16 @@ export const useSendMessageState = () => {
     [body, selectedRecipients],
   )
 
-  const senderName = useMemo(() => {
-    const displayName = auth.user?.displayName?.trim()
-    const boothName = myBoothQuery.data?.name?.trim()
-    const emailName = auth.user?.email?.split('@')[0]?.trim()
-
-    return displayName || boothName || emailName || undefined
-  }, [auth.user?.displayName, auth.user?.email, myBoothQuery.data?.name])
-
   const messages = useMemo<SentMessage[]>(() => (
     (messagesQuery.data ?? []).map((message) => ({
       id: message.id,
-      senderName: message.senderId === auth.user?.id && message.senderName === 'ADMIN'
-        ? senderName ?? message.senderName
-        : message.senderName,
+      senderName: message.senderName,
       recipients: message.recipientLabels,
       body: message.body,
       sentAt: formatMessageTime(message.createdAt),
       sentAtFull: formatFullMessageTime(message.createdAt),
     }))
-  ), [auth.user?.id, messagesQuery.data, senderName])
+  ), [messagesQuery.data])
 
   const selectedMessage = useMemo(
     () => messages.find((message) => message.id === selectedMessageId) ?? null,
@@ -145,7 +130,6 @@ export const useSendMessageState = () => {
       {
         raceId,
         body: draft.data.body,
-        senderName,
         recipients: selectedRecipients.map((recipient) => ({
           key: recipient.id,
           label: recipient.label,
