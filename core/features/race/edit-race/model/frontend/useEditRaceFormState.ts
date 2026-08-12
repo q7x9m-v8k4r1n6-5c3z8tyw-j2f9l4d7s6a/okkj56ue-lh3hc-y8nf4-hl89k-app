@@ -102,6 +102,7 @@ export const useEditRaceFormState = (
       place: '',
       managers: [],
       description: '',
+      isHidden: false,
       ...changes,
     }
     dispatch({ type: 'ADD_BOOTH', booth })

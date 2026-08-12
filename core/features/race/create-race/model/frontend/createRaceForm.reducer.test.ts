@@ -24,6 +24,7 @@ describe('createRaceFormReducer', () => {
         location: '',
         managers: [],
         description: '',
+        isHidden: false,
       }],
       errors: {
         ...createInitialRaceForm().errors,

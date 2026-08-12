@@ -24,7 +24,8 @@ const hasBoothContent = (booth: EditRaceBooth) => (
     booth.name.trim() ||
     booth.place.trim() ||
     booth.managers.length ||
-    booth.description.replace(/<[^>]*>/g, '').trim(),
+    booth.description.replace(/<[^>]*>/g, '').trim() ||
+    booth.isHidden,
   )
 )
 
@@ -37,6 +38,9 @@ export const useBoothInformationSection = () => {
   const inputRefs = useRef<Record<string, Partial<Record<'name' | 'place', HTMLInputElement | null>>>>({})
   const pendingFocusRef = useRef<{ id: string; field: 'name' | 'place' } | null>(null)
   const selectedBooth = editor.form.booths.find((booth) => booth.id === detailId)
+  const persistedBoothIds = new Set(
+    editor.originalForm.booths.map((booth) => booth.id),
+  )
 
   useEffect(() => {
     const pendingFocus = pendingFocusRef.current
@@ -77,6 +81,7 @@ export const useBoothInformationSection = () => {
       ...booth,
       descriptionText: shortenDescription(booth.description),
       managerText: formatManagers(booth),
+      isPersisted: persistedBoothIds.has(booth.id),
       onDescriptionChange: (event: ChangeEvent<HTMLInputElement>) =>
         editor.updateBooth(booth.id, { description: event.target.value }),
       onManagersChange: (managers: OrganizerSummary[]) => {
@@ -93,10 +98,15 @@ export const useBoothInformationSection = () => {
         editor.updateBooth(booth.id, { name: event.target.value }),
       onPlaceChange: (event: ChangeEvent<HTMLInputElement>) =>
         editor.updateBooth(booth.id, { place: event.target.value }),
+      onHiddenChange: (isHidden: boolean) =>
+        editor.updateBooth(booth.id, { isHidden }),
       onRemove: () => editor.removeBooth(booth.id),
     })),
     errors: editor.errors.booths,
     isEditing: editor.isEditing,
+    createHiddenBooth: (isHidden: boolean) => {
+      if (isHidden) createBooth({ isHidden })
+    },
     closeDetails,
     openDetails: setDetailId,
     selectedBooth,

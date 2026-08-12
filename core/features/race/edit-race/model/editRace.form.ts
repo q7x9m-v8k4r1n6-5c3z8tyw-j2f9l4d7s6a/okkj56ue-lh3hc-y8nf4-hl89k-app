@@ -13,6 +13,7 @@ export type EditRaceBooth = {
   place: string
   managers: EditRaceOrganizer[]
   description: string
+  isHidden: boolean
 }
 
 export type EditRaceTeam = {

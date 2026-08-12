@@ -16,7 +16,8 @@ export const hasStationContent = (
   station.name?.trim()
   || station.location?.trim()
   || station.managers?.length
-  || station.description?.replace(/<[^>]*>/g, '').trim(),
+  || station.description?.replace(/<[^>]*>/g, '').trim()
+  || station.isHidden
 )
 
 /** Validates the basic-information step without reading React state. */
