@@ -37,6 +37,14 @@ export const router = createBrowserRouter([
               return { Component: TeamDetailRacePage }
             },
           },
+          {
+            path: 'team/races/:raceId/secret-missions/:missionId?',
+            handle: { title: 'Danh sách nhiệm vụ bí mật' },
+            lazy: async () => {
+              const { TeamSecretMissionListPage } = await import('@/src/app/pages/team-secret-mission-list')
+              return { Component: TeamSecretMissionListPage }
+            },
+          },
         ],
       },
       {

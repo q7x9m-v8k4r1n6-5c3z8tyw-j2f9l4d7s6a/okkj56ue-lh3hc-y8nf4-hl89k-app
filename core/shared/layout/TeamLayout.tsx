@@ -57,7 +57,7 @@ export const TeamLayout = ({
       </button>
     </header>
 
-    <main className="min-h-0 flex-1 overflow-y-auto">{children}</main>
+    <main className="flex min-h-0 flex-1 flex-col overflow-y-auto">{children}</main>
 
     {navItems.length > 0 ? (
       <nav className="sticky bottom-0 z-20 bg-white px-3 pb-3" aria-label="Điều hướng đội chơi">
@@ -76,7 +76,11 @@ export const TeamLayout = ({
                 <div key={item.id} className="relative flex items-center justify-center">
                   <button
                     type="button"
-                    className="absolute -top-4 flex size-[62px] items-center justify-center rounded-full bg-[#de3336] text-white shadow-[0_4px_14px_rgba(0,0,0,0.15)] transition-transform active:scale-95"
+                    className={`absolute -top-4 flex size-[62px] items-center justify-center rounded-full shadow-[0_4px_14px_rgba(0,0,0,0.15)] ${
+                      isActive
+                        ? 'bg-[#de3336] text-white'
+                        : 'bg-[#d9d9d9] text-[#5e5e5e]'
+                    }`}
                     aria-current={isActive ? 'page' : undefined}
                     aria-label={item.label || 'Quét mã QR'}
                     onClick={() => onNavChange?.(item.id)}
