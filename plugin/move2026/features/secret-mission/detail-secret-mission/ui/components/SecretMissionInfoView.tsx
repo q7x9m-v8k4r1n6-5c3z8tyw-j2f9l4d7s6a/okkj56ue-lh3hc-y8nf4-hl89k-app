@@ -1,5 +1,5 @@
-import { ReturnHeader } from '../../../../../shared/ui/ReturnHeader'
 import type { SecretMissionDetailDto } from '../../model/detailSecretMission.contract'
+import { PluginScreenLayout } from '@plugin/move2026/shared/ui/PluginScreenLayout'
 
 export type SecretMissionInfoViewProps = {
   missionData: SecretMissionDetailDto
@@ -24,33 +24,21 @@ export const SecretMissionInfoView = ({
   }
 
   return (
-    // Dùng flex flex-1 để ôm sát không gian bên trong TeamLayout
-    <div className="flex flex-1 flex-col bg-white relative">
-      
-      {/* HEADER: Sticky dính chặt lên trần của vùng cuộn */}
-      <header className="sticky top-0 z-10 bg-white">
-        <ReturnHeader
-          title={`Thông tin nhiệm vụ ${missionData.name}`}
-          onBack={onBack}
-        />
-      </header>
-
-      {/* CONTENT: Khoảng đệm cho văn bản */}
-      <div className="flex-1 px-5 py-6">
-        {renderSimpleMarkdown(missionData.description)}
-      </div>
-
-      {/* FOOTER: Sticky dính chặt xuống đáy của vùng cuộn */}
-      <footer className="sticky bottom-0 z-10 bg-transparent px-3 pb-8">
+    <PluginScreenLayout
+      title={`Thông tin nhiệm vụ ${missionData.name}`}
+      onBack={onBack}
+      contentClassName="px-5 pt-3"
+      footer={
         <button
           type="button"
           onClick={onViewEvidence}
-          className="flex w-full items-center justify-center rounded-full bg-[#de3336] py-2.5 text-base font-semibold text-white transition-all active:scale-95"
+          className="flex w-full items-center justify-center rounded-full bg-[#de3336] py-3 text-base font-semibold text-white transition-all active:scale-95"
         >
           Xem minh chứng
         </button>
-      </footer>
-      
-    </div>
+      }
+    >
+      {renderSimpleMarkdown(missionData.description)}
+    </PluginScreenLayout>
   )
 }

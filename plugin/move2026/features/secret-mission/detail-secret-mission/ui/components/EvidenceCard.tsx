@@ -33,10 +33,6 @@ export const EvidenceCard = ({
         </button>
       ) : null}
 
-      {/* 
-        Khu vực ảnh/video: 
-        🎯 THÊM `min-h-0` VÀ `overflow-hidden` VÀO ĐÂY ĐỂ CHỐNG TRÀN LAYOUT 
-      */}
       <div 
         className="relative flex-1 min-h-0 overflow-hidden cursor-pointer bg-[#166534] transition-opacity hover:opacity-90"
         onClick={onViewClick}
@@ -65,7 +61,6 @@ export const EvidenceCard = ({
         )}
       </div>
 
-      {/* Thanh thời gian (Sẽ luôn được giữ cố định ở đáy) */}
       <div className="flex h-8 shrink-0 items-center justify-center bg-white px-1">
         <span className="truncate text-[9px] text-[#5e5e5e]">
           Cập nhật lần cuối: {formatGmt7Time(createdAt)}
