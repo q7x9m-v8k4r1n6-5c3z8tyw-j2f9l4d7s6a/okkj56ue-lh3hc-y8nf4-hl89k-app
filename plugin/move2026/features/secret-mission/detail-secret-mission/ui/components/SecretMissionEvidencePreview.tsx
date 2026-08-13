@@ -14,7 +14,6 @@ export type SecretMissionEvidencePreviewProps = {
 }
 
 export const SecretMissionEvidencePreview = ({
-  missionName,
   file,
   source,
   onCancel,
