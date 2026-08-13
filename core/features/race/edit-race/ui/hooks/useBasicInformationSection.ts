@@ -19,7 +19,7 @@ export const useBasicInformationSection = () => {
       editor.updateBasic({ place: event.target.value }),
     onRaceNameChange: (event: ChangeEvent<HTMLInputElement>) =>
       editor.updateBasic({ raceName: event.target.value }),
-    onRulesChange: (content: string) => 
+    onRulesChange: (content: string) =>
       editor.updateBasic({ rules: content }),
     onTimeEndChange: (event: ChangeEvent<HTMLInputElement>) =>
       editor.updateBasic({ timeEnd: event.target.value }),

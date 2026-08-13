@@ -16,6 +16,7 @@ export type CreateRaceStationForm = {
   location: string
   managers: OrganizerSummary[]
   description: string
+  isHidden: boolean
 }
 
 export type CreateRaceSettingsForm = {

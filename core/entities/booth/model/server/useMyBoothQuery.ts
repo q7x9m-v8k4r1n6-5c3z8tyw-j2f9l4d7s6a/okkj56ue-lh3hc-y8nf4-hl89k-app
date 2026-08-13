@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 import { getMyBooth } from '../../api/getMyBooth.api'
+import { myBoothQueryKeys } from './myBooth.queryKeys'
 
 /** Loads and caches the organizer's assigned booth for one race. */
 export const useMyBoothQuery = (raceId?: string) =>
   useQuery({
-    queryKey: ['booth', 'my-booth', raceId],
-    queryFn: () => getMyBooth(raceId!),
+    queryKey: myBoothQueryKeys.detail(raceId),
+    queryFn: ({ signal }) => getMyBooth(raceId!, signal),
     enabled: Boolean(raceId),
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   })

@@ -16,7 +16,7 @@ export const mapCreateRaceFormToRequest = (
     timeEnd: form.basic.endAt
       ? toGmt7ApiDateTime(form.basic.endAt)
       : getCurrentGmt7DateTime(),
-    rules: form.basic.rules?.trim() || undefined, 
+    rules: form.basic.rules?.trim() || undefined,
   },
   organizerId: form.organizers.map((organizer) => organizer.id),
   raceTeam: form.teams.map((team) => team.id),
@@ -25,6 +25,7 @@ export const mapCreateRaceFormToRequest = (
     place: station.location.trim(),
     description: station.description || undefined,
     organizerIds: station.managers.map((manager) => manager.id),
+    isHidden: station.isHidden,
   })),
   raceSettings: {
     isToggledLeaderboard: form.settings.showLeaderboard,

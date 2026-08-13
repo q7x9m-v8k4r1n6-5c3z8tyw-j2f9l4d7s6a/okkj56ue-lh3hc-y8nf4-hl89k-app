@@ -10,8 +10,8 @@ import type { TeamNavItem } from '@/core/shared'
 export const teamDetailRaceTabs = [
   { value: 'rules', label: 'Luật chơi' },
   { value: 'map', label: 'Bản đồ' },
-  { value: 'scan', label: 'Quét QR' },
-  { value: 'leaderboard', label: 'BXH' },
+  { value: 'scan', label: 'Quét mã QR' },
+  { value: 'leaderboard', label: 'Kết quả' },
   { value: 'more', label: 'Khác' },
 ] as const
 
@@ -20,8 +20,8 @@ export type TeamDetailRaceTab = (typeof teamDetailRaceTabs)[number]['value']
 export const teamDetailRaceNavItems: TeamNavItem[] = [
   { id: 'rules', label: 'Luật chơi', icon: <GavelIcon /> },
   { id: 'map', label: 'Bản đồ', icon: <MapIcon /> },
-  { id: 'scan', label: 'Quét QR', icon: <QrScanIcon /> },
-  { id: 'leaderboard', label: 'BXH', icon: <LeaderboardIcon /> },
+  { id: 'scan', label: 'Quét mã QR', icon: <QrScanIcon /> },
+  { id: 'leaderboard', label: 'Kết quả', icon: <LeaderboardIcon /> },
   { id: 'more', label: 'Khác', icon: <GridMenuIcon /> },
 ]
 

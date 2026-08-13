@@ -71,6 +71,7 @@ export const mapEditRaceFormToRequest = (
       name: booth.name.trim(),
       place: booth.place.trim(),
       description: booth.description,
+      isHidden: booth.isHidden,
       organizerIds: [...new Set(booth.managers.map((manager) => manager.id))],
     }))
   const boothUpdate = form.booths

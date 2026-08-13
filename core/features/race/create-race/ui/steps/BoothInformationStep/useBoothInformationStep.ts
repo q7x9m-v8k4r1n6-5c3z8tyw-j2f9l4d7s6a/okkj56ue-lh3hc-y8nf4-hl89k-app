@@ -50,6 +50,7 @@ export const useBoothInformationStep = () => {
         location: '',
         managers: [],
         description: '',
+        isHidden: false,
       }, ...changes,
     } })
 
@@ -86,6 +87,14 @@ export const useBoothInformationStep = () => {
     if (errors[row.id]?.managers) clearError(row.id, 'managers')
   }
 
+  const updateHiddenStatus = (id: string, isHidden: boolean) => {
+    update(id, { isHidden })
+  }
+
+  const createHiddenStation = (isHidden: boolean) => {
+    if (isHidden) createStation({ isHidden }, undefined, true)
+  }
+
   const setInputRef = (id: string, field: StationInputField, node: HTMLInputElement | null) => {
     inputRefs.current[id] = { ...inputRefs.current[id], [field]: node }
   }
@@ -114,6 +123,8 @@ export const useBoothInformationStep = () => {
     closeDetails,
     getManagerValue,
     updateManagers,
+    updateHiddenStatus,
+    createHiddenStation,
     setInputRef,
     removeStation: (id: string) => dispatch({ type: 'stations/remove', id }),
   }
