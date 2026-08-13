@@ -57,8 +57,9 @@ export const TeamLayout = ({
       </button>
     </header>
 
-    <main className="flex min-h-0 flex-1 flex-col overflow-y-auto">{children}</main>
-
+    <main className="relative flex min-h-0 flex-1 flex-col overflow-y-auto">
+      {children}
+    </main>
     {navItems.length > 0 ? (
       <nav className="sticky bottom-0 z-20 bg-white px-3 pb-3" aria-label="Điều hướng đội chơi">
         <div

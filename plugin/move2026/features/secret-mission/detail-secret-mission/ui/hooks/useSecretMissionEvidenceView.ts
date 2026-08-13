@@ -5,15 +5,11 @@ import { useDeleteMissionEvidenceMutation } from '../../model/server/useDeleteMi
 
 export const useSecretMissionEvidenceView = (missionData: SecretMissionDetailDto) => {
   const [searchParams] = useSearchParams()
-  // Lấy cờ 'edit' từ URL (nếu URL là ?view=evidence&edit=true thì biến này = true)
   const initialEditMode = searchParams.get('edit') === 'true'
-
-  // Khởi tạo state local bằng giá trị lấy từ URL
   const [isEditMode, setIsEditMode] = useState(initialEditMode)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [evidenceToDelete, setEvidenceToDelete] = useState<string | null>(null)
   const [viewingMedia, setViewingMedia] = useState<{ url: string; isVideo: boolean } | null>(null)
-
   const deleteMutation = useDeleteMissionEvidenceMutation(missionData.id)
 
   const mergedEvidences = useMemo(() => {

@@ -9,7 +9,7 @@ export const ReturnHeader = ({ title, onBack }: ReturnHeaderProps) => (
   <div>
     <button
       type="button"
-      className="flex h-12 w-full items-center gap-2 px-5 active:underline"
+      className="flex h-10 w-full items-center gap-2 px-4 active:underline"
       onClick={onBack}
       aria-label="Quay lại"
     >

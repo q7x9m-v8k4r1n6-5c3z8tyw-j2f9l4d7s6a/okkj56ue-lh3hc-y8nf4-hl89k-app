@@ -11,7 +11,6 @@ export const secretMissionOverviewItemSchema = z.object({
 
 export type SecretMissionOverviewDto = z.infer<typeof secretMissionOverviewItemSchema>
 
-// Frontend Model
 export type SecretMissionListItem = {
   id: string
   name: string

@@ -19,11 +19,6 @@ export const useSecretMissionDetailContainer = () => {
   const handleClose = () => navigate(`/team/races/${raceId}/secret-missions`)
   const handleOpenInfo = () => navigate(`?view=info`, { replace: true })
   
-  // ====================================================================
-  // 🎯 FIX TẠI ĐÂY: Kiểm tra type an toàn (Safe Type Checking)
-  // Chỉ bật editMode khi withEdit chính xác là giá trị boolean 'true'
-  // Bỏ qua nếu withEdit là Event Object từ cú click chuột.
-  // ====================================================================
   const handleOpenEvidence = (withEdit?: boolean | unknown) => {
     const isEdit = withEdit === true 
     navigate(`?view=evidence${isEdit ? '&edit=true' : ''}`, { replace: true })

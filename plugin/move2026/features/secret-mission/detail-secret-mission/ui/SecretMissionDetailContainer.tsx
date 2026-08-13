@@ -26,7 +26,6 @@ export const SecretMissionDetailContainer = () => {
     return <SecretMissionInfoView missionData={missionData} onBack={container.handleClose} onViewEvidence={container.handleOpenEvidence} />
   }
 
-  // --- MỚI: Trạng thái 5 - Màn hình Preview ---
   if (container.viewMode === 'preview' && container.tempFile) {
     return (
       <SecretMissionEvidencePreview
@@ -35,8 +34,8 @@ export const SecretMissionDetailContainer = () => {
         source={container.tempFile.source}
         onCancel={container.handleCancelPreview}
         onUpdateFile={(newFile) => container.setTempFile({ file: newFile, source: container.tempFile!.source })}
-        onConfirmUpload={container.handleSubmitEvidence} // TRUYỀN HÀM XỬ LÝ UPLOAD VÀO ĐÂY
-        isSubmitting={container.isSubmitting} // TRUYỀN TRẠNG THÁI LOADING VÀO ĐÂY
+        onConfirmUpload={container.handleSubmitEvidence} 
+        isSubmitting={container.isSubmitting} 
       />
     )
   }
@@ -46,7 +45,7 @@ export const SecretMissionDetailContainer = () => {
       <SecretMissionEvidenceView
         missionData={missionData}
         onBack={container.handleClose}
-        onFileSelected={container.handlePreviewFile} // Nhận file từ View
+        onFileSelected={container.handlePreviewFile} 
       />
     )
   }

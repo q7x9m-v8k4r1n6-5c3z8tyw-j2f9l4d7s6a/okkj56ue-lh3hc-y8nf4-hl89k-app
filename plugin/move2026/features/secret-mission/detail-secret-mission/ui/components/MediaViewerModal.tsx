@@ -9,7 +9,6 @@ export type MediaViewerModalProps = {
 }
 
 export const MediaViewerModal = ({ url, isVideo, onClose }: MediaViewerModalProps) => {
-  // Hỗ trợ bấm nút ESC trên bàn phím (nếu test trên laptop) để đóng
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -21,10 +20,8 @@ export const MediaViewerModal = ({ url, isVideo, onClose }: MediaViewerModalProp
   return createPortal(
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 p-4 backdrop-blur-sm"
-      // Kỹ thuật bắt sự kiện click ra ngoài: Chỉ đóng khi target chính là cái nền đen
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      {/* Nút Close góc trên bên phải */}
       <button
         type="button"
         onClick={onClose}
@@ -33,7 +30,6 @@ export const MediaViewerModal = ({ url, isVideo, onClose }: MediaViewerModalProp
         <CloseIcon className="size-5" />
       </button>
 
-      {/* Nội dung Media */}
       {isVideo ? (
         <video
           src={url}
