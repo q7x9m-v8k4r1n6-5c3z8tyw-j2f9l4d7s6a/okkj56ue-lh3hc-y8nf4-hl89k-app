@@ -49,3 +49,5 @@ export type {
 } from './Toast'
 export { ConfirmDialogProvider, useConfirmDialog } from './ConfirmDialog'
 export type { ConfirmDialogOptions } from './ConfirmDialog'
+export { ModalOptionChoice } from './ModalOptionChoice'
+export type { ModalOptionChoiceProps, OptionChoiceAction } from './ModalOptionChoice'

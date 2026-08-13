@@ -1,6 +1,7 @@
 export {
   formatDateTime,
   formatGmt7DateTime,
+  formatGmt7Time,
   getCurrentGmt7DateTime,
   toGmt7ApiDateTime,
 } from './dateTime'
