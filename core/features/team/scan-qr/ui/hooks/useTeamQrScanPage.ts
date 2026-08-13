@@ -1,8 +1,15 @@
-import { useCallback, type ChangeEvent, type KeyboardEvent } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  type ChangeEvent,
+  type KeyboardEvent,
+} from 'react'
 import { useParams } from 'react-router-dom'
 import { useTeamBoothSessionQuery } from '@/core/entities/booth'
 import { useAuthSession } from '@/core/features/auth'
 import { useToast } from '@/core/shared'
+import { shouldResetBoothRequest } from '../../model/frontend/teamBoothSessionRecovery'
 import { useTeamQrScanForm } from '../../model/frontend/useTeamQrScanForm'
 import { mapQrToRequest } from '../../model/mapQrToRequest'
 import { validateQrCode } from '../../model/scanQr.validation'
@@ -27,12 +34,35 @@ export const useTeamQrScanPage = () => {
   const { toast } = useToast()
   const teamId = authSession.user?.id
   const session = sessionQuery.data ?? null
+  const hadActiveSessionRef = useRef(false)
 
   const resetBoothRequest = useCallback(() => {
+    hadActiveSessionRef.current = false
     mutation.reset()
     form.setRawQrCode('')
     form.setErrorMessage(null)
   }, [form, mutation])
+
+  useEffect(() => {
+    if (session) {
+      hadActiveSessionRef.current = true
+      return
+    }
+
+    if (shouldResetBoothRequest({
+      hadActiveSession: hadActiveSessionRef.current,
+      hasSession: Boolean(session),
+      isFetched: sessionQuery.isFetched,
+      isFetching: sessionQuery.isFetching,
+    })) {
+      resetBoothRequest()
+    }
+  }, [
+    resetBoothRequest,
+    session,
+    sessionQuery.isFetched,
+    sessionQuery.isFetching,
+  ])
 
   const handleEntryRejected = useCallback(() => {
     resetBoothRequest()
@@ -84,7 +114,7 @@ export const useTeamQrScanPage = () => {
     form.setErrorMessage(null)
     form.setRawQrCode(qrCode)
 
-    mutation.mutate(mapQrToRequest(qrCode, teamId), {
+    mutation.mutate(mapQrToRequest(qrCode), {
       onError: (requestError: unknown) => {
         form.setErrorMessage(
           getErrorMessage(requestError) || 'Không thể gửi mã QR. Vui lòng thử lại!',
@@ -130,6 +160,7 @@ export const useTeamQrScanPage = () => {
     isSessionError: sessionQuery.isError,
     rawQrCode: form.rawQrCode,
     retrySession,
+    session,
     sessionStatus: session?.status ?? null,
     statusMessage,
   }

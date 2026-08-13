@@ -110,9 +110,21 @@ export const OrganizerJoinRequestsView = () => {
           </p>
         </div>
         {joinRequests.errorMessage ? (
-          <p className="text-center text-sm font-medium text-red-600" role="alert">
-            {joinRequests.errorMessage}
-          </p>
+          <div className="flex flex-col items-center gap-3 text-center">
+            <p className="text-sm font-medium text-red-600" role="alert">
+              {joinRequests.errorMessage}
+            </p>
+            {joinRequests.hasLoadingError ? (
+              <button
+                type="button"
+                className="rounded-md border border-[#5d0004] px-4 py-2 text-sm font-semibold text-[#5d0004] disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={joinRequests.isRetrying}
+                onClick={joinRequests.retryBoothSession}
+              >
+                {joinRequests.isRetrying ? 'Đang thử lại...' : 'Thử lại'}
+              </button>
+            ) : null}
+          </div>
         ) : null}
       </section>
     )

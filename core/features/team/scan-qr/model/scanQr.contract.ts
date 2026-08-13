@@ -2,7 +2,6 @@ import { z } from 'zod'
 
 export const scanQrRequestSchema = z.object({
   boothId: z.string().uuid('Mã trạm không hợp lệ'),
-  teamId: z.string().uuid('Mã đội không hợp lệ'),
 })
 
 export const scanQrResponseSchema = z.object({

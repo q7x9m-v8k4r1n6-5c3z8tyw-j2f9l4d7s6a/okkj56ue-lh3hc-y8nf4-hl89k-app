@@ -1,5 +1,6 @@
 import { useTeamQrScanPage } from './hooks/useTeamQrScanPage'
 import { QrScannerBox } from './components/QrScannerBox'
+import { TeamBoothSessionCard } from './components/TeamBoothSessionCard'
 
 export const TeamQrScanView = () => {
   const page = useTeamQrScanPage()
@@ -44,6 +45,10 @@ export const TeamQrScanView = () => {
         >
           {page.statusMessage}
         </p>
+      ) : null}
+
+      {page.session ? (
+        <TeamBoothSessionCard session={page.session} />
       ) : null}
 
       {page.canScan ? (

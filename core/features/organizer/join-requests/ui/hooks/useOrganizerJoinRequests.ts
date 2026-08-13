@@ -18,6 +18,7 @@ export const useOrganizerJoinRequests = () => {
   const [errorMessage, setErrorMessage] = useState('')
   const session = mapMyBoothToOrganizerSession(myBoothQuery.data)
   const { clearScore } = state
+  const { refetch: refetchMyBooth } = myBoothQuery
 
   useEffect(() => {
     clearScore()
@@ -26,6 +27,11 @@ export const useOrganizerJoinRequests = () => {
   const invalidateBoothSession = useCallback(() => {
     void invalidateMyBooth(queryClient, raceId)
   }, [queryClient, raceId])
+
+  const retryBoothSession = useCallback(() => {
+    setErrorMessage('')
+    void refetchMyBooth()
+  }, [refetchMyBooth])
 
   useBoothSignalR({
     boothId: myBoothQuery.data?.boothId,
@@ -56,6 +62,9 @@ export const useOrganizerJoinRequests = () => {
     errorMessage: errorMessage || (
       myBoothQuery.error ? getActionErrorMessage(myBoothQuery.error) : ''
     ),
+    hasLoadingError: myBoothQuery.isError,
     isLoading: myBoothQuery.isPending,
+    isRetrying: myBoothQuery.isFetching,
+    retryBoothSession,
   }
 }
