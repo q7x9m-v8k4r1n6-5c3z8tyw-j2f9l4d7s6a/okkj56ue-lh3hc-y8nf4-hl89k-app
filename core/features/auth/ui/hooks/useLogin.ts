@@ -80,7 +80,7 @@ export const useLogin = () => {
     } catch (error) {
       handleError(error, 'Đăng nhập Google thất bại.')
     }
-  }, [finishLogin, mutateAsync, handleError])
+  }, [finishLogin, mutateAsync, handleError, setGlobalError])
 
   const handleConfigurationError = useCallback(() => {
     setGlobalError('Thiếu cấu hình Google Client ID.')

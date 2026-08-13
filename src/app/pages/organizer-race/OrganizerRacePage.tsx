@@ -1,3 +1,4 @@
+import { OrganizerAnnouncementHistoryView } from '@/core/features/organizer/announcement-history'
 import { OrganizerHistoryView } from '@/core/features/organizer/history'
 import { OrganizerJoinRequestsView } from '@/core/features/organizer/join-requests'
 import { OrganizerMenuView } from '@/core/features/organizer/menu'
@@ -15,12 +16,15 @@ export const OrganizerRacePage = () => {
   const canShowRaceTabs = !page.isRaceAccessLoading
     && !page.isRaceAccessError
     && !page.isRaceUnavailable
+  const canShowBottomNav = canShowRaceTabs
+    && page.activeTab !== 'menu'
+    && page.activeTab !== 'announcement-history'
 
   return (
     <OrganizerRouteLayout
       activeNavId={page.activeTab}
       isMenuOpen={page.isMenuOpen}
-      navItems={page.isMenuOpen || !canShowRaceTabs ? [] : page.navItems}
+      navItems={canShowBottomNav ? page.navItems : []}
       onHeaderMenuToggle={page.openMenu}
       onNavChange={page.onNavChange}
       raceName={page.raceName}
@@ -28,6 +32,7 @@ export const OrganizerRacePage = () => {
       {page.activeTab === 'menu' ? (
         <OrganizerMenuView
           onCancel={page.closeMenu}
+          onOpenAnnouncementHistory={page.openAnnouncementHistory}
           onReturnToRaceList={page.returnToRaceList}
         />
       ) : null}
@@ -52,8 +57,11 @@ export const OrganizerRacePage = () => {
         />
       ) : null}
       {canShowRaceTabs && page.activeTab === 'rules' ? <OrganizerRaceRulesView /> : null}
-      {canShowRaceTabs ? <OrganizerJoinRequestsView /> : null}
+      {canShowRaceTabs && page.activeTab === 'requests' ? <OrganizerJoinRequestsView /> : null}
       {canShowRaceTabs && page.activeTab === 'history' ? <OrganizerHistoryView /> : null}
+      {canShowRaceTabs && page.activeTab === 'announcement-history' ? (
+        <OrganizerAnnouncementHistoryView onBack={page.openMenu} />
+      ) : null}
     </OrganizerRouteLayout>
   )
 }

@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
 import { useAuthSession } from '@/core/features/auth'
 import {
@@ -61,18 +62,17 @@ const toBanner = (message: RaceMessageNotification) => ({
 export const useRaceMessageNotification = () => {
   const { raceId } = useParams<{ raceId: string }>()
   const auth = useAuthSession()
+  const queryClient = useQueryClient()
   const storageKey = getStorageKey(raceId, auth.user?.id)
-  const [messages, setMessages] = useState<RaceMessageNotification[]>([])
+  const [messagesByStorageKey, setMessagesByStorageKey] = useState<
+    Record<string, RaceMessageNotification[]>
+  >({})
 
-  useEffect(() => {
-    if (!storageKey) {
-      setMessages([])
-      return
-    }
-
-    const storedMessages = parseStoredMessages(window.localStorage.getItem(storageKey))
-    setMessages(storedMessages)
-  }, [storageKey])
+  const messages = useMemo(() => {
+    if (!storageKey) return []
+    return messagesByStorageKey[storageKey]
+      ?? parseStoredMessages(window.localStorage.getItem(storageKey))
+  }, [messagesByStorageKey, storageKey])
 
   const handleMessageReceived = useCallback((nextMessage: RaceMessageNotification) => {
     if (!isTargetedToUser(
@@ -81,17 +81,39 @@ export const useRaceMessageNotification = () => {
       auth.user?.userType,
     )) return
 
-    setMessages((current) => {
+    const announcementHistoryQueryKey = nextMessage.raceId && auth.user?.userType === 'team'
+      ? ['team', 'announcement-history', nextMessage.raceId]
+      : nextMessage.raceId && auth.user?.userType === 'organizer'
+        ? ['organizer', 'announcement-history', nextMessage.raceId]
+        : null
+
+    if (announcementHistoryQueryKey) {
+      queryClient.setQueryData<RaceMessageNotification[]>(
+        announcementHistoryQueryKey,
+        (current = []) => [
+          nextMessage,
+          ...current.filter((message) => message.id !== nextMessage.id),
+        ],
+      )
+    }
+
+    setMessagesByStorageKey((currentByKey) => {
+      if (!storageKey) return currentByKey
+
+      const current = currentByKey[storageKey]
+        ?? parseStoredMessages(window.localStorage.getItem(storageKey))
       const nextMessages = [
         nextMessage,
         ...current.filter((message) => message.id !== nextMessage.id),
       ]
-      if (storageKey) {
-        window.localStorage.setItem(storageKey, JSON.stringify(nextMessages))
+      window.localStorage.setItem(storageKey, JSON.stringify(nextMessages))
+
+      return {
+        ...currentByKey,
+        [storageKey]: nextMessages,
       }
-      return nextMessages
     })
-  }, [auth.user?.id, auth.user?.userType, storageKey])
+  }, [auth.user?.id, auth.user?.userType, queryClient, storageKey])
 
   useRaceMessageSignalR({
     raceId,
@@ -101,16 +123,23 @@ export const useRaceMessageNotification = () => {
   const banners = useMemo(() => messages.map(toBanner), [messages])
 
   const dismiss = useCallback((messageId: string) => {
-    setMessages((current) => {
+    setMessagesByStorageKey((currentByKey) => {
+      if (!storageKey) return currentByKey
+
+      const current = currentByKey[storageKey]
+        ?? parseStoredMessages(window.localStorage.getItem(storageKey))
       const nextMessages = current.filter((message) => message.id !== messageId)
-      if (storageKey) {
-        if (nextMessages.length) {
-          window.localStorage.setItem(storageKey, JSON.stringify(nextMessages))
-        } else {
-          window.localStorage.removeItem(storageKey)
-        }
+
+      if (nextMessages.length) {
+        window.localStorage.setItem(storageKey, JSON.stringify(nextMessages))
+      } else {
+        window.localStorage.removeItem(storageKey)
       }
-      return nextMessages
+
+      return {
+        ...currentByKey,
+        [storageKey]: nextMessages,
+      }
     })
   }, [storageKey])
 

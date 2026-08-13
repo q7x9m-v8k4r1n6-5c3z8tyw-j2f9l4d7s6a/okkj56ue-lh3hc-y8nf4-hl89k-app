@@ -1,5 +1,6 @@
 import {
   ArrowLeftIcon,
+  HistoryIcon,
   LogoutIcon,
   RequestJoinIcon,
 } from '@/core/assets'
@@ -7,11 +8,13 @@ import { useTeamRaceMenu } from './hooks/useTeamRaceMenu'
 
 export type TeamRaceMenuViewProps = {
   onCancel: () => void
+  onOpenAnnouncementHistory?: () => void
   onReturnToRaceList: () => void
 }
 
 export const TeamRaceMenuView = ({
   onCancel,
+  onOpenAnnouncementHistory,
   onReturnToRaceList,
 }: TeamRaceMenuViewProps) => {
   const menu = useTeamRaceMenu()
@@ -26,6 +29,17 @@ export const TeamRaceMenuView = ({
         <ArrowLeftIcon className="size-6" />
         <span>Quay lại danh sách trận đấu</span>
       </button>
+
+      {onOpenAnnouncementHistory ? (
+        <button
+          type="button"
+          className="flex h-20 w-full items-center justify-center gap-4 border-b border-[#e2e2e2] text-base text-[#323232]"
+          onClick={onOpenAnnouncementHistory}
+        >
+          <HistoryIcon className="size-6" />
+          <span>Lịch sử thông báo</span>
+        </button>
+      ) : null}
 
       <button
         type="button"

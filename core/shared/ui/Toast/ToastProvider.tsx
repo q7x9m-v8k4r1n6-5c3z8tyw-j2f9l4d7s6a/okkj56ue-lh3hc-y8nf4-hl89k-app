@@ -48,11 +48,12 @@ export const ToastProvider = ({ children }: PropsWithChildren) => {
 
   // --- ĐĂNG KÝ HÀM TOAST VÀO AXIOS ---
   useEffect(() => {
+    const timers = timersRef.current
     configureGlobalToast(toast)
     return () => {
       configureGlobalToast(null)
-      timersRef.current.forEach(clearTimeout)
-      timersRef.current.clear()
+      timers.forEach(clearTimeout)
+      timers.clear()
     }
   }, [toast])
 

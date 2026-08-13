@@ -6,6 +6,7 @@ import {
   type SentMessage,
 } from '../sendMessage.schema'
 import { useMessageRecipientsQuery } from '../server/useMessageRecipientsQuery'
+import { useRaceMessageHistorySignalR } from '../server/useRaceMessageHistorySignalR'
 import { useRaceMessagesQuery } from '../server/useRaceMessagesQuery'
 import { useSendRaceMessageMutation } from '../server/useSendRaceMessageMutation'
 
@@ -43,6 +44,8 @@ export const useSendMessageState = () => {
   const recipientsQuery = useMessageRecipientsQuery()
   const messagesQuery = useRaceMessagesQuery(raceId)
   const sendMutation = useSendRaceMessageMutation()
+
+  useRaceMessageHistorySignalR(raceId)
 
   const selectedIds = useMemo(
     () => new Set(selectedRecipients.map((recipient) => recipient.id)),

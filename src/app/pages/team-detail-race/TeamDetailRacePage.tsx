@@ -1,4 +1,5 @@
 import { RaceMessageNotificationBanner } from '@/core/features/race/race-message-notification'
+import { TeamAnnouncementHistoryView } from '@/core/features/team/announcement-history'
 import { TeamLeaderboardView } from '@/core/features/team/leaderboard'
 import { TeamMapView } from '@/core/features/team/map'
 import { TeamRaceMenuView } from '@/core/features/team/race-menu'
@@ -16,12 +17,15 @@ export const TeamDetailRacePage = () => {
   const canShowRaceTabs = !page.isRaceAccessLoading
     && !page.isRaceAccessError
     && !page.isRaceUnavailable
+  const canShowBottomNav = canShowRaceTabs
+    && page.activeTab !== 'more'
+    && page.activeTab !== 'history'
 
   return (
     <TeamRouteLayout
       activeNavId={page.activeTab}
       isMenuOpen={page.isMenuOpen}
-      navItems={page.isMenuOpen || !canShowRaceTabs ? [] : page.navItems}
+      navItems={canShowBottomNav ? page.navItems : []}
       onHeaderMenuToggle={page.openMenu}
       onNavChange={page.onNavChange}
       raceName={page.raceName}
@@ -29,6 +33,7 @@ export const TeamDetailRacePage = () => {
       {page.activeTab === 'more' ? (
         <TeamRaceMenuView
           onCancel={page.closeMenu}
+          onOpenAnnouncementHistory={page.openAnnouncementHistory}
           onReturnToRaceList={page.returnToRaceList}
         />
       ) : null}
@@ -56,6 +61,9 @@ export const TeamDetailRacePage = () => {
       {canShowRaceTabs && page.activeTab === 'map' ? <TeamMapView /> : null}
       {canShowRaceTabs && page.activeTab === 'scan' ? <TeamQrScanView /> : null}
       {canShowRaceTabs && page.activeTab === 'leaderboard' ? <TeamLeaderboardView /> : null}
+      {canShowRaceTabs && page.activeTab === 'history' ? (
+        <TeamAnnouncementHistoryView onBack={page.openMenu} />
+      ) : null}
     </TeamRouteLayout>
   )
 }

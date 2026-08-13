@@ -24,6 +24,14 @@ export const useTeamDetailRacePage = () => {
   const [previousTab, setPreviousTab] = useState<TeamPrimaryDetailRaceTab>('rules')
   const isMenuOpen = activeTab === 'more'
 
+  const setTabSearchParam = (value: TeamDetailRaceTab) => {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current)
+      next.set('tab', value)
+      return next
+    })
+  }
+
   const openMenu = () => {
     if (isTeamPrimaryDetailRaceTab(activeTab)) setPreviousTab(activeTab)
     setActiveTab('more')
@@ -31,7 +39,10 @@ export const useTeamDetailRacePage = () => {
 
   return {
     activeTab,
-    closeMenu: () => setActiveTab(previousTab),
+    closeMenu: () => {
+      setActiveTab(previousTab)
+      setTabSearchParam(previousTab)
+    },
     errorMessage: raceAccess.errorMessage,
     isMenuOpen,
     isRaceAccessError: raceAccess.isError,
@@ -44,9 +55,14 @@ export const useTeamDetailRacePage = () => {
         openMenu()
         return
       }
+      if (!isTeamPrimaryDetailRaceTab(value)) return
       setPreviousTab(value)
       setActiveTab(value)
-      setSearchParams((current) => { current.set('tab', value); return current })
+      setTabSearchParam(value)
+    },
+    openAnnouncementHistory: () => {
+      setActiveTab('history')
+      setTabSearchParam('history')
     },
     openMenu,
     raceName: raceAccess.raceName,
