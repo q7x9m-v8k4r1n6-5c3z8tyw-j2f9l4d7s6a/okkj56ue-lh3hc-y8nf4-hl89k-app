@@ -1,5 +1,5 @@
 import { useCallback, type ChangeEvent, type KeyboardEvent } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useTeamBoothSessionQuery } from '@/core/entities/booth'
 import { useAuthSession } from '@/core/features/auth'
 import { useToast } from '@/core/shared'
@@ -8,6 +8,10 @@ import { mapQrToRequest } from '../../model/mapQrToRequest'
 import { validateQrCode } from '../../model/scanQr.validation'
 import { useScanQrMutation } from '../../model/server/useScanQrMutation'
 import { useTeamBoothSignalR } from '../../model/server/useTeamBoothSignalR'
+
+// ==================== [PLUGIN: secret-mission] START ====================
+import { useClaimSecretMissionMutation } from '@/plugin/move2026/features/secret-mission/scan-secret-mission/model/server/useClaimSecretMissionMutation'
+// ==================== [PLUGIN: secret-mission] END ======================
 
 const getErrorMessage = (error: unknown) => {
   if (error instanceof Error) return error.message
@@ -18,13 +22,23 @@ const getErrorMessage = (error: unknown) => {
   return ''
 }
 
+// ==================== [PLUGIN: secret-mission (Tech Cache)] START ====================
+const TECH_CACHE_QR_PREFIX = 'techcache_'
+// ==================== [PLUGIN: secret-mission (Tech Cache)] END ======================
+
 export const useTeamQrScanPage = () => {
   const { raceId } = useParams<{ raceId: string }>()
   const form = useTeamQrScanForm()
   const mutation = useScanQrMutation(raceId)
+
+  // ==================== [PLUGIN: secret-mission (Tech Cache)] START ====================
+  const claimMissionMutation = useClaimSecretMissionMutation()
+  // ==================== [PLUGIN: secret-mission (Tech Cache)] END ======================
+
   const sessionQuery = useTeamBoothSessionQuery(raceId)
   const authSession = useAuthSession()
   const { toast } = useToast()
+  const navigate = useNavigate()
   const teamId = authSession.user?.id
   const session = sessionQuery.data ?? null
 
@@ -62,6 +76,27 @@ export const useTeamQrScanPage = () => {
   })
 
   const handleScan = (qrCode: string) => {
+    if (mutation.isPending || claimMissionMutation.isPending) return
+
+    // ==================== [PLUGIN: secret-mission (Tech Cache)] START ====================
+    if (qrCode.startsWith(TECH_CACHE_QR_PREFIX)) {
+      const missionId = qrCode.slice(TECH_CACHE_QR_PREFIX.length)
+      claimMissionMutation.mutate(missionId, {
+        onSuccess: () => {
+          setTimeout(() => {
+            navigate(`/team/races/${raceId}/secret-missions/${missionId}`)
+          }, 1000)
+        },
+        onError: (requestError: unknown) => {
+          form.setErrorMessage(
+            getErrorMessage(requestError) || 'Không thể nhận nhiệm vụ. Vui lòng thử lại!',
+          )
+        },
+      })
+      return
+    }
+    // ==================== [PLUGIN: secret-mission (Tech Cache)] END ======================
+
     if (
       mutation.isPending ||
       mutation.isSuccess ||
@@ -121,7 +156,9 @@ export const useTeamQrScanPage = () => {
       !sessionQuery.isError &&
       !session &&
       !mutation.isPending &&
-      !mutation.isSuccess,
+      !mutation.isSuccess &&
+      !claimMissionMutation.isPending &&
+      !claimMissionMutation.isSuccess,
     errorMessage: form.errorMessage,
     handleScan,
     handleQrCodeChange,
@@ -132,5 +169,12 @@ export const useTeamQrScanPage = () => {
     retrySession,
     sessionStatus: session?.status ?? null,
     statusMessage,
+
+    // ==================== [PLUGIN: secret-mission (Tech Cache)] START ====================
+    isClaimingMission: claimMissionMutation.isPending,
+    claimMissionMessage: claimMissionMutation.isSuccess
+      ? 'Quét mã QR thành công!'
+      : '',
+    // ==================== [PLUGIN: secret-mission (Tech Cache)] END ======================
   }
 }

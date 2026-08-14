@@ -14,6 +14,7 @@ export type SecretMissionOverviewDto = z.infer<typeof secretMissionOverviewItemS
 export type SecretMissionListItem = {
   id: string
   name: string
+  isAssigned: boolean
   isCompleted: boolean
   lastUpdatedAt: string | null
 }
@@ -23,6 +24,7 @@ export const mapOverviewDtoToFrontendModel = (
 ): SecretMissionListItem => ({
   id: dto.id,
   name: dto.name,
+  isAssigned: dto.isAssigned,
   isCompleted: dto.hasImageEvidence || dto.hasVideoEvidence,
   lastUpdatedAt: dto.lastUpdatedAt ?? null,
 })

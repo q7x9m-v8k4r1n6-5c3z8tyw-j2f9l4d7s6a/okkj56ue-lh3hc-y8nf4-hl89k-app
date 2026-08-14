@@ -32,7 +32,7 @@ export const validateBasicStep = (
   if (!basic.startAt) errors.startAt = 'Vui lòng chọn thời gian bắt đầu.'
   if (!basic.endAt) errors.endAt = 'Vui lòng chọn thời gian kết thúc.'
   if (!basic.location.trim()) errors.location = 'Vui lòng nhập địa điểm trận đấu.'
-  if (!basic.rules.trim()) errors.rules = 'Vui lòng nhập luật trận đấu.'
+  //if (!basic.rules.trim()) errors.rules = 'Vui lòng nhập luật trận đấu.'
   if (basic.startAt && Number.isNaN(startAt.getTime())) {
     errors.startAt = 'Thời gian bắt đầu không hợp lệ.'
   }

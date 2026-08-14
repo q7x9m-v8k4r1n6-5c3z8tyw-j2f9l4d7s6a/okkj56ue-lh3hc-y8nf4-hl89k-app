@@ -35,7 +35,7 @@ export const TeamRaceMoreMenu = () => {
         <div className="flex size-14 items-center justify-center rounded-2xl bg-red-50 text-red-500">
           <QuestionBubbleIcon className="size-6" />
         </div>
-        <span className="text-base font-medium text-gray-700">Nhiệm vụ bí mật</span>
+        <span className="text-base font-medium text-gray-700">Nhiệm vụ bí mật và Tech Cache</span>
       </button>
     </section>
   )
