@@ -7,6 +7,7 @@ import { EvidenceCard } from './EvidenceCard'
 import type { FileSource } from '../hooks/useSecretMissionDetailContainer' 
 import { MediaViewerModal } from './MediaViewerModal'
 import { PluginScreenLayout } from '@/plugin/move2026/shared/ui/PluginScreenLayout' 
+import { formatSecretMissionName } from '../../../shared/formatSecretMissionName'
 
 export type SecretMissionEvidenceViewProps = {
   missionData: SecretMissionDetailDto
@@ -35,7 +36,7 @@ export const SecretMissionEvidenceView = ({
 
   return (
     <PluginScreenLayout
-      title={`Minh chứng ${missionData.name}`}
+      title={`Minh chứng ${formatSecretMissionName(missionData.name, missionData.isAssigned)}`}
       onBack={onBack}
       contentClassName="px-5 py-4"
       // Truyền Footer động vào Layout: Trả về undefined nếu không có evidence để Layout ẩn thẻ footer đi
