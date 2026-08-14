@@ -2,18 +2,17 @@ import { RaceMessageNotificationBanner } from '@/core/features/race/race-message
 import { TeamAnnouncementHistoryView } from '@/core/features/team/announcement-history'
 import { TeamLeaderboardView } from '@/core/features/team/leaderboard'
 import { TeamMapView } from '@/core/features/team/map'
-import { TeamRaceMenuView } from '@/core/features/team/race-menu'
+import { TeamRaceMenuView } from '@/core/features/team/race-menu' 
+import { TeamRaceMoreMenu } from './components/TeamRaceMoreMenu'
 import { TeamRaceRulesView } from '@/core/features/team/race-rules'
 import { TeamQrScanView } from '@/core/features/team/scan-qr'
 import { TeamRaceUnavailableView } from '@/core/features/team/team-race'
 import { TeamRouteLayout } from '@/core/widgets/team-layout'
 import { useTeamDetailRacePage } from './model/useTeamDetailRacePage'
 
-/**
- * Composes team race-detail feature tabs while each feature owns its workflow.
- */
 export const TeamDetailRacePage = () => {
   const page = useTeamDetailRacePage()
+  
   const canShowRaceTabs = !page.isRaceAccessLoading
     && !page.isRaceAccessError
     && !page.isRaceUnavailable
@@ -30,7 +29,7 @@ export const TeamDetailRacePage = () => {
       onNavChange={page.onNavChange}
       raceName={page.raceName}
     >
-      {page.activeTab === 'more' ? (
+      {page.isMenuOpen ? (
         <TeamRaceMenuView
           onCancel={page.closeMenu}
           onOpenAnnouncementHistory={page.openAnnouncementHistory}

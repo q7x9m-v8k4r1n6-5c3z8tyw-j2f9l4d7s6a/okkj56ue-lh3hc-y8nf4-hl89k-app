@@ -45,6 +45,7 @@ export const editRaceRequestSchema = z.object({
       name: z.string().min(1).max(255),
       place: z.string().min(1).max(255),
       description: z.string().max(500).optional(),
+      isHidden: z.boolean(),
       organizerIds: z.array(z.string().uuid()),
     })).optional(),
     update: z.array(z.object({
@@ -77,6 +78,7 @@ const editRaceBoothSchema = z.object({
   place: z.string(),
   description: z.string().nullable().optional(),
   organizerID: z.string().nullable().optional(),
+  isHidden: z.boolean(),
 })
 
 /** Runtime-validated contract returned by the race detail API. */

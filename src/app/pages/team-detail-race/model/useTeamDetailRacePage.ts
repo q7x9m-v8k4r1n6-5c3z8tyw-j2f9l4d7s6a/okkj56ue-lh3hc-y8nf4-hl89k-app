@@ -3,14 +3,12 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useTeamRaceAccess } from '@/core/features/team/team-race'
 import {
   isTeamDetailRaceTab,
-  isTeamPrimaryDetailRaceTab,
   teamDetailRaceNavItems,
   type TeamDetailRaceTab,
-  type TeamPrimaryDetailRaceTab,
 } from './teamDetailRace.tabs'
 
 /**
- * Owns presentation-only tab and menu state for the team race-detail route.
+ * Owns presentation-only tab and header menu state for the team race-detail route.
  */
 export const useTeamDetailRacePage = () => {
   const navigate = useNavigate()
@@ -19,10 +17,8 @@ export const useTeamDetailRacePage = () => {
   const raceAccess = useTeamRaceAccess(raceId)
   const initialTab = searchParams.get('tab')
   const [activeTab, setActiveTab] = useState<TeamDetailRaceTab>(
-    initialTab && isTeamDetailRaceTab(initialTab) && initialTab !== 'more' ? initialTab : 'rules',
+    initialTab && isTeamDetailRaceTab(initialTab) ? initialTab : 'rules'
   )
-  const [previousTab, setPreviousTab] = useState<TeamPrimaryDetailRaceTab>('rules')
-  const isMenuOpen = activeTab === 'more'
 
   const setTabSearchParam = (value: TeamDetailRaceTab) => {
     setSearchParams((current) => {
@@ -49,6 +45,7 @@ export const useTeamDetailRacePage = () => {
     isRaceAccessLoading: raceAccess.isLoading,
     isRaceUnavailable: raceAccess.isUnavailable,
     navItems: teamDetailRaceNavItems,
+    
     onNavChange: (value: string) => {
       if (!isTeamDetailRaceTab(value)) return
       if (value === 'more') {
@@ -64,7 +61,8 @@ export const useTeamDetailRacePage = () => {
       setActiveTab('history')
       setTabSearchParam('history')
     },
-    openMenu,
+    
+    toggleMenu: () => setIsMenuOpen((prev) => !prev),
     raceName: raceAccess.raceName,
     returnToRaceList: () => navigate('/team'),
     unavailableMessage: raceAccess.unavailableMessage,

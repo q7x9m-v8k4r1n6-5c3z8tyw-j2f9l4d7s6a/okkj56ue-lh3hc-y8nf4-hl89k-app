@@ -8,7 +8,7 @@ import {
 import type { TeamNavItem } from '@/core/shared'
 
 export const teamDetailRaceTabs = [
-  { value: 'rules', label: 'Luật trận đấu' },
+  { value: 'rules', label: 'Luật chơi' },
   { value: 'map', label: 'Bản đồ' },
   { value: 'scan', label: 'Quét mã QR' },
   { value: 'leaderboard', label: 'Kết quả' },
@@ -20,7 +20,7 @@ export type TeamDetailRaceTab = (typeof teamDetailRaceTabs)[number]['value']
 export type TeamPrimaryDetailRaceTab = Exclude<TeamDetailRaceTab, 'history' | 'more'>
 
 export const teamDetailRaceNavItems: TeamNavItem[] = [
-  { id: 'rules', label: 'Luật trận đấu', icon: <GavelIcon /> },
+  { id: 'rules', label: 'Luật chơi', icon: <GavelIcon /> },
   { id: 'map', label: 'Bản đồ', icon: <MapIcon /> },
   { id: 'scan', label: 'Quét mã QR', icon: <QrScanIcon /> },
   { id: 'leaderboard', label: 'Kết quả', icon: <LeaderboardIcon /> },
