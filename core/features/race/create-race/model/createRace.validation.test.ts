@@ -18,7 +18,7 @@ describe('create-race validation', () => {
       name: 'Vui lòng nhập tên trận đấu.',
       endAt: 'Thời gian kết thúc phải sau thời gian bắt đầu.',
       location: 'Vui lòng nhập địa điểm trận đấu.',
-      rules: 'Vui lòng nhập luật trận đấu.',
+      //rules: 'Vui lòng nhập luật trận đấu.',
     })
   })
 

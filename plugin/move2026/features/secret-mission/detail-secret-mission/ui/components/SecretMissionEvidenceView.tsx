@@ -35,7 +35,7 @@ export const SecretMissionEvidenceView = ({
 
   return (
     <PluginScreenLayout
-      title={`Minh chứng nhiệm vụ ${missionData.name}`}
+      title={`Minh chứng ${missionData.name}`}
       onBack={onBack}
       contentClassName="px-5 py-4"
       // Truyền Footer động vào Layout: Trả về undefined nếu không có evidence để Layout ẩn thẻ footer đi
