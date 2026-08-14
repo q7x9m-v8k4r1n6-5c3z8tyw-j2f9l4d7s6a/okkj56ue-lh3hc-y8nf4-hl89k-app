@@ -3,9 +3,14 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useTeamRaceAccess } from '@/core/features/team/team-race'
 import {
   isTeamDetailRaceTab,
+  isTeamPrimaryDetailRaceTab,
   teamDetailRaceNavItems,
   type TeamDetailRaceTab,
+  type TeamPrimaryDetailRaceTab,
 } from './teamDetailRace.tabs'
+
+const TEAM_RACE_TAB_PARAM = 'tab'
+const DEFAULT_TAB: TeamPrimaryDetailRaceTab = 'rules'
 
 /**
  * Owns presentation-only tab and header menu state for the team race-detail route.
@@ -15,37 +20,38 @@ export const useTeamDetailRacePage = () => {
   const { raceId } = useParams<{ raceId: string }>()
   const [searchParams, setSearchParams] = useSearchParams()
   const raceAccess = useTeamRaceAccess(raceId)
-  const initialTab = searchParams.get('tab')
-  const [activeTab, setActiveTab] = useState<TeamDetailRaceTab>(
-    initialTab && isTeamDetailRaceTab(initialTab) ? initialTab : 'rules'
+
+  const tabParam = searchParams.get(TEAM_RACE_TAB_PARAM)
+  const activeTab: TeamDetailRaceTab = tabParam && isTeamDetailRaceTab(tabParam)
+    ? tabParam
+    : DEFAULT_TAB
+  const [previousTab, setPreviousTab] = useState<TeamPrimaryDetailRaceTab>(
+    isTeamPrimaryDetailRaceTab(activeTab) ? activeTab : DEFAULT_TAB,
   )
+  const isMenuOpen = activeTab === 'more'
 
   const setTabSearchParam = (value: TeamDetailRaceTab) => {
     setSearchParams((current) => {
       const next = new URLSearchParams(current)
-      next.set('tab', value)
+      next.set(TEAM_RACE_TAB_PARAM, value)
       return next
     })
   }
 
   const openMenu = () => {
     if (isTeamPrimaryDetailRaceTab(activeTab)) setPreviousTab(activeTab)
-    setActiveTab('more')
+    setTabSearchParam('more')
   }
 
   return {
     activeTab,
-    closeMenu: () => {
-      setActiveTab(previousTab)
-      setTabSearchParam(previousTab)
-    },
+    closeMenu: () => setTabSearchParam(previousTab),
     errorMessage: raceAccess.errorMessage,
     isMenuOpen,
     isRaceAccessError: raceAccess.isError,
     isRaceAccessLoading: raceAccess.isLoading,
     isRaceUnavailable: raceAccess.isUnavailable,
     navItems: teamDetailRaceNavItems,
-    
     onNavChange: (value: string) => {
       if (!isTeamDetailRaceTab(value)) return
       if (value === 'more') {
@@ -54,15 +60,10 @@ export const useTeamDetailRacePage = () => {
       }
       if (!isTeamPrimaryDetailRaceTab(value)) return
       setPreviousTab(value)
-      setActiveTab(value)
       setTabSearchParam(value)
     },
-    openAnnouncementHistory: () => {
-      setActiveTab('history')
-      setTabSearchParam('history')
-    },
-    
-    toggleMenu: () => setIsMenuOpen((prev) => !prev),
+    openAnnouncementHistory: () => setTabSearchParam('history'),
+    openMenu,
     raceName: raceAccess.raceName,
     returnToRaceList: () => navigate('/team'),
     unavailableMessage: raceAccess.unavailableMessage,

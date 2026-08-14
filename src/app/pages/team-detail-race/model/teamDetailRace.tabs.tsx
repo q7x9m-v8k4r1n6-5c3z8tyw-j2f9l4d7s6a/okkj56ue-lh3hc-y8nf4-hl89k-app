@@ -12,7 +12,7 @@ export const teamDetailRaceTabs = [
   { value: 'map', label: 'Bản đồ' },
   { value: 'scan', label: 'Quét mã QR' },
   { value: 'leaderboard', label: 'Kết quả' },
-  { value: 'history', label: 'Lịch sử' },
+  { value: 'history', label: 'Lịch sử thông báo' },
   { value: 'more', label: 'Khác' },
 ] as const
 
