@@ -43,6 +43,7 @@ const mapChangedBooth = (
     ...(booth.description !== original.description
       ? { description: booth.description }
       : {}),
+    ...(booth.isHidden !== original.isHidden ? { isHidden: booth.isHidden } : {}),
     ...(!haveSameIds(managerIds, originalManagerIds)
       ? { organizerIds: [...new Set(managerIds)] }
       : {}),

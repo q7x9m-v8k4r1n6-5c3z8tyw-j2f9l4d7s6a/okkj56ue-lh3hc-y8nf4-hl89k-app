@@ -36,5 +36,13 @@ export default defineConfig(({ mode }) => {
   server: {
     https,
   },
+  build: {
+    rollupOptions: {
+      checks: {
+        invalidAnnotation: false,
+        pluginTimings: false,
+      },
+    },
+  },
   }
 })

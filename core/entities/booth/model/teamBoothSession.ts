@@ -8,7 +8,7 @@ export const teamBoothSessionSchema = z.object({
   boothName: z.string().min(1),
   place: z.string(),
   description: z.string(),
-  isHidden: z.boolean(),
+  isHidden: z.boolean().default(false),
   status: boothStatusSchema.pipe(z.enum(['pending', 'occupied'])),
 })
 

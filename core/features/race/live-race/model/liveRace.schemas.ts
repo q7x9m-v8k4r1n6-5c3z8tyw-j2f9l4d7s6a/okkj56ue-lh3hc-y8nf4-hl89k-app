@@ -13,7 +13,7 @@ export const boothListItemSchema = z.object({
   boothLocation: z.string(),
   description: z.string(),
   status: z.string(),
-  isHidden: z.boolean(),
+  isHidden: z.boolean().default(false),
   currentTeamName: z.string().nullable().optional(),
   currentOrganizerName: z.string().nullable().optional(),
 })

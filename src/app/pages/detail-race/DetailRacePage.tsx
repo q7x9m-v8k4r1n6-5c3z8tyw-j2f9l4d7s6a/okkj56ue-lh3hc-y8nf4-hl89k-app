@@ -1,5 +1,6 @@
 import { EditRaceView } from '@/core/features/race/edit-race'
 import { LiveRaceView } from '@/core/features/race/live-race'
+import { SendMessageView } from '@/core/features/race/send-message'
 import { Tabs } from '@/core/shared'
 import { useDetailRacePage } from './model/useDetailRacePage'
 
@@ -21,7 +22,8 @@ export const DetailRacePage = () => {
         <div className="min-h-0 flex-1 overflow-y-auto pb-8">
           {activeTab === 'basic' && <EditRaceView />}
           {activeTab === 'live' && <LiveRaceView />}
-          {activeTab !== 'basic' && activeTab !== 'live' && (
+          {activeTab === 'message' && <SendMessageView />}
+          {activeTab !== 'basic' && activeTab !== 'live' && activeTab !== 'message' && (
             <div className="flex h-full items-center justify-center text-gray-400">
               {activeTabLabel}
             </div>
