@@ -1,10 +1,14 @@
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 import { MapFloatingControls } from './components/MapFloatingControls'
 import { StationPinItem } from './components/StationPinItem'
-import { StationDetailSheet } from './components/StationDetailSheet'
 import { TeamMapEmptyState } from './components/TeamMapEmptyState'
 import { useTeamMapView } from './hooks/useTeamMapView'
 
+/**
+ * Team Interactive Map View.
+ * Renders full-screen pan-and-zoom map canvas with station pins and floating bubble cards.
+ * Bottom sheet is removed to keep the bottom area completely clean for navigation.
+ */
 export const TeamMapView = () => {
   const {
     isLoading,
@@ -12,7 +16,6 @@ export const TeamMapView = () => {
     isEmpty,
     mapImageUrl,
     stations,
-    selectedStation,
     selectedStationId,
     selectStation,
     clearSelection,
@@ -89,7 +92,7 @@ export const TeamMapView = () => {
               className="pointer-events-none h-full w-full object-cover select-none"
             />
 
-            {/* Placed Station Pins Overlay */}
+            {/* Placed Station Pins Overlay with Floating Bubbles */}
             {stations.map((pin) => (
               <StationPinItem
                 key={pin.id}
@@ -101,12 +104,6 @@ export const TeamMapView = () => {
           </div>
         </TransformComponent>
       </TransformWrapper>
-
-      {/* Station detail bottom sheet */}
-      <StationDetailSheet
-        pin={selectedStation}
-        onClose={clearSelection}
-      />
     </section>
   )
 }

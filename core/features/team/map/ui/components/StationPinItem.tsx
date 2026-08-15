@@ -1,4 +1,5 @@
 import type { StationPin } from '../../model/teamMap.types'
+import { StationPinBubble } from './StationPinBubble'
 
 interface StationPinItemProps {
   pin: StationPin
@@ -6,33 +7,26 @@ interface StationPinItemProps {
   onClick: (id: string) => void
 }
 
+/**
+ * Interactive station map pin on player view.
+ * Renders a teardrop SVG pin with glow effect and floating detail bubble.
+ * Restored to commit 9c95f67 flat-button structure with 2-color status scheme.
+ */
 export const StationPinItem = ({ pin, isSelected, onClick }: StationPinItemProps) => {
-  const getPinColorClass = () => {
-    switch (pin.status) {
-      case 'completed':
-        return 'text-[#166534]'
-      case 'occupied':
-        return 'text-[#ea580c]'
-      case 'pending':
-        return 'text-[#d97706]'
-      case 'active':
-      case 'free':
-        return 'text-[#de3336]'
-      case 'locked':
-      default:
-        return 'text-[#9ca3af]'
-    }
-  }
-
-  const colorClass = getPinColorClass()
+  const isOccupied =
+    pin.status === 'occupied' ||
+    pin.status === 'completed' ||
+    Boolean(pin.currentTeamName)
 
   return (
     <button
       type="button"
-      className={`absolute flex size-10 -translate-x-1/2 -translate-y-full origin-bottom items-center justify-center transition-all duration-300 cursor-pointer ${colorClass} ${
+      className={`absolute flex size-10 -translate-x-1/2 -translate-y-full origin-bottom items-center justify-center transition-all duration-300 ${
+        isOccupied ? 'text-[#de3336]' : 'text-[#16a34a]'
+      } ${
         isSelected
-          ? 'scale-125 drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] z-10'
-          : 'hover:scale-110 drop-shadow-md z-0'
+          ? 'scale-125 drop-shadow-[0_0_10px_rgba(255,255,255,0.95)] z-30'
+          : 'hover:scale-115 drop-shadow-md z-10'
       }`}
       style={{ left: `${pin.x}%`, top: `${pin.y}%` }}
       onClick={(e) => {
@@ -51,15 +45,12 @@ export const StationPinItem = ({ pin, isSelected, onClick }: StationPinItemProps
         <path
           d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
           stroke="white"
-          strokeWidth="1"
+          strokeWidth="0.8"
         />
       </svg>
 
-      {pin.code ? (
-        <span className="pointer-events-none absolute -top-1 left-1/2 -translate-x-1/2 rounded bg-black/80 px-1.5 py-0.5 text-[9px] font-bold text-white whitespace-nowrap shadow-xs">
-          {pin.code}
-        </span>
-      ) : null}
+      {/* Floating Bubble card positioned above the pin */}
+      {isSelected && <StationPinBubble pin={pin} />}
     </button>
   )
 }
