@@ -1,5 +1,6 @@
 export const detailRaceTabs = [
   { value: 'basic', label: 'Thông tin cơ bản' },
+  { value: 'map', label: 'Bản đồ' },
   { value: 'live', label: 'Trực tiếp trận đấu' },
   { value: 'cards', label: 'Quản lý thẻ' },
   { value: 'secret', label: 'Quản lý nhiệm vụ bí mật' },

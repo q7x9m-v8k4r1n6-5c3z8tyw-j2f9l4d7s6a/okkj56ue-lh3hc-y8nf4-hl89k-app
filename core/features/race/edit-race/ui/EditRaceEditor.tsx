@@ -5,6 +5,7 @@ import { RaceDetailRibbon } from './components/RaceDetailRibbon'
 import { SettingsSection } from './components/SettingsSection'
 import { TeamInformationSection } from './components/TeamInformationSection'
 import { useEditRaceEditor } from './hooks/useEditRaceEditor'
+import { Modal, Button } from '@/core/shared'
 
 type EditRaceEditorProps = {
   raceId?: string
@@ -40,6 +41,26 @@ export const EditRaceEditor = ({ raceId }: EditRaceEditorProps) => {
       <TeamInformationSection />
       <OrganizerInformationSection />
       <SettingsSection />
+
+      <Modal
+        open={editor.isStartModalOpen}
+        onClose={editor.closeStartModal}
+        title="Bắt đầu trận đấu"
+        footer={
+          <>
+            <Button variant="secondary" onClick={editor.closeStartModal}>
+              Hủy
+            </Button>
+            <Button onClick={editor.confirmStart}>
+              Xác nhận Bắt đầu
+            </Button>
+          </>
+        }
+      >
+        <p className="text-sm leading-6 text-[#525252]">
+          Lưu ý quan trọng: Sau khi bắt đầu, sơ đồ bản đồ và vị trí các trạm sẽ bị <strong>KHÓA CỐ ĐỊNH</strong> và không thể thay đổi hay tải ảnh mới lên. Bạn có chắc chắn muốn bắt đầu ngay bây giờ?
+        </p>
+      </Modal>
     </>
   )
 }

@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useToast } from '@/core/shared'
+import { useState } from 'react'
 import {
   getEditRaceErrorMessage,
   isEditRaceConflict,
@@ -22,6 +23,8 @@ export const useEditRaceEditor = (raceId?: string) => {
   const queryClient = useQueryClient()
   const { toast } = useToast()
   const patchMutation = usePatchRaceMutation(raceId)
+
+  const [isStartModalOpen, setIsStartModalOpen] = useState(false)
 
   /** Sends the current form and optionally changes the race status. */
   const submit = (
@@ -73,6 +76,12 @@ export const useEditRaceEditor = (raceId?: string) => {
       )
       : '',
     isConflict: conflict,
+    isStartModalOpen,
+    closeStartModal: () => setIsStartModalOpen(false),
+    confirmStart: () => {
+      setIsStartModalOpen(false)
+      submit('ongoing', false)
+    },
     reloadLatestVersion,
     ribbon: {
       actionsDisabled: !raceId,
@@ -86,7 +95,7 @@ export const useEditRaceEditor = (raceId?: string) => {
       onPublish: () => submit('ready', false),
       onResume: () => submit('ongoing', false),
       onSave: () => submit(),
-      onStart: () => submit('ongoing', false),
+      onStart: () => setIsStartModalOpen(true),
       saveDisabled: !editor.isDirty,
       status: editor.form.status,
     },
