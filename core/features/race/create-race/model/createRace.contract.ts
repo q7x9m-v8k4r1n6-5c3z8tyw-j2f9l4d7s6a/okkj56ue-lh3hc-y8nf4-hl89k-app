@@ -21,6 +21,7 @@ export const createRaceRequestSchema = z.object({
     place: z.string().min(1).max(255),
     description: z.string().max(500).optional(),
     organizerIds: z.array(z.string().min(1)),
+    isHidden: z.boolean(),
   })),
   raceSettings: z.object({
     isToggledLeaderboard: z.boolean(),

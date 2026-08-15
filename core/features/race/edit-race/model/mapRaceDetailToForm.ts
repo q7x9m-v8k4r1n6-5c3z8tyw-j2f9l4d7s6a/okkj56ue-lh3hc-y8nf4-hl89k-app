@@ -54,6 +54,7 @@ export const mapRaceDetailToForm = (
         findOrganizer(organizerLookup, id, index),
       ),
       description: booth.description ?? '',
+      isHidden: booth.isHidden,
     })),
     teams: detail.raceTeam.map((team, index) => ({
       id: team.teamID,

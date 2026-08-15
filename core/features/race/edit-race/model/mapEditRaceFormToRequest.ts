@@ -43,6 +43,7 @@ const mapChangedBooth = (
     ...(booth.description !== original.description
       ? { description: booth.description }
       : {}),
+    ...(booth.isHidden !== original.isHidden ? { isHidden: booth.isHidden } : {}),
     ...(!haveSameIds(managerIds, originalManagerIds)
       ? { organizerIds: [...new Set(managerIds)] }
       : {}),
@@ -71,6 +72,7 @@ export const mapEditRaceFormToRequest = (
       name: booth.name.trim(),
       place: booth.place.trim(),
       description: booth.description,
+      isHidden: booth.isHidden,
       organizerIds: [...new Set(booth.managers.map((manager) => manager.id))],
     }))
   const boothUpdate = form.booths

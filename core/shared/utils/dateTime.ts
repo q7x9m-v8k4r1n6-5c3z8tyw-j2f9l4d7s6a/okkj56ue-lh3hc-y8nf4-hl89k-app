@@ -88,6 +88,19 @@ export const toGmt7ApiDateTime = (value: string | Date) => {
 
   return toGmt7ApiDateTimeFromParts(getGmt7PartsFromDate(date))
 }
+/** Converts an instant to GMT+7 and formats it as HH:mm for display. */
+export const formatGmt7Time = (value: string) => {
+  const isLocalDateTime = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?$/.test(value)
+  const normalizedValue = !timezonePattern.test(value) && isLocalDateTime
+    ? `${value}Z`
+    : value
+  const date = new Date(normalizedValue)
+  if (Number.isNaN(date.getTime())) return value
+
+  const parts = getGmt7PartsFromDate(date)
+  
+  return `${parts.hour}:${parts.minute}`
+}
 
 /** Returns the current instant in the backend GMT+7 date-time format. */
 export const getCurrentGmt7DateTime = () => toGmt7ApiDateTime(new Date())

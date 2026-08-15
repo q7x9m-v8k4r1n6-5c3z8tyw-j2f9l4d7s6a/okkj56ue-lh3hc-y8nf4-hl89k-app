@@ -1,6 +1,7 @@
 import { BuildMapRaceView } from '@/core/features/race/build-map'
 import { EditRaceView } from '@/core/features/race/edit-race'
 import { LiveRaceView } from '@/core/features/race/live-race'
+import { SendMessageView } from '@/core/features/race/send-message'
 import { Tabs } from '@/core/shared'
 import { useDetailRacePage } from './model/useDetailRacePage'
 
@@ -23,7 +24,8 @@ export const DetailRacePage = () => {
           {activeTab === 'basic' && <EditRaceView />}
           {activeTab === 'map' && <BuildMapRaceView />}
           {activeTab === 'live' && <LiveRaceView />}
-          {activeTab !== 'basic' && activeTab !== 'map' && activeTab !== 'live' && (
+          {activeTab === 'message' && <SendMessageView />}
+          {activeTab !== 'basic' && activeTab !== 'map' && activeTab !== 'live' && activeTab !== 'message' && (
             <div className="flex h-full items-center justify-center text-gray-400">
               {activeTabLabel}
             </div>

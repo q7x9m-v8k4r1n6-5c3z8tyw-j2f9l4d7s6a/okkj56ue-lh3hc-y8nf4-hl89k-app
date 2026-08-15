@@ -57,9 +57,11 @@ export const useOrganizerRacePage = () => {
         openMenu()
         return
       }
+      if (!isOrganizerPrimaryRaceTab(value)) return
       setPreviousTab(value)
       setTab(value)
     },
+    openAnnouncementHistory: () => setTab('announcement-history'),
     openMenu,
     raceName: raceAccess.raceName,
     returnToRaceList: () => navigate('/organizer'),

@@ -18,7 +18,7 @@ describe('create-race validation', () => {
       name: 'Vui lòng nhập tên trận đấu.',
       endAt: 'Thời gian kết thúc phải sau thời gian bắt đầu.',
       location: 'Vui lòng nhập địa điểm trận đấu.',
-      rules: 'Vui lòng nhập luật trận đấu.',
+      //rules: 'Vui lòng nhập luật trận đấu.',
     })
   })
 
@@ -29,6 +29,7 @@ describe('create-race validation', () => {
       location: '',
       managers: [],
       description: '',
+      isHidden: false,
     }
     const startedStation = {
       ...emptyStation,
@@ -39,6 +40,26 @@ describe('create-race validation', () => {
     expect(hasStationContent(emptyStation)).toBe(false)
     expect(validateStationStep([emptyStation, startedStation])).toEqual({
       started: {
+        name: 'Vui lòng nhập tên trạm.',
+        location: 'Vui lòng nhập địa điểm.',
+        managers: 'Vui lòng chọn ít nhất một quản trạm.',
+      },
+    })
+  })
+
+  it('treats selecting hidden as starting a station draft', () => {
+    const hiddenStation = {
+      id: 'hidden',
+      name: '',
+      location: '',
+      managers: [],
+      description: '',
+      isHidden: true,
+    }
+
+    expect(hasStationContent(hiddenStation)).toBe(true)
+    expect(validateStationStep([hiddenStation])).toEqual({
+      hidden: {
         name: 'Vui lòng nhập tên trạm.',
         location: 'Vui lòng nhập địa điểm.',
         managers: 'Vui lòng chọn ít nhất một quản trạm.',
@@ -58,6 +79,7 @@ describe('create-race validation', () => {
       location: 'BK',
       managers: [manager],
       description: '',
+      isHidden: false,
     })
 
     expect(validateStationStep([station('one'), station('two')])).toEqual({
