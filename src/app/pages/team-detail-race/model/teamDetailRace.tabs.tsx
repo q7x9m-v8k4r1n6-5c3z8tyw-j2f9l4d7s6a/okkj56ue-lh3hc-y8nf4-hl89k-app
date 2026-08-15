@@ -12,12 +12,10 @@ export const teamDetailRaceTabs = [
   { value: 'map', label: 'Bản đồ' },
   { value: 'scan', label: 'Quét mã QR' },
   { value: 'leaderboard', label: 'Kết quả' },
-  { value: 'history', label: 'Lịch sử thông báo' },
   { value: 'more', label: 'Khác' },
 ] as const
 
 export type TeamDetailRaceTab = (typeof teamDetailRaceTabs)[number]['value']
-export type TeamPrimaryDetailRaceTab = Exclude<TeamDetailRaceTab, 'history' | 'more'>
 
 export const teamDetailRaceNavItems: TeamNavItem[] = [
   { id: 'rules', label: 'Luật chơi', icon: <GavelIcon /> },
@@ -29,7 +27,3 @@ export const teamDetailRaceNavItems: TeamNavItem[] = [
 
 export const isTeamDetailRaceTab = (value: string): value is TeamDetailRaceTab =>
   teamDetailRaceTabs.some((tab) => tab.value === value)
-
-export const isTeamPrimaryDetailRaceTab = (
-  value: TeamDetailRaceTab,
-): value is TeamPrimaryDetailRaceTab => value !== 'history' && value !== 'more'
