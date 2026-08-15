@@ -1,6 +1,11 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { client } from '@/core/shared/api'
-import { getRaceMapDetail, uploadAndSaveRaceMap } from './buildMap.api'
+import {
+  getRaceMapDetail,
+  getRaceBoothList,
+  uploadAndSaveRaceMap,
+  updateBoothCoordinates,
+} from './buildMap.api'
 
 vi.mock('@/core/shared/api', () => ({
   client: {
@@ -45,6 +50,38 @@ describe('buildMap.api', () => {
     })
   })
 
+  describe('getRaceBoothList', () => {
+    it('fetches and parses booth list with coordinate metadata', async () => {
+      const mockBooths = [
+        {
+          boothId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+          boothName: 'Trạm Khởi Động',
+          boothLocation: 'Khu A',
+          description: 'Mô tả 1',
+          status: 'free',
+          isHidden: false,
+          currentTeamName: null,
+          currentOrganizerName: 'Organizer 1',
+          mapX: 25.5,
+          mapY: 30.0,
+        },
+      ]
+
+      vi.mocked(client.request).mockResolvedValueOnce(mockBooths)
+
+      const result = await getRaceBoothList('race-123')
+
+      expect(client.request).toHaveBeenCalledWith({
+        path: '/Race/booth-list',
+        query: { RaceId: 'race-123' },
+        signal: undefined,
+      })
+      expect(result).toHaveLength(1)
+      expect(result[0].boothName).toBe('Trạm Khởi Động')
+      expect(result[0].mapX).toBe(25.5)
+    })
+  })
+
   describe('uploadAndSaveRaceMap', () => {
     const mockFile = new File(['image-content'], 'map.png', { type: 'image/png' })
 
@@ -62,6 +99,30 @@ describe('buildMap.api', () => {
         }),
       )
       expect(result.mapImageUrl).toBe('https://azure.blob/race-map/uploaded.png')
+    })
+  })
+
+  describe('updateBoothCoordinates', () => {
+    it('sends PUT request with coordinates payload', async () => {
+      const mockPayload = {
+        coordinates: [
+          { boothId: 'b-1', mapX: 45.0, mapY: 55.0 },
+          { boothId: 'b-2', mapX: null, mapY: null },
+        ],
+      }
+
+      vi.mocked(client.request).mockResolvedValueOnce({
+        message: 'Đã cập nhật tọa độ trạm thành công.',
+      })
+
+      const result = await updateBoothCoordinates('race-123', mockPayload)
+
+      expect(client.request).toHaveBeenCalledWith({
+        path: '/Race/race-123/booths/coordinates',
+        method: 'PUT',
+        body: mockPayload,
+      })
+      expect(result.message).toBe('Đã cập nhật tọa độ trạm thành công.')
     })
   })
 })

@@ -5,12 +5,12 @@ import { StationPaletteSidebar } from './components/StationPaletteSidebar'
 import { LockIcon } from '@/core/assets/icons'
 
 /**
- * Main feature view component for Admin Map Builder (Figma Node 1719-1328).
+ * Main feature view component for Admin Map Builder (Figma Node 1719-1328 & Node 1744-1966).
  * Renders:
- * - Top Ribbon: Thin rounded ribbon bar matching Figma design
  * - 2-Column Layout:
  *   - Left: Station Palette Sidebar ("📋 Danh sách các trạm")
- *   - Right: Map Canvas Area with Zoom/Pan, Upload Dropzone, and Save Map action.
+ *   - Right: Map Canvas Area with Zoom/Pan, Upload Dropzone, and Pin D&D Canvas.
+ * Note: Per Requirement R4, the top note ribbon is strictly excluded.
  */
 export const BuildMapRaceView = () => {
   const view = useBuildMapRaceView()
@@ -48,10 +48,13 @@ export const BuildMapRaceView = () => {
         </div>
       )}
 
-      {view.isLocked && (
+      {!view.isDraft && (
         <div className="flex items-center gap-2.5 rounded-lg border border-[#fdcacb] bg-[#fff5f5] p-4 text-sm text-[#c82528]">
           <LockIcon className="size-4 shrink-0" />
-          <span>Trận đấu đang diễn ra. Sơ đồ bản đồ đã được khóa cố định để đảm bảo tính đồng bộ cho các đội chơi.</span>
+          <span>
+            Trận đấu đang diễn ra. Sơ đồ bản đồ đã được khóa cố định để đảm bảo
+            tính đồng bộ cho các đội chơi.
+          </span>
         </div>
       )}
 
@@ -61,6 +64,10 @@ export const BuildMapRaceView = () => {
         <StationPaletteSidebar
           stations={view.stations}
           isLoading={view.isStationsLoading}
+          isLocked={view.isLocked}
+          selectedStationId={view.selectedStationId}
+          onStationSelect={view.onStationSelect}
+          onStationRemovePin={view.onStationRemovePin}
         />
 
         {/* Right Column: Map Canvas Area */}
@@ -75,13 +82,22 @@ export const BuildMapRaceView = () => {
               previewUrl={view.previewUrl}
               fileName={view.fileName}
               fileSize={view.fileSize}
+              stations={view.stations}
+              selectedStationId={view.selectedStationId}
               isDirty={view.isDirty}
               isSaving={view.isSaving}
               isLocked={view.isLocked}
+              isDraft={view.isDraft}
+              isLockSaving={view.isLockSaving}
               onSave={view.onSaveMap}
               onCancel={view.onCancelEdit}
               onRemoveImage={view.onRemoveImage}
               onFileSelect={view.onFileSelect}
+              onStationSelect={view.onStationSelect}
+              onStationDrop={view.onStationDrop}
+              onStationRemovePin={view.onStationRemovePin}
+              onToggleLock={view.onToggleLock}
+              onClose={view.onClose}
             />
           ) : (
             <div className="flex flex-col gap-3 w-full">
@@ -102,7 +118,8 @@ export const BuildMapRaceView = () => {
                       />
                     </svg>
                     <span>
-                      Ảnh bản đồ đã được gỡ khỏi bản xem trước. Bạn có thể chọn ảnh mới hoặc khôi phục lại ảnh đã lưu.
+                      Ảnh bản đồ đã được gỡ khỏi bản xem trước. Bạn có thể chọn
+                      ảnh mới hoặc khôi phục lại ảnh đã lưu.
                     </span>
                   </div>
                   <button

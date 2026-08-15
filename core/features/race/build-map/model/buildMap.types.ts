@@ -28,7 +28,7 @@ export interface MapFileState {
 }
 
 /**
- * Normalized station item rendered in the Station Palette Sidebar.
+ * Normalized station item rendered in the Station Palette Sidebar and Admin Canvas.
  */
 export interface StationItem {
   id: string
@@ -37,6 +37,55 @@ export interface StationItem {
   isHidden?: boolean
   place?: string
   status?: string
-  description?: string
-  managerName?: string
+  description?: string | null
+  managerName?: string | null
+  currentTeamName?: string | null
+  currentOrganizerName?: string | null
+  mapX?: number | null // percentage [0..100], null if unplaced
+  mapY?: number | null // percentage [0..100], null if unplaced
+  isPlaced?: boolean
+}
+
+/**
+ * Interactive Pin model rendered on the Map Canvas.
+ */
+export interface StationPin {
+  id: string
+  name: string
+  code: string
+  x: number // percentage [0..100]
+  y: number // percentage [0..100]
+  status: string
+  isHidden: boolean
+  currentTeamName: string | null
+  currentOrganizerName: string | null
+}
+
+/**
+ * Reducer state for an individual booth pin.
+ */
+export interface StationPinState {
+  boothId: string
+  boothName: string
+  boothLocation: string
+  description?: string | null
+  status: 'free' | 'pending' | 'occupied' | string
+  isHidden: boolean
+  stationType?: string
+  currentTeamName?: string | null
+  currentOrganizerName?: string | null
+  mapX: number | null // percentage [0..100] or null if unplaced
+  mapY: number | null // percentage [0..100] or null if unplaced
+}
+
+/**
+ * Pin Placement Reducer State.
+ */
+export interface PinPlacementState {
+  booths: StationPinState[]
+  initialBooths: StationPinState[]
+  isLocked: boolean
+  selectedBoothId: string | null
+  activeDragBoothId: string | null
+  isDirty: boolean
 }

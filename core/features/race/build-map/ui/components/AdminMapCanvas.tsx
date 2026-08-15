@@ -1,18 +1,30 @@
-import { useRef, useState } from 'react'
+import React, { useRef, useState, type DragEvent } from 'react'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 import { Spinner } from '@/core/shared'
+import { AdminStationPin } from './AdminStationPin'
+import { CoordinateLockControls } from './CoordinateLockControls'
+import type { StationItem } from '../../model/buildMap.types'
 
 export interface AdminMapCanvasProps {
   previewUrl: string
   fileName?: string
   fileSize?: number
+  stations?: StationItem[]
+  selectedStationId?: string | null
   isDirty?: boolean
   isSaving?: boolean
   isLocked?: boolean
+  isDraft?: boolean
+  isLockSaving?: boolean
   onSave?: () => void
   onCancel?: () => void
   onRemoveImage: () => void
   onFileSelect: (file: File) => void
+  onStationSelect?: (stationId: string) => void
+  onStationDrop?: (stationId: string, mapX: number, mapY: number) => void
+  onStationRemovePin?: (stationId: string) => void
+  onToggleLock?: () => void
+  onClose?: () => void
 }
 
 /** Format file size in bytes to human readable MB/KB */
@@ -25,23 +37,47 @@ const formatFileSize = (bytes?: number): string => {
 }
 
 /**
- * Interactive map viewport supporting zoom, pan, reset, file replacement, and save/cancel actions.
- * Conforms to Figma Node 1719-1328.
+ * Interactive map viewport supporting zoom, pan, reset, file replacement,
+ * drag-and-drop station pin placement, and coordinate locking.
+ * Conforms to Figma Node 1744-1966.
  */
 export const AdminMapCanvas = ({
   previewUrl,
   fileName = 'Bản đồ trận đấu',
   fileSize,
+  stations = [],
+  selectedStationId = null,
   isDirty = false,
   isSaving = false,
   isLocked = false,
+  isDraft = true,
+  isLockSaving = false,
   onSave,
   onCancel,
   onRemoveImage,
   onFileSelect,
+  onStationSelect,
+  onStationDrop,
+  onStationRemovePin,
+  onToggleLock,
+  onClose,
 }: AdminMapCanvasProps) => {
   const hiddenInputRef = useRef<HTMLInputElement>(null)
+  const mapImageRef = useRef<HTMLImageElement>(null)
   const [imageLoadError, setImageLoadError] = useState(false)
+  const [isDropTargetActive, setIsDropTargetActive] = useState(false)
+
+  const placedStations = stations.filter(
+    (s) =>
+      typeof s.mapX === 'number' &&
+      typeof s.mapY === 'number' &&
+      !Number.isNaN(s.mapX) &&
+      !Number.isNaN(s.mapY) &&
+      s.mapX >= 0 &&
+      s.mapX <= 100 &&
+      s.mapY >= 0 &&
+      s.mapY <= 100,
+  )
 
   const handleHiddenInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -51,6 +87,41 @@ export const AdminMapCanvas = ({
 
   const handleTriggerChangeImage = () => {
     hiddenInputRef.current?.click()
+  }
+
+  // Drag over map canvas
+  const handleDragOver = (e: DragEvent) => {
+    if (isLocked) return
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'copy'
+    setIsDropTargetActive(true)
+  }
+
+  const handleDragLeave = (e: DragEvent) => {
+    if (isLocked) return
+    e.preventDefault()
+    setIsDropTargetActive(false)
+  }
+
+  // Handle station drop onto canvas
+  const handleDrop = (e: DragEvent) => {
+    e.preventDefault()
+    setIsDropTargetActive(false)
+    if (isLocked || !mapImageRef.current) return
+
+    const stationId = e.dataTransfer.getData('text/plain')
+    if (!stationId) return
+
+    const rect = mapImageRef.current.getBoundingClientRect()
+    if (rect.width <= 0 || rect.height <= 0) return
+
+    const rawX = ((e.clientX - rect.left) / rect.width) * 100
+    const rawY = ((e.clientY - rect.top) / rect.height) * 100
+
+    const mapX = Math.round(Math.max(0, Math.min(100, rawX)) * 100) / 100
+    const mapY = Math.round(Math.max(0, Math.min(100, rawY)) * 100) / 100
+
+    onStationDrop?.(stationId, mapX, mapY)
   }
 
   return (
@@ -81,7 +152,7 @@ export const AdminMapCanvas = ({
       >
         {({ zoomIn, zoomOut, resetTransform, state }) => (
           <div className="flex w-full flex-col rounded-[16px] border border-[#e5e5e5] bg-white shadow-xs overflow-hidden">
-            {/* Canvas Header & Toolbar */}
+            {/* Header & Toolbar */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-200 bg-white px-4 py-3">
               {/* File Info */}
               <div className="flex items-center gap-2 overflow-hidden min-w-[180px]">
@@ -122,7 +193,7 @@ export const AdminMapCanvas = ({
                   type="button"
                   onClick={() => zoomOut()}
                   title="Thu nhỏ"
-                  className="flex h-7 w-7 items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                  className="flex h-7 w-7 items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"
                 >
                   <svg
                     className="h-3.5 w-3.5"
@@ -140,14 +211,14 @@ export const AdminMapCanvas = ({
                 </button>
 
                 <span className="min-w-[44px] text-center text-xs font-semibold text-slate-700 select-none">
-                  {Math.round((state.scale ?? 1) * 100)}%
+                  {`${Math.round((state.scale ?? 1) * 100)}%`}
                 </span>
 
                 <button
                   type="button"
                   onClick={() => zoomIn()}
                   title="Phóng to"
-                  className="flex h-7 w-7 items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                  className="flex h-7 w-7 items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"
                 >
                   <svg
                     className="h-3.5 w-3.5"
@@ -170,7 +241,7 @@ export const AdminMapCanvas = ({
                   type="button"
                   onClick={() => resetTransform()}
                   title="Đặt lại góc nhìn"
-                  className="flex h-7 px-2 items-center gap-1 rounded-md text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                  className="flex h-7 px-2 items-center gap-1 rounded-md text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"
                 >
                   <svg
                     className="h-3 w-3"
@@ -197,7 +268,7 @@ export const AdminMapCanvas = ({
                       type="button"
                       disabled={isSaving}
                       onClick={onSave}
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-[#de3336] px-3.5 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-[#c82528] active:bg-[#b01e21] transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-[#de3336] px-3.5 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-[#c82528] active:bg-[#b01e21] transition-colors disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
                       data-testid="save-map-btn"
                     >
                       {isSaving ? (
@@ -229,7 +300,7 @@ export const AdminMapCanvas = ({
                       type="button"
                       disabled={isSaving}
                       onClick={onCancel}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-[#e5e5e5] bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-2xs hover:bg-slate-50 transition-colors disabled:opacity-60"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-[#e5e5e5] bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-2xs hover:bg-slate-50 transition-colors disabled:opacity-60 cursor-pointer"
                       data-testid="cancel-map-btn"
                     >
                       Hủy
@@ -242,7 +313,7 @@ export const AdminMapCanvas = ({
                     <button
                       type="button"
                       onClick={handleTriggerChangeImage}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 shadow-2xs hover:bg-neutral-50 transition-colors"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 shadow-2xs hover:bg-neutral-50 transition-colors cursor-pointer"
                     >
                       <svg
                         className="h-3.5 w-3.5"
@@ -263,7 +334,7 @@ export const AdminMapCanvas = ({
                     <button
                       type="button"
                       onClick={onRemoveImage}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 shadow-2xs hover:bg-red-100 transition-colors"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 shadow-2xs hover:bg-red-100 transition-colors cursor-pointer"
                     >
                       <svg
                         className="h-3.5 w-3.5"
@@ -282,11 +353,48 @@ export const AdminMapCanvas = ({
                     </button>
                   </>
                 )}
+
+                {onClose && (
+                  <>
+                    <div className="mx-0.5 h-4 w-px bg-slate-200" />
+                    <button
+                      type="button"
+                      onClick={onClose}
+                      title="Đóng"
+                      aria-label="Đóng"
+                      className="flex h-7 w-7 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors cursor-pointer"
+                      data-testid="close-map-btn"
+                    >
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  </>
+                )}
               </div>
             </div>
 
             {/* Interactive Viewport */}
-            <div className="relative flex h-[580px] w-full items-center justify-center bg-slate-950 overflow-hidden cursor-grab active:cursor-grabbing">
+            <div
+              className={`relative flex h-[580px] w-full items-center justify-center bg-slate-950 overflow-hidden ${
+                isLocked
+                  ? 'cursor-default'
+                  : 'cursor-grab active:cursor-grabbing'
+              } ${isDropTargetActive ? 'ring-4 ring-inset ring-[#de3336]/40' : ''}`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
               {imageLoadError ? (
                 <div className="flex flex-col items-center justify-center p-8 text-center text-slate-300">
                   <svg
@@ -321,20 +429,56 @@ export const AdminMapCanvas = ({
                   wrapperClass="!w-full !h-full flex items-center justify-center"
                   contentClass="flex items-center justify-center min-w-full min-h-full"
                 >
-                  <img
-                    src={previewUrl}
-                    alt={fileName}
-                    className="max-h-full max-w-full object-contain select-none shadow-2xl"
-                    draggable={false}
-                    onError={() => setImageLoadError(true)}
-                  />
+                  <div className="relative inline-block select-none">
+                    <img
+                      ref={mapImageRef}
+                      src={previewUrl}
+                      alt={fileName}
+                      className="max-h-[580px] max-w-full object-contain select-none shadow-2xl block"
+                      draggable={false}
+                      onError={() => setImageLoadError(true)}
+                    />
+
+                    {/* Interactive Pins Overlay */}
+                    <div className="absolute inset-0 pointer-events-none">
+                      {placedStations.map((station) => (
+                        <div key={station.id} className="pointer-events-auto">
+                          <AdminStationPin
+                            id={station.id}
+                            name={station.name}
+                            stationType={station.stationType}
+                            status={station.status}
+                            isHidden={station.isHidden}
+                            x={station.mapX!}
+                            y={station.mapY!}
+                            isSelected={selectedStationId === station.id}
+                            isLocked={isLocked}
+                            onClick={onStationSelect}
+                            onRemove={onStationRemovePin}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </TransformComponent>
               )}
 
               {!imageLoadError && (
                 <div className="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-white/85 px-3.5 py-1.5 text-xs text-neutral-600 backdrop-blur-md shadow-sm border border-neutral-200/80">
-                  Dùng chuột lăn hoặc drag để Zoom / Pan bản đồ
+                  {isLocked
+                    ? 'Bản đồ đã khóa cố định. Nhấn Mở khóa để điều chỉnh vị trí trạm.'
+                    : 'Dùng chuột lăn để Zoom / Kéo thả trạm vào bản đồ'}
                 </div>
+              )}
+
+              {/* Floating Coordinate Lock / Unlock Control (Bottom Right) */}
+              {!imageLoadError && onToggleLock && (
+                <CoordinateLockControls
+                  isLocked={isLocked}
+                  isDraft={isDraft}
+                  isSaving={isLockSaving}
+                  onToggleLock={onToggleLock}
+                />
               )}
             </div>
           </div>

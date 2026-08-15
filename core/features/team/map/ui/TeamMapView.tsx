@@ -1,15 +1,63 @@
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
-import { useTeamMap } from '../model/frontend/useTeamMap'
-import { mockTeamMapData } from '../model/mockMapData'
 import { MapFloatingControls } from './components/MapFloatingControls'
 import { StationPinItem } from './components/StationPinItem'
 import { StationDetailSheet } from './components/StationDetailSheet'
+import { TeamMapEmptyState } from './components/TeamMapEmptyState'
+import { useTeamMapView } from './hooks/useTeamMapView'
 
 export const TeamMapView = () => {
-  const { selectedStationId, selectStation, clearSelection } = useTeamMap()
-  
-  const mapData = mockTeamMapData
-  const selectedStation = mapData.stations.find((s) => s.id === selectedStationId)
+  const {
+    isLoading,
+    isError,
+    isEmpty,
+    mapImageUrl,
+    stations,
+    selectedStation,
+    selectedStationId,
+    selectStation,
+    clearSelection,
+    refetch,
+  } = useTeamMapView()
+
+  if (isLoading) {
+    return (
+      <section
+        className="flex h-[calc(100svh-137px)] w-full flex-col items-center justify-center bg-[#f9fafb] p-6 text-center"
+        aria-label="Đang tải bản đồ"
+      >
+        <div className="flex flex-col items-center gap-3">
+          <div className="size-8 animate-spin rounded-full border-3 border-[#de3336] border-t-transparent" />
+          <p className="text-sm font-medium text-[#737373]">Đang tải bản đồ trận đấu...</p>
+        </div>
+      </section>
+    )
+  }
+
+  if (isError) {
+    return (
+      <section
+        className="flex h-[calc(100svh-137px)] w-full flex-col items-center justify-center p-6 text-center bg-[#f9fafb]"
+        aria-label="Lỗi tải bản đồ"
+      >
+        <div className="flex max-w-[320px] flex-col items-center gap-3 rounded-2xl border border-[#fecaca] bg-[#fef2f2] p-6 shadow-xs">
+          <p className="text-sm font-medium text-[#dc2626]">
+            Không thể tải thông tin bản đồ trận đấu.
+          </p>
+          <button
+            type="button"
+            onClick={() => void refetch()}
+            className="rounded-xl bg-[#de3336] px-4 py-2 text-sm font-medium text-white hover:bg-[#b91c1c] transition-colors cursor-pointer"
+          >
+            Thử lại
+          </button>
+        </div>
+      </section>
+    )
+  }
+
+  if (isEmpty || !mapImageUrl) {
+    return <TeamMapEmptyState onRetry={() => void refetch()} />
+  }
 
   return (
     <section
@@ -25,9 +73,9 @@ export const TeamMapView = () => {
       >
         <MapFloatingControls />
         <TransformComponent wrapperClass="!w-full !h-full" contentClass="!w-full !h-full">
-          {/* Vùng Map có thể tương tác */}
-          <div 
-            className="relative h-full w-full"
+          {/* Interactive map surface */}
+          <div
+            className="relative h-full w-full select-none"
             onClick={clearSelection}
             onKeyDown={(e) => {
               if (e.key === 'Escape') clearSelection()
@@ -35,14 +83,14 @@ export const TeamMapView = () => {
             role="button"
             tabIndex={0}
           >
-            <img 
-              src={mapData.backgroundImageUrl} 
-              alt="Bản đồ" 
-              className="pointer-events-none h-full w-full object-cover"
+            <img
+              src={mapImageUrl}
+              alt="Bản đồ trận đấu"
+              className="pointer-events-none h-full w-full object-cover select-none"
             />
-            
-            {/* Pins Overlay */}
-            {mapData.stations.map((pin) => (
+
+            {/* Placed Station Pins Overlay */}
+            {stations.map((pin) => (
               <StationPinItem
                 key={pin.id}
                 pin={pin}
@@ -54,10 +102,10 @@ export const TeamMapView = () => {
         </TransformComponent>
       </TransformWrapper>
 
-      {/* Hiển thị Bottom Sheet khi chọn 1 trạm (luôn render để chạy animation) */}
-      <StationDetailSheet 
-        pin={selectedStation || null} 
-        onClose={clearSelection} 
+      {/* Station detail bottom sheet */}
+      <StationDetailSheet
+        pin={selectedStation}
+        onClose={clearSelection}
       />
     </section>
   )
