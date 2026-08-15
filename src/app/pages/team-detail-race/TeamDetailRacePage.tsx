@@ -1,6 +1,8 @@
+import { RaceMessageNotificationBanner } from '@/core/features/race/race-message-notification'
+import { TeamAnnouncementHistoryView } from '@/core/features/team/announcement-history'
 import { TeamLeaderboardView } from '@/core/features/team/leaderboard'
 import { TeamMapView } from '@/core/features/team/map'
-import { TeamRaceMenuView } from '@/core/features/team/race-menu' 
+import { TeamRaceMenuView } from '@/core/features/team/race-menu'
 import { TeamRaceMoreMenu } from './components/TeamRaceMoreMenu'
 import { TeamRaceRulesView } from '@/core/features/team/race-rules'
 import { TeamQrScanView } from '@/core/features/team/scan-qr'
@@ -10,27 +12,33 @@ import { useTeamDetailRacePage } from './model/useTeamDetailRacePage'
 
 export const TeamDetailRacePage = () => {
   const page = useTeamDetailRacePage()
-  
+
   const canShowRaceTabs = !page.isRaceAccessLoading
     && !page.isRaceAccessError
     && !page.isRaceUnavailable
+  const canShowBottomNav = canShowRaceTabs
+    && !page.isMenuOpen
+    && page.activeTab !== 'announcement-history'
 
   return (
     <TeamRouteLayout
       activeNavId={page.activeTab}
       isMenuOpen={page.isMenuOpen}
-      navItems={page.isMenuOpen || !canShowRaceTabs ? [] : page.navItems}
+      navItems={canShowBottomNav ? page.navItems : []}
       onHeaderMenuToggle={page.toggleMenu}
       onNavChange={page.onNavChange}
       raceName={page.raceName}
     >
       {page.isMenuOpen ? (
         <TeamRaceMenuView
-          onCancel={page.toggleMenu}
+          onCancel={page.closeMenu}
+          onOpenAnnouncementHistory={page.openAnnouncementHistory}
           onReturnToRaceList={page.returnToRaceList}
         />
       ) : (
         <>
+          {canShowRaceTabs ? <RaceMessageNotificationBanner /> : null}
+
           {page.isRaceAccessLoading ? (
             <section className="flex min-h-full items-center justify-center px-5 py-12 text-center text-sm text-[#737373]">
               Đang tải thông tin trận đấu...
@@ -56,6 +64,9 @@ export const TeamDetailRacePage = () => {
           {canShowRaceTabs && page.activeTab === 'scan' ? <TeamQrScanView /> : null}
           {canShowRaceTabs && page.activeTab === 'leaderboard' ? <TeamLeaderboardView /> : null}
           {canShowRaceTabs && page.activeTab === 'more' ? <TeamRaceMoreMenu /> : null}
+          {canShowRaceTabs && page.activeTab === 'announcement-history' ? (
+            <TeamAnnouncementHistoryView onBack={page.openMenu} />
+          ) : null}
         </>
       )}
     </TeamRouteLayout>

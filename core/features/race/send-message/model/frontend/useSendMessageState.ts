@@ -41,7 +41,7 @@ export const useSendMessageState = () => {
   const [recipientSearch, setRecipientSearch] = useState('')
   const [selectedRecipients, setSelectedRecipients] = useState<MessageRecipient[]>([])
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null)
-  const recipientsQuery = useMessageRecipientsQuery()
+  const recipientsQuery = useMessageRecipientsQuery(raceId)
   const messagesQuery = useRaceMessagesQuery(raceId)
   const sendMutation = useSendRaceMessageMutation()
 

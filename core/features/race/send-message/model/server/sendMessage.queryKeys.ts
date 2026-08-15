@@ -1,4 +1,5 @@
 export const sendMessageQueryKeys = {
-  recipients: ['race', 'send-message', 'recipients'] as const,
+  recipients: (raceId?: string) =>
+    ['race', 'send-message', raceId, 'recipients'] as const,
   messages: (raceId: string) => ['race', 'send-message', raceId, 'messages'] as const,
 }
