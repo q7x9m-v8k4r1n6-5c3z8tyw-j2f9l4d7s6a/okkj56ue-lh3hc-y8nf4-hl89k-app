@@ -65,7 +65,7 @@ export const TeamDetailRacePage = () => {
           {canShowRaceTabs && page.activeTab === 'leaderboard' ? <TeamLeaderboardView /> : null}
           {canShowRaceTabs && page.activeTab === 'more' ? <TeamRaceMoreMenu /> : null}
           {canShowRaceTabs && page.activeTab === 'announcement-history' ? (
-            <TeamAnnouncementHistoryView onBack={page.openMenu} />
+            <TeamAnnouncementHistoryView />
           ) : null}
         </>
       )}

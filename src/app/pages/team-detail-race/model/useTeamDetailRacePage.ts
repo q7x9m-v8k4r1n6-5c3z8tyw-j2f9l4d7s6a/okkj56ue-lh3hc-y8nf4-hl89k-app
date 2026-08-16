@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useTeamRaceAccess } from '@/core/features/team/team-race'
 import {
@@ -29,6 +29,13 @@ export const useTeamDetailRacePage = () => {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
+  useEffect(() => {
+    const requestedTab = searchParams.get('tab')
+    if (!requestedTab || !isTeamDetailRaceTab(requestedTab)) return
+    setActiveTab(requestedTab)
+    setIsMenuOpen(requestedTab === 'menu')
+  }, [searchParams])
+
   const setTab = (tab: TeamDetailRaceTab) => {
     setSearchParams((current) => {
       const next = new URLSearchParams(current)
@@ -40,6 +47,7 @@ export const useTeamDetailRacePage = () => {
 
   const openMenu = () => {
     if (isTeamPrimaryRaceTab(activeTab)) setPreviousTab(activeTab)
+    setTab('menu')
     setIsMenuOpen(true)
   }
 

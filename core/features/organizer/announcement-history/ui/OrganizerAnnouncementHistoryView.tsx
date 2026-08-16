@@ -1,13 +1,7 @@
 import { ArrowLeftIcon } from '@/core/assets'
 import { useOrganizerAnnouncementHistory } from './hooks/useOrganizerAnnouncementHistory'
 
-export type OrganizerAnnouncementHistoryViewProps = {
-  onBack: () => void
-}
-
-export const OrganizerAnnouncementHistoryView = ({
-  onBack,
-}: OrganizerAnnouncementHistoryViewProps) => {
+export const OrganizerAnnouncementHistoryView = () => {
   const history = useOrganizerAnnouncementHistory()
 
   return (
@@ -19,7 +13,7 @@ export const OrganizerAnnouncementHistoryView = ({
         type="button"
         id="organizer-announcement-history-title"
         className="mx-auto mb-6 flex h-7 items-center justify-center gap-3 text-[16px] font-semibold text-[#202020]"
-        onClick={onBack}
+        onClick={history.backToMenu}
       >
         <ArrowLeftIcon className="size-5" />
         Lịch sử thông báo
