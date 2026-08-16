@@ -1,5 +1,5 @@
-import { getOrganizers } from '@/core/entities/organizer/api/organizer.api'
-import { getTeams } from '@/core/entities/team/api/team.api'
+import { client } from '@/core/shared/api'
+import { z } from 'zod'
 import {
   messageRecipientSchema,
   type MessageRecipient,
@@ -9,43 +9,58 @@ const staticRecipients: MessageRecipient[] = [
   {
     id: 'all',
     label: 'Tất cả mọi người',
-    description: 'Gửi cho toàn bộ ban tổ chức và đội chơi',
+    description: 'Gửi cho toàn bộ ban tổ chức và đội chơi trong trận đấu',
     type: 'all',
   },
   {
     id: 'all-organizers',
     label: 'Tất cả ban tổ chức',
-    description: 'Gửi cho toàn bộ ban tổ chức',
+    description: 'Gửi cho toàn bộ ban tổ chức trong trận đấu',
     type: 'all-organizers',
   },
   {
     id: 'all-teams',
     label: 'Tất cả team',
-    description: 'Gửi cho toàn bộ đội chơi',
+    description: 'Gửi cho toàn bộ đội chơi trong trận đấu',
     type: 'all-teams',
   },
 ]
 
-/** Loads recipient choices for race message composition. */
+const raceMessageRecipientDetailSchema = z.object({
+  raceTeam: z.array(z.object({
+    teamID: z.string().uuid(),
+    name: z.string().optional(),
+    leaderEmail: z.string().optional(),
+  })).catch([]),
+  organizers: z.array(z.object({
+    id: z.string().uuid(),
+    displayName: z.string().optional(),
+    email: z.string().optional(),
+  })).catch([]),
+})
+
+/** Loads recipient choices assigned to the current race. */
 export const getMessageRecipients = async (
+  raceId: string,
   signal?: AbortSignal,
 ): Promise<MessageRecipient[]> => {
-  const [organizers, teams] = await Promise.all([
-    getOrganizers('', signal),
-    getTeams('', signal),
-  ])
+  const response = await client.request<unknown>({
+    path: `/Race/${raceId}`,
+    signal,
+  })
+  const detail = raceMessageRecipientDetailSchema.parse(response)
 
   return [
     ...staticRecipients,
-    ...organizers.map<MessageRecipient>((organizer) => ({
+    ...detail.organizers.map<MessageRecipient>((organizer) => ({
       id: `organizer:${organizer.id}`,
-      label: organizer.displayName || organizer.email,
+      label: organizer.displayName || organizer.email || 'Ban tổ chức',
       description: organizer.email || 'Ban tổ chức',
       type: 'organizer',
     })),
-    ...teams.map<MessageRecipient>((team) => ({
-      id: `team:${team.id}`,
-      label: team.name,
+    ...detail.raceTeam.map<MessageRecipient>((team) => ({
+      id: `team:${team.teamID}`,
+      label: team.name || team.leaderEmail || 'Đội chơi',
       description: team.leaderEmail || 'Đội chơi',
       type: 'team',
     })),

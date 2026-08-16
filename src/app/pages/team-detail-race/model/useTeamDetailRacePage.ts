@@ -3,7 +3,9 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useTeamRaceAccess } from '@/core/features/team/team-race'
 import {
   isTeamDetailRaceTab,
+  isTeamPrimaryRaceTab,
   teamDetailRaceNavItems,
+  type TeamPrimaryRaceTab,
   type TeamDetailRaceTab,
 } from './teamDetailRace.tabs'
 
@@ -19,11 +21,36 @@ export const useTeamDetailRacePage = () => {
   const [activeTab, setActiveTab] = useState<TeamDetailRaceTab>(
     initialTab && isTeamDetailRaceTab(initialTab) ? initialTab : 'rules'
   )
+  const [previousTab, setPreviousTab] = useState<TeamPrimaryRaceTab>(
+    isTeamDetailRaceTab(initialTab ?? '') && isTeamPrimaryRaceTab(initialTab as TeamDetailRaceTab)
+      ? initialTab as TeamPrimaryRaceTab
+      : 'rules',
+  )
 
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
+  const setTab = (tab: TeamDetailRaceTab) => {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current)
+      next.set('tab', tab)
+      return next
+    })
+    setActiveTab(tab)
+  }
+
+  const openMenu = () => {
+    if (isTeamPrimaryRaceTab(activeTab)) setPreviousTab(activeTab)
+    setIsMenuOpen(true)
+  }
+
+  const closeMenu = () => {
+    setIsMenuOpen(false)
+    setTab(previousTab)
+  }
+
   return {
     activeTab,
+    closeMenu,
     errorMessage: raceAccess.errorMessage,
     isMenuOpen,
     isRaceAccessError: raceAccess.isError,
@@ -33,11 +60,23 @@ export const useTeamDetailRacePage = () => {
     
     onNavChange: (value: string) => {
       if (!isTeamDetailRaceTab(value)) return
-      setActiveTab(value)
-      setSearchParams((current) => { current.set('tab', value); return current })
+      if (!isTeamPrimaryRaceTab(value)) return
+      setPreviousTab(value)
+      setTab(value)
     },
     
-    toggleMenu: () => setIsMenuOpen((prev) => !prev),
+    openAnnouncementHistory: () => {
+      setIsMenuOpen(false)
+      setTab('announcement-history')
+    },
+    openMenu,
+    toggleMenu: () => {
+      if (isMenuOpen) {
+        closeMenu()
+        return
+      }
+      openMenu()
+    },
     raceName: raceAccess.raceName,
     returnToRaceList: () => navigate('/team'),
     unavailableMessage: raceAccess.unavailableMessage,

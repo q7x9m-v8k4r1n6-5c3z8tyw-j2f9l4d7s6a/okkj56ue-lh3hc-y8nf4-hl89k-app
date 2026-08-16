@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { CloseIcon } from '@/core/assets/icons'
 import type { MessageRecipient } from '../../model/sendMessage.schema'
 
@@ -42,6 +42,13 @@ export const MessageComposer = ({
   selectedRecipients,
 }: MessageComposerProps) => {
   const [isOpen, setIsOpen] = useState(false)
+  const bodyInputRef = useRef<HTMLTextAreaElement>(null)
+
+  const focusBodyInput = () => {
+    window.requestAnimationFrame(() => {
+      bodyInputRef.current?.focus()
+    })
+  }
 
   return (
     <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_126px]">
@@ -95,6 +102,13 @@ export const MessageComposer = ({
                 placeholder="Tìm người nhận"
                 value={recipientSearch}
                 onChange={(event) => onRecipientSearchChange(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key !== 'Enter' || event.nativeEvent.isComposing) return
+
+                  event.preventDefault()
+                  setIsOpen(false)
+                  focusBodyInput()
+                }}
               />
               {recipientErrorMessage ? (
                 <p className="mt-2 text-xs text-[#de3336]">{recipientErrorMessage}</p>
@@ -113,6 +127,16 @@ export const MessageComposer = ({
                     key={recipient.id}
                     type="button"
                     onClick={() => onRecipientToggle(recipient)}
+                    onKeyDown={(event) => {
+                      if (event.key !== 'Enter') return
+
+                      event.preventDefault()
+                      if (!selectedIds.has(recipient.id)) {
+                        onRecipientToggle(recipient)
+                      }
+                      setIsOpen(false)
+                      focusBodyInput()
+                    }}
                   >
                     <span
                       className={`flex size-5 items-center justify-center rounded border ${selectedIds.has(recipient.id) ? 'border-[#de3336] bg-[#de3336]' : 'border-[#d4d4d4] bg-white'}`}
@@ -156,6 +180,7 @@ export const MessageComposer = ({
       </button>
       <textarea
         aria-label="Soạn tin nhắn"
+        ref={bodyInputRef}
         className="min-h-[290px] resize-none rounded-lg border border-[#e5e5e5] px-3 py-3 text-base text-[#323232] outline-none transition-colors placeholder:text-[#98a2b3] focus:border-[#de3336] lg:col-span-2 xl:min-h-[326px]"
         placeholder="Soạn tin nhắn"
         value={body}
