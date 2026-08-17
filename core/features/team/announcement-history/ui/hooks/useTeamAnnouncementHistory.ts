@@ -2,13 +2,14 @@ import { useMemo } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { useAuthSession } from '@/core/features/auth'
 import {
+  TEAM_RACE_MENU_TAB,
+  TEAM_RACE_TAB_PARAM,
+} from '@/core/shared/utils'
+import {
   isTeamAnnouncementTargetedToUser,
   mapTeamAnnouncementHistoryItem,
 } from '../../model/teamAnnouncementHistory.presentation'
 import { useTeamAnnouncementHistoryQuery } from '../../model/server/useTeamAnnouncementHistoryQuery'
-
-const TEAM_RACE_TAB_PARAM = 'tab'
-const TEAM_RACE_MENU_TAB = 'menu'
 
 export const useTeamAnnouncementHistory = () => {
   const { raceId } = useParams<{ raceId: string }>()

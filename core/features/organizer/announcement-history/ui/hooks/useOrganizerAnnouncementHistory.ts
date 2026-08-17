@@ -1,14 +1,15 @@
 import { useMemo } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { useAuthSession } from '@/core/features/auth'
-import { ORGANIZER_RACE_TAB_PARAM } from '@/core/shared/utils'
+import {
+  ORGANIZER_RACE_MENU_TAB,
+  ORGANIZER_RACE_TAB_PARAM,
+} from '@/core/shared/utils'
 import {
   isOrganizerAnnouncementTargetedToUser,
   mapOrganizerAnnouncementHistoryItem,
 } from '../../model/organizerAnnouncementHistory.presentation'
 import { useOrganizerAnnouncementHistoryQuery } from '../../model/server/useOrganizerAnnouncementHistoryQuery'
-
-const ORGANIZER_RACE_MENU_TAB = 'menu'
 
 export const useOrganizerAnnouncementHistory = () => {
   const { raceId } = useParams<{ raceId: string }>()

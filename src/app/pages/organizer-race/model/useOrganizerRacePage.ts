@@ -1,7 +1,11 @@
 import { useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useOrganizerRaceAccess } from '@/core/features/organizer/organizer-race'
-import { ORGANIZER_RACE_TAB_PARAM } from '@/core/shared/utils/organizerRaceRoute'
+import {
+  ORGANIZER_RACE_ANNOUNCEMENT_HISTORY_TAB,
+  ORGANIZER_RACE_MENU_TAB,
+  ORGANIZER_RACE_TAB_PARAM,
+} from '@/core/shared/utils/organizerRaceRoute'
 import {
   isOrganizerPrimaryRaceTab,
   isOrganizerRaceTab,
@@ -27,7 +31,7 @@ export const useOrganizerRacePage = () => {
   const [previousTab, setPreviousTab] = useState<OrganizerPrimaryRaceTab>(
     isOrganizerPrimaryRaceTab(activeTab) ? activeTab : DEFAULT_TAB,
   )
-  const isMenuOpen = activeTab === 'menu'
+  const isMenuOpen = activeTab === ORGANIZER_RACE_MENU_TAB
 
   const setTab = (tab: OrganizerRaceTab) => {
     setSearchParams((prev) => {
@@ -39,7 +43,7 @@ export const useOrganizerRacePage = () => {
 
   const openMenu = () => {
     if (isOrganizerPrimaryRaceTab(activeTab)) setPreviousTab(activeTab)
-    setTab('menu')
+    setTab(ORGANIZER_RACE_MENU_TAB)
   }
 
   return {
@@ -53,7 +57,7 @@ export const useOrganizerRacePage = () => {
     navItems: organizerRaceNavItems,
     onNavChange: (value: string) => {
       if (!isOrganizerRaceTab(value)) return
-      if (value === 'menu') {
+      if (value === ORGANIZER_RACE_MENU_TAB) {
         openMenu()
         return
       }
@@ -61,7 +65,7 @@ export const useOrganizerRacePage = () => {
       setPreviousTab(value)
       setTab(value)
     },
-    openAnnouncementHistory: () => setTab('announcement-history'),
+    openAnnouncementHistory: () => setTab(ORGANIZER_RACE_ANNOUNCEMENT_HISTORY_TAB),
     openMenu,
     raceName: raceAccess.raceName,
     returnToRaceList: () => navigate('/organizer'),
