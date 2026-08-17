@@ -20,7 +20,7 @@ export const mapOrganizerAnnouncementHistoryItem = (
   message: OrganizerAnnouncementMessage,
 ): OrganizerAnnouncementHistoryItem => ({
   id: message.id,
-  senderName: message.senderName || 'ADMIN',
+  senderName: 'ADMIN',
   body: message.body,
   sentAt: formatGmt7DateTime(message.createdAt),
 })
