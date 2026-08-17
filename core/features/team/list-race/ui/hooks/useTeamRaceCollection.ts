@@ -1,4 +1,5 @@
 import { useAuthSession } from '@/core/features/auth'
+import { isTeamRaceVisible } from '@/core/features/team/team-race'
 import { useTeamRaceListState } from '../../model/frontend/useTeamRaceListState'
 import { useTeamRaceListQuery } from '../../model/server/useTeamRaceListQuery'
 
@@ -6,17 +7,17 @@ const PAGE_SIZE = 20
 
 /** Combines team race-list browser state and server state for rendering. */
 export const useTeamRaceCollection = () => {
-  const { user } = useAuthSession()
+  const auth = useAuthSession()
   const state = useTeamRaceListState()
   const racesQuery = useTeamRaceListQuery({
     page: state.page,
     pageSize: PAGE_SIZE,
-    teamId: user?.id,
   }, {
-    enabled: Boolean(user?.id),
+    enabled: Boolean(auth.user?.id),
   })
   const result = racesQuery.data
-  const totalItems = result?.totalItems ?? 0
+  const races = (result?.items ?? []).filter(isTeamRaceVisible)
+  const totalItems = races.length
   const pageSize = result?.pageSize ?? PAGE_SIZE
 
   return {
@@ -28,7 +29,7 @@ export const useTeamRaceCollection = () => {
     isRaceSelectable: state.isRaceSelectable,
     openRaceDetail: state.openRaceDetail,
     page: state.page,
-    races: result?.items ?? [],
+    races,
     setPage: state.setPage,
     summary: {
       startItem: totalItems === 0 ? 0 : (state.page - 1) * pageSize + 1,
