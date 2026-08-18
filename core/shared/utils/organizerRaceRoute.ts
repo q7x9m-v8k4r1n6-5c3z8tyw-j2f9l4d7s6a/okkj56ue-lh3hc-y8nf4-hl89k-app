@@ -6,3 +6,5 @@
  */
 export const ORGANIZER_RACE_TAB_PARAM = 'tab'
 export const ORGANIZER_RACE_REQUESTS_TAB = 'requests'
+export const ORGANIZER_RACE_MENU_TAB = 'menu'
+export const ORGANIZER_RACE_ANNOUNCEMENT_HISTORY_TAB = 'announcement-history'

@@ -1,6 +1,10 @@
 import { useMemo } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { useAuthSession } from '@/core/features/auth'
+import {
+  TEAM_RACE_MENU_TAB,
+  TEAM_RACE_TAB_PARAM,
+} from '@/core/shared/utils'
 import {
   isTeamAnnouncementTargetedToUser,
   mapTeamAnnouncementHistoryItem,
@@ -9,6 +13,7 @@ import { useTeamAnnouncementHistoryQuery } from '../../model/server/useTeamAnnou
 
 export const useTeamAnnouncementHistory = () => {
   const { raceId } = useParams<{ raceId: string }>()
+  const [, setSearchParams] = useSearchParams()
   const auth = useAuthSession()
   const query = useTeamAnnouncementHistoryQuery(raceId)
 
@@ -19,6 +24,13 @@ export const useTeamAnnouncementHistory = () => {
   ), [auth.user?.id, query.data])
 
   return {
+    backToMenu: () => {
+      setSearchParams((current) => {
+        const next = new URLSearchParams(current)
+        next.set(TEAM_RACE_TAB_PARAM, TEAM_RACE_MENU_TAB)
+        return next
+      })
+    },
     isError: query.isError,
     isLoading: query.isLoading,
     items,

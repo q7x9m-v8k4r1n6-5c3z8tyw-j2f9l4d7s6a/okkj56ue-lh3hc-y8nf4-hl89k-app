@@ -1,13 +1,7 @@
 import { ArrowLeftIcon } from '@/core/assets'
 import { useTeamAnnouncementHistory } from './hooks/useTeamAnnouncementHistory'
 
-export type TeamAnnouncementHistoryViewProps = {
-  onBack: () => void
-}
-
-export const TeamAnnouncementHistoryView = ({
-  onBack,
-}: TeamAnnouncementHistoryViewProps) => {
+export const TeamAnnouncementHistoryView = () => {
   const history = useTeamAnnouncementHistory()
 
   return (
@@ -19,7 +13,7 @@ export const TeamAnnouncementHistoryView = ({
         type="button"
         id="team-announcement-history-title"
         className="mx-auto mb-6 flex h-7 items-center justify-center gap-3 text-[16px] font-semibold text-[#202020]"
-        onClick={onBack}
+        onClick={history.backToMenu}
       >
         <ArrowLeftIcon className="size-5" />
         Lịch sử thông báo

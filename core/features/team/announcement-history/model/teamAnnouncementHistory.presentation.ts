@@ -20,7 +20,7 @@ export const mapTeamAnnouncementHistoryItem = (
   message: TeamAnnouncementMessage,
 ): TeamAnnouncementHistoryItem => ({
   id: message.id,
-  senderName: message.senderName || 'ADMIN',
+  senderName: 'ADMIN',
   body: message.body,
   sentAt: formatGmt7DateTime(message.createdAt),
 })

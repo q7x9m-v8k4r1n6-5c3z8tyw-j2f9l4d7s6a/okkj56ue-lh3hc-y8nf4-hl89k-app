@@ -60,7 +60,7 @@ export const OrganizerRacePage = () => {
       {canShowRaceTabs && page.activeTab === 'requests' ? <OrganizerJoinRequestsView /> : null}
       {canShowRaceTabs && page.activeTab === 'history' ? <OrganizerHistoryView /> : null}
       {canShowRaceTabs && page.activeTab === 'announcement-history' ? (
-        <OrganizerAnnouncementHistoryView onBack={page.openMenu} />
+        <OrganizerAnnouncementHistoryView />
       ) : null}
     </OrganizerRouteLayout>
   )

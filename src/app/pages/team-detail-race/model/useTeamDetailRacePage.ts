@@ -1,6 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useTeamRaceAccess } from '@/core/features/team/team-race'
+import {
+  TEAM_RACE_ANNOUNCEMENT_HISTORY_TAB,
+  TEAM_RACE_MENU_TAB,
+  TEAM_RACE_TAB_PARAM,
+} from '@/core/shared/utils'
 import {
   isTeamDetailRaceTab,
   isTeamPrimaryRaceTab,
@@ -17,7 +22,7 @@ export const useTeamDetailRacePage = () => {
   const { raceId } = useParams<{ raceId: string }>()
   const [searchParams, setSearchParams] = useSearchParams()
   const raceAccess = useTeamRaceAccess(raceId)
-  const initialTab = searchParams.get('tab')
+  const initialTab = searchParams.get(TEAM_RACE_TAB_PARAM)
   const [activeTab, setActiveTab] = useState<TeamDetailRaceTab>(
     initialTab && isTeamDetailRaceTab(initialTab) ? initialTab : 'rules'
   )
@@ -29,10 +34,17 @@ export const useTeamDetailRacePage = () => {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
+  useEffect(() => {
+    const requestedTab = searchParams.get(TEAM_RACE_TAB_PARAM)
+    if (!requestedTab || !isTeamDetailRaceTab(requestedTab)) return
+    setActiveTab(requestedTab)
+    setIsMenuOpen(requestedTab === TEAM_RACE_MENU_TAB)
+  }, [searchParams])
+
   const setTab = (tab: TeamDetailRaceTab) => {
     setSearchParams((current) => {
       const next = new URLSearchParams(current)
-      next.set('tab', tab)
+      next.set(TEAM_RACE_TAB_PARAM, tab)
       return next
     })
     setActiveTab(tab)
@@ -40,6 +52,7 @@ export const useTeamDetailRacePage = () => {
 
   const openMenu = () => {
     if (isTeamPrimaryRaceTab(activeTab)) setPreviousTab(activeTab)
+    setTab(TEAM_RACE_MENU_TAB)
     setIsMenuOpen(true)
   }
 
@@ -67,7 +80,7 @@ export const useTeamDetailRacePage = () => {
     
     openAnnouncementHistory: () => {
       setIsMenuOpen(false)
-      setTab('announcement-history')
+      setTab(TEAM_RACE_ANNOUNCEMENT_HISTORY_TAB)
     },
     openMenu,
     toggleMenu: () => {

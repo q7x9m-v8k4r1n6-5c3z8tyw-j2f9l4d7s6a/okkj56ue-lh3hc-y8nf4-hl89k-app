@@ -1,6 +1,10 @@
 import { useMemo } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { useAuthSession } from '@/core/features/auth'
+import {
+  ORGANIZER_RACE_MENU_TAB,
+  ORGANIZER_RACE_TAB_PARAM,
+} from '@/core/shared/utils'
 import {
   isOrganizerAnnouncementTargetedToUser,
   mapOrganizerAnnouncementHistoryItem,
@@ -9,6 +13,7 @@ import { useOrganizerAnnouncementHistoryQuery } from '../../model/server/useOrga
 
 export const useOrganizerAnnouncementHistory = () => {
   const { raceId } = useParams<{ raceId: string }>()
+  const [, setSearchParams] = useSearchParams()
   const auth = useAuthSession()
   const query = useOrganizerAnnouncementHistoryQuery(raceId)
 
@@ -19,6 +24,13 @@ export const useOrganizerAnnouncementHistory = () => {
   ), [auth.user?.id, query.data])
 
   return {
+    backToMenu: () => {
+      setSearchParams((current) => {
+        const next = new URLSearchParams(current)
+        next.set(ORGANIZER_RACE_TAB_PARAM, ORGANIZER_RACE_MENU_TAB)
+        return next
+      })
+    },
     isError: query.isError,
     isLoading: query.isLoading,
     items,

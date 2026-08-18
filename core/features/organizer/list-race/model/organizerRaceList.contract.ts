@@ -4,6 +4,7 @@ import { raceSummarySchema } from '@/core/entities/race'
 export const listOrganizerRacesRequestSchema = z.object({
   page: z.number().int().positive().optional(),
   pageSize: z.number().int().positive().max(100).optional(),
+  participantView: z.literal(true).optional(),
 })
 
 export const listOrganizerRacesResponseSchema = z.object({

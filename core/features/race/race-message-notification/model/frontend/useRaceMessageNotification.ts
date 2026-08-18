@@ -11,6 +11,8 @@ import { useRaceMessageSignalR } from '../server/useRaceMessageSignalR'
 
 const storagePrefix = 'ovc-race-message-notification'
 const dismissedStoragePrefix = 'ovc-race-message-notification-dismissed'
+const notificationSenderName = 'ADMIN'
+const collapsedMessageLength = 76
 
 const getStorageKey = (raceId?: string, userId?: string) => {
   if (!raceId || !userId) return null
@@ -93,9 +95,19 @@ const isTargetedToUser = (
   return false
 }
 
-const toBanner = (message: RaceMessageNotification) => ({
+const shouldCollapseMessage = (message: RaceMessageNotification) =>
+  message.body.split(/\r?\n/).length >= 2 ||
+  `${notificationSenderName}: ${message.body}`.length > collapsedMessageLength
+
+const toBanner = (
+  message: RaceMessageNotification,
+  expandedIds: Set<string>,
+) => ({
   id: message.id,
-  text: `${message.senderName || 'ADMIN'}: ${message.body}`,
+  body: message.body,
+  isExpandable: shouldCollapseMessage(message),
+  isExpanded: expandedIds.has(message.id),
+  senderName: notificationSenderName,
 })
 
 export const useRaceMessageNotification = () => {
@@ -107,6 +119,7 @@ export const useRaceMessageNotification = () => {
   const [messagesByStorageKey, setMessagesByStorageKey] = useState<
     Record<string, RaceMessageNotification[]>
   >({})
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set())
   const historyQuery = useRaceMessageNotificationsQuery(
     raceId,
     Boolean(auth.user?.id),
@@ -192,9 +205,17 @@ export const useRaceMessageNotification = () => {
     onMessageReceived: handleMessageReceived,
   })
 
-  const banners = useMemo(() => messages.map(toBanner), [messages])
+  const banners = useMemo(
+    () => messages.map((message) => toBanner(message, expandedIds)),
+    [expandedIds, messages],
+  )
 
   const dismiss = useCallback((messageId: string) => {
+    setExpandedIds((current) => {
+      const next = new Set(current)
+      next.delete(messageId)
+      return next
+    })
     setMessagesByStorageKey((currentByKey) => {
       if (!storageKey) return currentByKey
 
@@ -223,9 +244,23 @@ export const useRaceMessageNotification = () => {
     })
   }, [dismissedStorageKey, storageKey])
 
+  const toggleExpanded = useCallback((messageId: string) => {
+    setExpandedIds((current) => {
+      const next = new Set(current)
+      if (next.has(messageId)) {
+        next.delete(messageId)
+      } else {
+        next.add(messageId)
+      }
+
+      return next
+    })
+  }, [])
+
   return {
     banners,
     isVisible: banners.length > 0,
     dismiss,
+    toggleExpanded,
   }
 }

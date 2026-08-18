@@ -25,16 +25,36 @@ export const RaceMessageNotificationBanner = () => {
     <div className="pointer-events-none fixed left-0 right-0 top-[92px] z-50 mx-auto flex w-full max-w-md flex-col gap-2 px-5">
       {notification.banners.map((banner) => (
         <div
-          className="pointer-events-auto flex min-h-[64px] items-center gap-4 rounded-[10px] bg-[#f8d1d3] px-4 py-3 text-[#564240] shadow-[0_8px_24px_rgba(15,23,42,0.12)]"
+          className="pointer-events-auto flex min-h-[64px] items-start gap-3 rounded-[10px] bg-[#f8d1d3] px-4 py-3 text-[#564240] shadow-[0_8px_24px_rgba(15,23,42,0.12)]"
           key={banner.id}
         >
-          <MegaphoneIcon className="size-5 shrink-0" />
-          <p className="min-w-0 flex-1 text-[15px] leading-5">
-            {banner.text}
-          </p>
+          <MegaphoneIcon className="mt-0.5 size-5 shrink-0" />
+          <div className="min-w-0 flex-1">
+            <p
+              className="whitespace-pre-wrap break-words text-[15px] leading-5"
+              style={banner.isExpanded ? undefined : {
+                WebkitBoxOrient: 'vertical',
+                WebkitLineClamp: 2,
+                display: '-webkit-box',
+                overflow: 'hidden',
+              }}
+            >
+              <span className="font-semibold">{banner.senderName}: </span>
+              {banner.body}
+            </p>
+            {banner.isExpandable ? (
+              <button
+                className="mt-1 text-[13px] font-semibold leading-5 text-[#de3336]"
+                type="button"
+                onClick={() => notification.toggleExpanded(banner.id)}
+              >
+                {banner.isExpanded ? 'Thu gọn' : 'Xem thêm'}
+              </button>
+            ) : null}
+          </div>
           <button
             aria-label="Đóng thông báo"
-            className="flex size-8 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-white/35"
+            className="-mr-1 -mt-1 flex size-8 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-white/35"
             type="button"
             onClick={() => notification.dismiss(banner.id)}
           >

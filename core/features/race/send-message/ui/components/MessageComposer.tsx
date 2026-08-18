@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { CloseIcon } from '@/core/assets/icons'
 import type { MessageRecipient } from '../../model/sendMessage.schema'
 
@@ -43,6 +43,7 @@ export const MessageComposer = ({
 }: MessageComposerProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const bodyInputRef = useRef<HTMLTextAreaElement>(null)
+  const recipientPickerRef = useRef<HTMLDivElement>(null)
 
   const focusBodyInput = () => {
     window.requestAnimationFrame(() => {
@@ -50,9 +51,27 @@ export const MessageComposer = ({
     })
   }
 
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target
+      if (!(target instanceof Node)) return
+      if (recipientPickerRef.current?.contains(target)) return
+
+      setIsOpen(false)
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+    }
+  }, [isOpen])
+
   return (
     <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_126px]">
-      <div className="relative">
+      <div ref={recipientPickerRef} className="relative">
         <div
           aria-expanded={isOpen}
           aria-label="Gửi đến"

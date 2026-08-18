@@ -1,5 +1,6 @@
 export {
   isOrganizerRaceSelectable,
+  isOrganizerRaceVisible,
   ORGANIZER_RACE_UNAVAILABLE_MESSAGE,
 } from './model/frontend/organizerRaceAccess'
 export { OrganizerRaceUnavailableView } from './ui/OrganizerRaceUnavailableView'
