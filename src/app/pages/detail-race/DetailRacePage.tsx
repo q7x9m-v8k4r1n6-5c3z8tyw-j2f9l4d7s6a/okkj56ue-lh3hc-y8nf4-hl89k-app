@@ -1,6 +1,7 @@
 import { EditRaceView } from '@/core/features/race/edit-race'
 import { LiveRaceView } from '@/core/features/race/live-race'
 import { SendMessageView } from '@/core/features/race/send-message'
+import { CardWorkflowManagementView } from '@/core/features/race/manage-card-workflows'
 import { Tabs } from '@/core/shared'
 import { useDetailRacePage } from './model/useDetailRacePage'
 
@@ -23,7 +24,8 @@ export const DetailRacePage = () => {
           {activeTab === 'basic' && <EditRaceView />}
           {activeTab === 'live' && <LiveRaceView />}
           {activeTab === 'message' && <SendMessageView />}
-          {activeTab !== 'basic' && activeTab !== 'live' && activeTab !== 'message' && (
+          {activeTab === 'cards' && <CardWorkflowManagementView />}
+          {activeTab !== 'basic' && activeTab !== 'live' && activeTab !== 'message' && activeTab !== 'cards' && (
             <div className="flex h-full items-center justify-center text-gray-400">
               {activeTabLabel}
             </div>

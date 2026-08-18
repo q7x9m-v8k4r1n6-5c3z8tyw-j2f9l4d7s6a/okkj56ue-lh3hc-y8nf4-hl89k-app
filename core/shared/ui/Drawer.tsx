@@ -4,15 +4,16 @@ import { CloseIcon } from '@/core/assets'
 
 export type DrawerProps = PropsWithChildren<{
   open: boolean
-  title: string
+  title: ReactNode
   icon?: ReactNode
   footer?: ReactNode
   panelClassName?: string
   layerClassName?: string
+  contentClassName?: string
   onClose: () => void
 }>
 
-export const Drawer = ({ children, footer, icon, layerClassName = '', onClose, open, panelClassName = '', title }: DrawerProps) => {
+export const Drawer = ({ children, contentClassName = '', footer, icon, layerClassName = '', onClose, open, panelClassName = '', title }: DrawerProps) => {
   useEffect(() => {
     if (!open) return
     const handleKeyDown = (event: KeyboardEvent) => event.key === 'Escape' && onClose()
@@ -37,7 +38,7 @@ export const Drawer = ({ children, footer, icon, layerClassName = '', onClose, o
             <CloseIcon className="size-3.5" />
           </button>
         </header>
-        <div className="min-h-0 flex-1 overflow-y-auto px-6 py-8">{children}</div>
+        <div className={`min-h-0 flex-1 overflow-y-auto px-6 py-8 ${contentClassName}`}>{children}</div>
         {footer ? <footer className="flex min-h-[86px] shrink-0 items-center justify-end gap-4 border-t border-[#eeeeee] px-6 py-6">{footer}</footer> : null}
       </aside>
     </div>,
