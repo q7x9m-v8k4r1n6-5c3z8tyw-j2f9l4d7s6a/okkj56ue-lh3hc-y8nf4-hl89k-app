@@ -12,9 +12,10 @@ type UseTeamBoothSignalRProps = {
   activeBoothId?: string
   raceId?: string
   teamId?: string
+  onBoothCompleted: (boothId: string, boothName: string, score: number) => void
   onEntryRejected: (boothId: string) => void
+  onSessionAccepted: (boothId: string) => void
   onSessionCancelled: (boothId: string) => void
-  onSessionReleased: () => void
 }
 
 /** Keeps the QR workflow aware when an organizer rejects or kicks the team. */
@@ -22,15 +23,17 @@ export const useTeamBoothSignalR = ({
   activeBoothId,
   raceId,
   teamId,
+  onBoothCompleted,
   onEntryRejected,
+  onSessionAccepted,
   onSessionCancelled,
-  onSessionReleased,
 }: UseTeamBoothSignalRProps) => {
   const queryClient = useQueryClient()
   const activeBoothIdRef = useRef(activeBoothId)
   const callbackRef = useRef(onSessionCancelled)
+  const acceptedCallbackRef = useRef(onSessionAccepted)
+  const completedCallbackRef = useRef(onBoothCompleted)
   const rejectedCallbackRef = useRef(onEntryRejected)
-  const releasedCallbackRef = useRef(onSessionReleased)
 
   useEffect(() => {
     activeBoothIdRef.current = activeBoothId
@@ -41,12 +44,16 @@ export const useTeamBoothSignalR = ({
   }, [onSessionCancelled])
 
   useEffect(() => {
-    rejectedCallbackRef.current = onEntryRejected
-  }, [onEntryRejected])
+    acceptedCallbackRef.current = onSessionAccepted
+  }, [onSessionAccepted])
 
   useEffect(() => {
-    releasedCallbackRef.current = onSessionReleased
-  }, [onSessionReleased])
+    completedCallbackRef.current = onBoothCompleted
+  }, [onBoothCompleted])
+
+  useEffect(() => {
+    rejectedCallbackRef.current = onEntryRejected
+  }, [onEntryRejected])
 
   useEffect(() => {
     if (!raceId || !teamId) return
@@ -61,11 +68,15 @@ export const useTeamBoothSignalR = ({
     return startTeamBoothSignalRSession({
       connection,
       getActiveBoothId: () => activeBoothIdRef.current,
+      onBoothCompleted: (boothId, boothName, score) => {
+        void invalidateTeamBoothSession(queryClient, raceId)
+        completedCallbackRef.current(boothId, boothName, score)
+      },
       onBoothStatusChanged: (_boothId, status) => {
         void invalidateTeamBoothSession(queryClient, raceId)
         const parsedStatus = boothStatusSchema.safeParse(status)
-        if (parsedStatus.data === 'free') {
-          releasedCallbackRef.current()
+        if (parsedStatus.data === 'occupied') {
+          acceptedCallbackRef.current(_boothId)
         }
       },
       onEntryRejected: (boothId) => {

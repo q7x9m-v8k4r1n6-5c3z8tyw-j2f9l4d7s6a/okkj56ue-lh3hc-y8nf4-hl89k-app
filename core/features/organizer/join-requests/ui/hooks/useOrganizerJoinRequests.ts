@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
 import { invalidateMyBooth, useMyBoothQuery } from '@/core/entities/booth'
+import { useToast } from '@/core/shared'
 import { useOrganizerJoinRequestsState } from '../../model/frontend/useOrganizerJoinRequestsState'
 import { getActionErrorMessage } from '../../model/getActionErrorMessage'
 import { mapMyBoothToOrganizerSession } from '../../model/mapMyBoothToOrganizerSession'
@@ -13,6 +14,7 @@ import { useOrganizerJoinRequestActions } from './useOrganizerJoinRequestActions
 export const useOrganizerJoinRequests = () => {
   const { raceId } = useParams<{ raceId: string }>()
   const queryClient = useQueryClient()
+  const { toast } = useToast()
   const myBoothQuery = useMyBoothQuery(raceId)
   const state = useOrganizerJoinRequestsState()
   const [errorMessage, setErrorMessage] = useState('')
@@ -28,6 +30,20 @@ export const useOrganizerJoinRequests = () => {
     void invalidateMyBooth(queryClient, raceId)
   }, [queryClient, raceId])
 
+  const handleBoothStatusChanged = useCallback((
+    status?: string,
+    teamName?: string | null,
+  ) => {
+    invalidateBoothSession()
+    if (status === 'pending') {
+      toast({
+        title: 'Có yêu cầu vào trạm',
+        description: `${teamName || 'Một đội chơi'} đang chờ bạn xác nhận.`,
+        variant: 'info',
+      })
+    }
+  }, [invalidateBoothSession, toast])
+
   const retryBoothSession = useCallback(() => {
     setErrorMessage('')
     void refetchMyBooth()
@@ -35,7 +51,7 @@ export const useOrganizerJoinRequests = () => {
 
   useBoothSignalR({
     boothId: myBoothQuery.data?.boothId,
-    onBoothStatusChanged: invalidateBoothSession,
+    onBoothStatusChanged: handleBoothStatusChanged,
   })
 
   const requestActions = useOrganizerJoinRequestActions({

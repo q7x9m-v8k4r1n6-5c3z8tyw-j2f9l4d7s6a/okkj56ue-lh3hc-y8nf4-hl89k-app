@@ -8,13 +8,11 @@ import {
 import { useParams } from 'react-router-dom'
 import { useTeamBoothSessionQuery } from '@/core/entities/booth'
 import { useAuthSession } from '@/core/features/auth'
-import { useToast } from '@/core/shared'
 import { shouldResetBoothRequest } from '../../model/frontend/teamBoothSessionRecovery'
 import { useTeamQrScanForm } from '../../model/frontend/useTeamQrScanForm'
 import { mapQrToRequest } from '../../model/mapQrToRequest'
 import { validateQrCode } from '../../model/scanQr.validation'
 import { useScanQrMutation } from '../../model/server/useScanQrMutation'
-import { useTeamBoothSignalR } from '../../model/server/useTeamBoothSignalR'
 
 const getErrorMessage = (error: unknown) => {
   if (error instanceof Error) return error.message
@@ -31,7 +29,6 @@ export const useTeamQrScanPage = () => {
   const mutation = useScanQrMutation(raceId)
   const sessionQuery = useTeamBoothSessionQuery(raceId)
   const authSession = useAuthSession()
-  const { toast } = useToast()
   const teamId = authSession.user?.id
   const session = sessionQuery.data ?? null
   const hadActiveSessionRef = useRef(false)
@@ -63,33 +60,6 @@ export const useTeamQrScanPage = () => {
     sessionQuery.isFetched,
     sessionQuery.isFetching,
   ])
-
-  const handleEntryRejected = useCallback(() => {
-    resetBoothRequest()
-    toast({
-      title: 'Yêu cầu vào trạm bị từ chối',
-      description: 'Quản trạm đã từ chối yêu cầu. Vui lòng chọn trạm khác.',
-      variant: 'warning',
-    })
-  }, [resetBoothRequest, toast])
-
-  const handleSessionCancelled = useCallback(() => {
-    resetBoothRequest()
-    toast({
-      title: 'Lượt chơi đã bị hủy',
-      description: 'Quản trạm đã hủy lượt chơi. Vui lòng chọn trạm khác.',
-      variant: 'warning',
-    })
-  }, [resetBoothRequest, toast])
-
-  useTeamBoothSignalR({
-    activeBoothId: session?.boothId,
-    raceId,
-    teamId,
-    onEntryRejected: handleEntryRejected,
-    onSessionCancelled: handleSessionCancelled,
-    onSessionReleased: resetBoothRequest,
-  })
 
   const handleScan = (qrCode: string) => {
     if (

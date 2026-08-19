@@ -4,7 +4,10 @@ import { getAuthToken } from '@/core/shared/api'
 
 type UseBoothSignalROptions = {
   boothId?: string
-  onBoothStatusChanged: () => void
+  onBoothStatusChanged: (
+    status?: string,
+    teamName?: string | null,
+  ) => void
 }
 
 /** Uses realtime as an invalidation signal; the database remains the source of truth. */
@@ -33,9 +36,14 @@ export const useBoothSignalR = ({
       callbackRef.current()
     }
 
-    connection.on('ReceiveBoothStatusChanged', (changedBoothId: string) => {
+    connection.on('ReceiveBoothStatusChanged', (
+      changedBoothId: string,
+      status: string,
+      _teamId?: string | null,
+      teamName?: string | null,
+    ) => {
       if (changedBoothId.toLowerCase() === boothId.toLowerCase()) {
-        callbackRef.current()
+        callbackRef.current(status, teamName)
       }
     })
 

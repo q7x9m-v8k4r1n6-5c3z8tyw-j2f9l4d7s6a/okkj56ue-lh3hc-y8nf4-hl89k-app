@@ -13,6 +13,11 @@ type TeamBoothSignalRSessionOptions = {
     status: string,
     teamId?: string | null,
   ) => void
+  onBoothCompleted: (
+    boothId: string,
+    boothName: string,
+    score: number,
+  ) => void
   onEntryRejected: (boothId: string) => void
   onReconnected: () => void
   onSessionCancelled: (boothId: string) => void
@@ -28,6 +33,7 @@ export const startTeamBoothSignalRSession = ({
   connection,
   getActiveBoothId,
   onBoothStatusChanged,
+  onBoothCompleted,
   onEntryRejected,
   onReconnected,
   onSessionCancelled,
@@ -55,10 +61,21 @@ export const startTeamBoothSignalRSession = ({
   const handleRejected = (boothId: string, rejectedTeamId: string) => {
     if (isSameId(rejectedTeamId, teamId)) onEntryRejected(boothId)
   }
+  const handleCompleted = (
+    boothId: string,
+    completedTeamId: string,
+    boothName: string,
+    score: number,
+  ) => {
+    if (isSameId(completedTeamId, teamId)) {
+      onBoothCompleted(boothId, boothName, score)
+    }
+  }
 
   connection.on('ReceiveBoothStatusChanged', handleBoothStatusChanged)
   connection.on('ReceiveBoothEntryCancelled', handleCancelled)
   connection.on('ReceiveBoothEntryRejected', handleRejected)
+  connection.on('ReceiveBoothCompleted', handleCompleted)
   connection.onreconnected(() => {
     void joinRaceGroup().then(onReconnected)
   })
@@ -73,6 +90,7 @@ export const startTeamBoothSignalRSession = ({
     connection.off('ReceiveBoothStatusChanged', handleBoothStatusChanged)
     connection.off('ReceiveBoothEntryCancelled', handleCancelled)
     connection.off('ReceiveBoothEntryRejected', handleRejected)
+    connection.off('ReceiveBoothCompleted', handleCompleted)
     void connection.invoke('LeaveRaceGroup', raceId).catch(() => undefined)
     void connection.stop()
   }

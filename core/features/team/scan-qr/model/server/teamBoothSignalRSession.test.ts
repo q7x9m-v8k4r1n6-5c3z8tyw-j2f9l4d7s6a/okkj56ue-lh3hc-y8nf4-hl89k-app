@@ -2,7 +2,7 @@ import type { HubConnection } from '@microsoft/signalr'
 import { describe, expect, it, vi } from 'vitest'
 import { startTeamBoothSignalRSession } from './teamBoothSignalRSession'
 
-type Handler = (...args: string[]) => void
+type Handler = (...args: unknown[]) => void
 
 const createConnection = () => {
   const handlers = new Map<string, Handler>()
@@ -39,6 +39,7 @@ describe('startTeamBoothSignalRSession', () => {
   it('handles rejected and cancelled events only for the current team', () => {
     const realtime = createConnection()
     const onBoothStatusChanged = vi.fn()
+    const onBoothCompleted = vi.fn()
     const onEntryRejected = vi.fn()
     const onReconnected = vi.fn()
     const onSessionCancelled = vi.fn()
@@ -47,6 +48,7 @@ describe('startTeamBoothSignalRSession', () => {
       connection: realtime.connection,
       getActiveBoothId: () => undefined,
       onBoothStatusChanged,
+      onBoothCompleted,
       onEntryRejected,
       onReconnected,
       onSessionCancelled,
@@ -65,6 +67,39 @@ describe('startTeamBoothSignalRSession', () => {
     expect(onSessionCancelled).toHaveBeenCalledWith('booth-2')
   })
 
+  it('forwards completion only for the authenticated team', () => {
+    const realtime = createConnection()
+    const onBoothCompleted = vi.fn()
+
+    startTeamBoothSignalRSession({
+      connection: realtime.connection,
+      getActiveBoothId: () => 'booth-1',
+      onBoothCompleted,
+      onBoothStatusChanged: vi.fn(),
+      onEntryRejected: vi.fn(),
+      onReconnected: vi.fn(),
+      onSessionCancelled: vi.fn(),
+      raceId: 'race-1',
+      teamId: 'team-a',
+    })
+
+    realtime.handlers.get('ReceiveBoothCompleted')?.(
+      'booth-1',
+      'team-b',
+      'Trạm B',
+      30,
+    )
+    realtime.handlers.get('ReceiveBoothCompleted')?.(
+      'booth-1',
+      'TEAM-A',
+      'Trạm A',
+      50,
+    )
+
+    expect(onBoothCompleted).toHaveBeenCalledOnce()
+    expect(onBoothCompleted).toHaveBeenCalledWith('booth-1', 'Trạm A', 50)
+  })
+
   it('forwards booth status changes so the query layer can refresh DB state', () => {
     const realtime = createConnection()
     const onBoothStatusChanged = vi.fn()
@@ -73,6 +108,7 @@ describe('startTeamBoothSignalRSession', () => {
       connection: realtime.connection,
       getActiveBoothId: () => 'booth-1',
       onBoothStatusChanged,
+      onBoothCompleted: vi.fn(),
       onEntryRejected: vi.fn(),
       onReconnected: vi.fn(),
       onSessionCancelled: vi.fn(),
@@ -118,6 +154,7 @@ describe('startTeamBoothSignalRSession', () => {
       connection: realtime.connection,
       getActiveBoothId: () => undefined,
       onBoothStatusChanged: vi.fn(),
+      onBoothCompleted: vi.fn(),
       onEntryRejected: vi.fn(),
       onReconnected,
       onSessionCancelled: vi.fn(),

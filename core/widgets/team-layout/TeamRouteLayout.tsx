@@ -1,4 +1,5 @@
 import type { PropsWithChildren } from 'react'
+import { TeamBoothNotificationListener } from '@/core/features/team/scan-qr'
 import { TeamLayout, type TeamNavItem } from '@/core/shared'
 import { useTeamRouteLayout } from './useTeamRouteLayout'
 
@@ -26,16 +27,19 @@ export const TeamRouteLayout = ({
   const layout = useTeamRouteLayout()
 
   return (
-    <TeamLayout
-      activeNavId={activeNavId}
-      isMenuOpen={isMenuOpen}
-      navItems={navItems}
-      onHeaderMenuToggle={onHeaderMenuToggle}
-      onNavChange={onNavChange}
-      raceName={raceName}
-      teamName={layout.teamName}
-    >
-      {children}
-    </TeamLayout>
+    <>
+      <TeamBoothNotificationListener />
+      <TeamLayout
+        activeNavId={activeNavId}
+        isMenuOpen={isMenuOpen}
+        navItems={navItems}
+        onHeaderMenuToggle={onHeaderMenuToggle}
+        onNavChange={onNavChange}
+        raceName={raceName}
+        teamName={layout.teamName}
+      >
+        {children}
+      </TeamLayout>
+    </>
   )
 }
