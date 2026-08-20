@@ -10,15 +10,16 @@ import {
   type SaveFunctionCardRequest,
 } from '../model/mockCards'
 import { useFunctionCardMutations, useFunctionCards, useFunctionCardTeams } from '../model/server/useFunctionCards'
-import type { TriggerType, Workflow } from '../model/workflow.contract'
+import type { Workflow } from '../model/workflow.contract'
 import { useCardWorkflows, useWorkflowCatalog } from '../model/server/useCardWorkflows'
 import { FunctionCardDrawer } from './components/FunctionCardDrawer'
 import { WorkflowBuilderDrawer } from './components/WorkflowBuilderDrawer'
+// import type { TriggerType } from '../model/workflow.contract'
 
-const triggerLabels: Record<TriggerType, string> = {
-  activated: 'Kích hoạt',
-  attacked: 'Khi bị tấn công',
-}
+// const triggerLabels: Record<TriggerType, string> = {
+//   activated: 'Kích hoạt',
+//   attacked: 'Khi bị tấn công',
+// }
 
 const statusLabels = {
   draft: 'Bản nháp',
