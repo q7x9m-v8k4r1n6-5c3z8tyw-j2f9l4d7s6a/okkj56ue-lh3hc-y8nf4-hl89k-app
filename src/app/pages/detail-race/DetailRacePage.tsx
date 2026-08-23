@@ -1,6 +1,10 @@
 import { EditRaceView } from '@/core/features/race/edit-race'
 import { LiveRaceView } from '@/core/features/race/live-race'
 import { SendMessageView } from '@/core/features/race/send-message'
+// ==================== [PLUGIN: secret-mission (Admin)] START ====================
+import { AdminSecretMissionListView } from '@/plugin/move2026/features/secret-mission/admin-secret-mission/ui/AdminSecretMissionListView'
+// ==================== [PLUGIN: secret-mission (Admin)] END ======================
+
 import { CardWorkflowManagementView } from '@/core/features/race/manage-card-workflows'
 import { Tabs } from '@/core/shared'
 import { useDetailRacePage } from './model/useDetailRacePage'
@@ -25,7 +29,8 @@ export const DetailRacePage = () => {
           {activeTab === 'live' && <LiveRaceView />}
           {activeTab === 'message' && <SendMessageView />}
           {activeTab === 'cards' && <CardWorkflowManagementView />}
-          {activeTab !== 'basic' && activeTab !== 'live' && activeTab !== 'message' && activeTab !== 'cards' && (
+          {activeTab === 'secret' && <AdminSecretMissionListView />}
+          {activeTab !== 'basic' && activeTab !== 'live' && activeTab !== 'message' && activeTab !== 'cards' && activeTab !== 'secret' && (
             <div className="flex h-full items-center justify-center text-gray-400">
               {activeTabLabel}
             </div>
