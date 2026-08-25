@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react'
 import { useFilePreview } from '../../model/frontend/useFilePreview'
 import type { FileSource } from '../hooks/useSecretMissionDetailContainer'
-import { PluginScreenLayout } from '@/plugin/move2026/shared/ui/PluginScreenLayout'
+import { MobileScreenLayout } from '@/core/shared/ui/MobileScreenLayout'
 
 export type SecretMissionEvidencePreviewProps = {
   missionName: string
@@ -26,10 +26,8 @@ export const SecretMissionEvidencePreview = ({
   
   const isVideo = file.type.startsWith('video/')
 
-  // State để lưu trạng thái ảnh dài hay ngắn
   const [isLongImage, setIsLongImage] = useState(false)
 
-  // Reset state mỗi khi previewUrl thay đổi (user chọn ảnh mới)
   useEffect(() => {
     setIsLongImage(false)
   }, [previewUrl])
@@ -43,7 +41,7 @@ export const SecretMissionEvidencePreview = ({
   }
 
   return (
-    <PluginScreenLayout
+    <MobileScreenLayout
       title="Xác nhận minh chứng"
       onBack={onCancel}
       contentClassName="p-0" 
@@ -77,6 +75,6 @@ export const SecretMissionEvidencePreview = ({
       ) : null}
 
       <input type="file" accept="image/*,video/*" capture={source === 'camera' ? 'environment' : undefined} ref={hiddenInputRef} onChange={handleFileChange} className="hidden" />
-    </PluginScreenLayout>
+    </MobileScreenLayout>
   )
 }

@@ -1,5 +1,5 @@
 import type { SecretMissionDetailDto } from '../../model/detailSecretMission.contract'
-import { PluginScreenLayout } from '@plugin/move2026/shared/ui/PluginScreenLayout'
+import { MobileScreenLayout } from '@/core/shared/ui/MobileScreenLayout'
 import { formatSecretMissionName } from '@plugin/move2026/features/secret-mission/shared/formatSecretMissionName'
 
 export type SecretMissionInfoViewProps = {
@@ -25,7 +25,7 @@ export const SecretMissionInfoView = ({
   }
 
   return (
-    <PluginScreenLayout
+    <MobileScreenLayout
       title={`Thông tin ${formatSecretMissionName(missionData.name, missionData.isAssigned)}`}
       onBack={onBack}
       contentClassName="px-5 pt-3"
@@ -40,6 +40,6 @@ export const SecretMissionInfoView = ({
       }
     >
       {renderSimpleMarkdown(missionData.description)}
-    </PluginScreenLayout>
+    </MobileScreenLayout>
   )
 }

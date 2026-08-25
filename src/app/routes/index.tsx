@@ -38,6 +38,22 @@ export const router = createBrowserRouter([
             },
           },
           {
+            path: 'team/races/:raceId/cards',
+            handle: { title: 'Danh sách thẻ chức năng' },
+            lazy: async () => {
+              const { TeamCardListPage } = await import('@/src/app/pages/team-card-list')
+              return { Component: TeamCardListPage }
+            },
+          },
+          {
+            path: 'team/races/:raceId/cards/:cardId',
+            handle: { title: 'Thông tin thẻ chức năng' },
+            lazy: async () => {
+              const { TeamCardDescriptionPage } = await import('@/src/app/pages/team-card-description')
+              return { Component: TeamCardDescriptionPage }
+            },
+          },
+          {
             path: 'team/races/:raceId/secret-missions/:missionId?',
             handle: { title: 'Danh sách nhiệm vụ bí mật' },
             lazy: async () => {

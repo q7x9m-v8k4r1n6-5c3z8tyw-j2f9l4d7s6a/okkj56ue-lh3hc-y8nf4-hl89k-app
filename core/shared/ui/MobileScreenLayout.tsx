@@ -1,7 +1,7 @@
 import type { PropsWithChildren, ReactNode } from 'react'
 import { ReturnHeader } from './ReturnHeader'
 
-export type PluginScreenLayoutProps = PropsWithChildren<{
+export type MobileScreenLayoutProps = PropsWithChildren<{
   title: string
   onBack: () => void
   footer?: ReactNode
@@ -9,14 +9,14 @@ export type PluginScreenLayoutProps = PropsWithChildren<{
   contentClassName?: string
 }>
 
-export const PluginScreenLayout = ({
+export const MobileScreenLayout = ({
   title,
   onBack,
   footer,
   isOverlayFooter = false,
   contentClassName = 'px-5',
   children,
-}: PluginScreenLayoutProps) => {
+}: MobileScreenLayoutProps) => {
   return (
     <div className="absolute inset-0 z-10 h-full w-full overflow-hidden bg-white">
       

@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCell, TableRow, Skeleton } from '@/core/shared'
 import { formatGmt7Time } from '@/core/shared/utils'
-import { PluginScreenLayout } from '@/plugin/move2026/shared/ui/PluginScreenLayout' 
+import { MobileScreenLayout } from '@/core/shared/ui/MobileScreenLayout' 
 import { formatSecretMissionName } from '@/plugin/move2026/features/secret-mission/shared/formatSecretMissionName'
 import { useSecretMissionListView } from './hooks/useSecretMissionListView'
 
@@ -8,7 +8,7 @@ export const SecretMissionListView = () => {
   const view = useSecretMissionListView()
 
   return (
-    <PluginScreenLayout
+    <MobileScreenLayout
       title="Danh sách các nhiệm vụ bí mật và Tech Cache"
       onBack={view.handleBack}
       contentClassName="px-3"
@@ -67,6 +67,6 @@ export const SecretMissionListView = () => {
           </TableBody>
         </Table>
       </div>
-    </PluginScreenLayout>
+    </MobileScreenLayout>
   )
 }

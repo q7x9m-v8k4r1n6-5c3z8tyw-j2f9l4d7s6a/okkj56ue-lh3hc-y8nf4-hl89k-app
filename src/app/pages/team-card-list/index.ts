@@ -1,0 +1,1 @@
+export { TeamCardListPage } from './TeamCardListPage'
