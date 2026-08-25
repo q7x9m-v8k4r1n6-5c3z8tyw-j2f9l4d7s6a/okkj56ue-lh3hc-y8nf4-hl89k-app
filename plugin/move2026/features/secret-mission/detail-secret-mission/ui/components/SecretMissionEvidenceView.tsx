@@ -6,7 +6,7 @@ import { AddEvidenceCard } from './AddEvidenceCard'
 import { EvidenceCard } from './EvidenceCard'
 import type { FileSource } from '../hooks/useSecretMissionDetailContainer' 
 import { MediaViewerModal } from './MediaViewerModal'
-import { PluginScreenLayout } from '@/plugin/move2026/shared/ui/PluginScreenLayout' 
+import { MobileScreenLayout } from '@/core/shared/ui/MobileScreenLayout' 
 import { formatSecretMissionName } from '../../../shared/formatSecretMissionName'
 
 export type SecretMissionEvidenceViewProps = {
@@ -35,11 +35,10 @@ export const SecretMissionEvidenceView = ({
   }
 
   return (
-    <PluginScreenLayout
+    <MobileScreenLayout
       title={`Minh chứng ${formatSecretMissionName(missionData.name, missionData.isAssigned)}`}
       onBack={onBack}
       contentClassName="px-5 py-4"
-      // Truyền Footer động vào Layout: Trả về undefined nếu không có evidence để Layout ẩn thẻ footer đi
       footer={
         view.hasAnyEvidence ? (
           <button 
@@ -52,7 +51,6 @@ export const SecretMissionEvidenceView = ({
         ) : undefined
       }
     >
-      {/* VÙNG NỘI DUNG CHÍNH (Đã được Layout bao bọc và xử lý cuộn) */}
       <div className="grid grid-cols-3 gap-3">
         {view.mergedEvidences.map((evidence) => (
           <EvidenceCard 
@@ -71,7 +69,6 @@ export const SecretMissionEvidenceView = ({
         ) : null}
       </div>
 
-      {/* CÁC THÀNH PHẦN ẨN VÀ MODALS (Không ảnh hưởng đến UI Layout) */}
       <input type="file" accept="image/*,video/*" capture="environment" ref={cameraInputRef} onChange={handleFileChange('camera')} className="hidden" />
       <input type="file" accept="image/*,video/*" ref={galleryInputRef} onChange={handleFileChange('gallery')} className="hidden" />
 
@@ -108,6 +105,6 @@ export const SecretMissionEvidenceView = ({
         />
       ) : null}
 
-    </PluginScreenLayout>
+    </MobileScreenLayout>
   )
 }

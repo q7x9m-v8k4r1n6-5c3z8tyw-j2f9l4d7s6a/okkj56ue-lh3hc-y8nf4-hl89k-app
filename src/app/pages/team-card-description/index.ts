@@ -1,0 +1,1 @@
+export { TeamCardDescriptionPage } from './TeamCardDescriptionPage'
