@@ -39,7 +39,7 @@ export const router = createBrowserRouter([
           },
           {
             path: 'team/races/:raceId/cards',
-            handle: { title: 'Danh sách thẻ chức năng' },
+            handle: { title: 'Danh sách card' },
             lazy: async () => {
               const { TeamCardListPage } = await import('@/src/app/pages/team-card-list')
               return { Component: TeamCardListPage }
@@ -47,7 +47,7 @@ export const router = createBrowserRouter([
           },
           {
             path: 'team/races/:raceId/cards/:cardId',
-            handle: { title: 'Thông tin thẻ chức năng' },
+            handle: { title: 'Thông tin card' },
             lazy: async () => {
               const { TeamCardDescriptionPage } = await import('@/src/app/pages/team-card-description')
               return { Component: TeamCardDescriptionPage }

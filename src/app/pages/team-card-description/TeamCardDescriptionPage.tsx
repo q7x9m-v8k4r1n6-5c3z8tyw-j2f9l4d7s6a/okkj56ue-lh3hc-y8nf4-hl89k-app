@@ -1,11 +1,11 @@
-import { CardDescriptionView } from '@/core/features/team/card/card-description'
+import { TeamCardDetailView } from '@/plugin/move2026/features/card'
 import { TeamRaceMenuView } from '@/core/features/team/race-menu'
 import { TeamRaceUnavailableView } from '@/core/features/team/team-race'
 import { TeamRouteLayout } from '@/core/widgets/team-layout'
 import { useTeamCardDescriptionPage } from './model/useTeamCardDescriptionPage'
 
 /**
- * Entry page hiển thị chi tiết và hành động sử dụng của một thẻ chức năng.
+ * Entry page hiển thị chi tiết và hành động sử dụng của một card.
  */
 export const TeamCardDescriptionPage = () => {
   const page = useTeamCardDescriptionPage()
@@ -43,7 +43,7 @@ export const TeamCardDescriptionPage = () => {
             />
           ) : null}
 
-          {canShowContent ? <CardDescriptionView /> : null}
+          {canShowContent ? <TeamCardDetailView /> : null}
         </>
       )}
     </TeamRouteLayout>

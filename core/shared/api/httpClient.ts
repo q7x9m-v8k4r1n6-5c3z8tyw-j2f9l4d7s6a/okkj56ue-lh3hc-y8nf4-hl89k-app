@@ -113,15 +113,17 @@ const apiClient = () => {
         }
 
         const responseData = error.response?.data as ApiErrorPayload | undefined
-        return Promise.reject({
+        const normalizedError = new Error(
+          responseData?.detailError ??
+          responseData?.message ??
+          error.message,
+        )
+        Object.assign(normalizedError, {
           status: error.response?.status,
-          message:
-            responseData?.detailError ??
-            responseData?.message ??
-            error.message,
           data: error.response?.data,
           retryAfterSeconds,
         })
+        return Promise.reject(normalizedError)
       }
 
       if (isRefreshing) {
