@@ -51,6 +51,8 @@ export const useBoothInformationStep = () => {
         managers: [],
         description: '',
         isHidden: false,
+        type: 'other',
+        maximumScore: null,
       }, ...changes,
     } })
 

@@ -67,6 +67,18 @@ describe('mapEditRaceFormToRequest', () => {
     })
   })
 
+  it('patches booth gameplay metadata', () => {
+    const original = createForm()
+    const form = structuredClone(original)
+    form.booths[0].type = 'physical'
+    form.booths[0].maximumScore = 20
+
+    expect(mapEditRaceFormToRequest(form, original)).toEqual({
+      expectedModifiedAt: original.modifiedAt,
+      booths: { update: [{ boothId, type: 'physical', maximumScore: 20 }] },
+    })
+  })
+
   it('builds relation add/remove operations', () => {
     const original = createForm()
     const form = structuredClone(original)
@@ -106,6 +118,8 @@ describe('mapEditRaceFormToRequest', () => {
           place: 'Floor 2',
           description: '',
           isHidden: true,
+          type: 'other',
+          maximumScore: null,
           organizerIds: [],
         }],
       },

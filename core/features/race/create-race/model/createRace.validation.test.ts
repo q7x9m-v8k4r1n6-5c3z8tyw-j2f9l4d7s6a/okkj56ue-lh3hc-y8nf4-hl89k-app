@@ -87,4 +87,21 @@ describe('create-race validation', () => {
       two: { managers: 'Mỗi quản trạm chỉ được quản lý một trạm.' },
     })
   })
+
+  it('requires a maximum score for a physical booth', () => {
+    const physicalStation = {
+      id: 'physical',
+      name: 'Tiếp sức dữ liệu',
+      location: 'Sân A',
+      managers: [{ id: 'manager', email: 'gsv@example.com', displayName: 'GSV' }],
+      description: '',
+      isHidden: false,
+      type: 'physical' as const,
+      maximumScore: null,
+    }
+
+    expect(validateStationStep([physicalStation])).toEqual({
+      physical: { maximumScore: 'Trạm thể chất cần điểm tối đa từ 1 đến 100.' },
+    })
+  })
 })

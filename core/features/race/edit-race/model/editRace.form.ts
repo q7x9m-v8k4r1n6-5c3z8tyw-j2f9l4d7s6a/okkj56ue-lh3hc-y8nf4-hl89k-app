@@ -14,6 +14,8 @@ export type EditRaceBooth = {
   managers: EditRaceOrganizer[]
   description: string
   isHidden: boolean
+  type?: 'other' | 'intellectual' | 'physical'
+  maximumScore?: number | null
 }
 
 export type EditRaceTeam = {
@@ -56,6 +58,6 @@ export type EditRaceFormErrors = {
   coverFile?: string
   booths: Record<
     string,
-    Partial<Record<'name' | 'place' | 'managers' | 'description', string>>
+    Partial<Record<'name' | 'place' | 'managers' | 'description' | 'maximumScore', string>>
   >
 }

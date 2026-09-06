@@ -60,6 +60,12 @@ export const validateEditRaceForm = (
     if (booth.description.length > 500) {
       boothErrors.description = 'Mô tả không được vượt quá 500 ký tự.'
     }
+    if (booth.type === 'physical' && (!booth.maximumScore || booth.maximumScore < 1)) {
+      boothErrors.maximumScore = 'Trạm thể chất cần điểm tối đa từ 1 đến 100.'
+    }
+    if (booth.maximumScore != null && (booth.maximumScore < 0 || booth.maximumScore > 100)) {
+      boothErrors.maximumScore = 'Điểm tối đa phải từ 0 đến 100.'
+    }
     if (Object.keys(boothErrors).length) {
       errors.booths[booth.id] = boothErrors
     }

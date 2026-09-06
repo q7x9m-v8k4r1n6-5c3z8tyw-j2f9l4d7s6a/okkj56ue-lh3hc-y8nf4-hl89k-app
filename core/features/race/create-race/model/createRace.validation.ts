@@ -7,7 +7,7 @@ import type {
 export type BasicValidationErrors =
   Partial<Record<keyof CreateRaceBasicForm, string>>
 export type StationValidationErrors =
-  Record<string, Partial<Record<'name' | 'location' | 'managers', string>>>
+  Record<string, Partial<Record<'name' | 'location' | 'managers' | 'maximumScore', string>>>
 
 /** Returns whether a station draft contains any user-entered content. */
 export const hasStationContent = (
@@ -18,6 +18,8 @@ export const hasStationContent = (
   || station.managers?.length
   || station.description?.replace(/<[^>]*>/g, '').trim()
   || station.isHidden
+  || station.type && station.type !== 'other'
+  || station.maximumScore !== null && station.maximumScore !== undefined
 )
 
 /** Validates the basic-information step without reading React state. */
@@ -66,6 +68,12 @@ export const validateStationStep = (
     if (!station.location.trim()) rowErrors.location = 'Vui lòng nhập địa điểm.'
     if (!station.managers.length) {
       rowErrors.managers = 'Vui lòng chọn ít nhất một quản trạm.'
+    }
+    if (station.type === 'physical' && (!station.maximumScore || station.maximumScore < 1)) {
+      rowErrors.maximumScore = 'Trạm thể chất cần điểm tối đa từ 1 đến 100.'
+    }
+    if (station.maximumScore != null && (station.maximumScore < 0 || station.maximumScore > 100)) {
+      rowErrors.maximumScore = 'Điểm tối đa phải từ 0 đến 100.'
     }
     if (Object.keys(rowErrors).length) errors[station.id] = rowErrors
   })

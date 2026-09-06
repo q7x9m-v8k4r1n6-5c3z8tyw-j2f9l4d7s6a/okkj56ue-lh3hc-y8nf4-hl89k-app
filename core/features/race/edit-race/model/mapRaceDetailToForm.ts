@@ -55,6 +55,8 @@ export const mapRaceDetailToForm = (
       ),
       description: booth.description ?? '',
       isHidden: booth.isHidden,
+      type: booth.type,
+      maximumScore: booth.maximumScore ?? null,
     })),
     teams: detail.raceTeam.map((team, index) => ({
       id: team.teamID,

@@ -1,37 +1,34 @@
 import { useState } from 'react'
-import { Button, Drawer, Input, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@/core/shared'
+import { Button, Drawer, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@/core/shared'
 import type { Card } from '../../model/card.contract'
 
 type Props = {
   cards: Card[]
   open: boolean
-  scheduled: boolean
   pending: boolean
   onClose: () => void
-  onSubmit: (scheduledAt: string | undefined, quantities: Record<string, number>) => void
+  onSubmit: (quantities: Record<string, number>) => void
 }
 
-export const BulkRestockDrawer = ({ cards, open, scheduled, pending, onClose, onSubmit }: Props) => {
+export const BulkRestockDrawer = ({ cards, open, pending, onClose, onSubmit }: Props) => {
   const [quantities, setQuantities] = useState<Record<string, string>>({})
-  const [scheduledAt, setScheduledAt] = useState('')
 
   const submit = () => {
     const normalized = Object.fromEntries(
       cards.map((card) => [card.cardId, Math.max(0, Number.parseInt(quantities[card.cardId] || '0', 10) || 0)]),
     )
-    onSubmit(scheduled ? scheduledAt : undefined, normalized)
+    onSubmit(normalized)
   }
 
   return (
     <Drawer
       open={open}
-      title={scheduled ? 'Hẹn giờ nhập kho' : 'Nhập kho hàng loạt'}
+      title="Nhập kho hàng loạt"
       panelClassName="!max-w-[680px]"
       onClose={onClose}
-      footer={<><Button variant="secondary" onClick={onClose}>Hủy</Button><Button disabled={pending || (scheduled && !scheduledAt)} onClick={submit}>{pending ? 'Đang lưu...' : 'Lưu'}</Button></>}
+      footer={<><Button variant="secondary" onClick={onClose}>Hủy</Button><Button disabled={pending} onClick={submit}>{pending ? 'Đang lưu...' : 'Lưu'}</Button></>}
     >
-      {scheduled ? <Input label="Ngày giờ tự động nhập" type="datetime-local" value={scheduledAt} onChange={(event) => setScheduledAt(event.target.value)} /> : null}
-      <div className={scheduled ? 'mt-6' : ''}>
+      <div>
         <Table>
           <TableHead><TableRow><TableHeaderCell>Tên card</TableHeaderCell><TableHeaderCell>Số lượng còn</TableHeaderCell><TableHeaderCell>Số lượng nhập thêm</TableHeaderCell><TableHeaderCell>Tổng</TableHeaderCell></TableRow></TableHead>
           <TableBody>

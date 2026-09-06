@@ -17,6 +17,8 @@ export type CreateRaceStationForm = {
   managers: OrganizerSummary[]
   description: string
   isHidden: boolean
+  type?: 'other' | 'intellectual' | 'physical'
+  maximumScore?: number | null
 }
 
 export type CreateRaceSettingsForm = {
@@ -33,7 +35,7 @@ export type CreateRaceFormState = {
   settings: CreateRaceSettingsForm
   errors: {
     basic: Partial<Record<keyof CreateRaceBasicForm, string>>
-    stations: Record<string, Partial<Record<'name' | 'location' | 'managers', string>>>
+    stations: Record<string, Partial<Record<'name' | 'location' | 'managers' | 'maximumScore', string>>>
     team: string
     organizer: string
   }

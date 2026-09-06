@@ -46,7 +46,7 @@ export const router = createBrowserRouter([
             },
           },
           {
-            path: 'team/races/:raceId/cards/:cardId',
+            path: 'team/races/:raceId/cards/:cardInstanceId',
             handle: { title: 'Thông tin card' },
             lazy: async () => {
               const { TeamCardDescriptionPage } = await import('@/src/app/pages/team-card-description')
