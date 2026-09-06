@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useTeamRaceAccess } from '@/core/features/team/team-race'
 import {
@@ -22,24 +22,16 @@ export const useTeamDetailRacePage = () => {
   const { raceId } = useParams<{ raceId: string }>()
   const [searchParams, setSearchParams] = useSearchParams()
   const raceAccess = useTeamRaceAccess(raceId)
-  const initialTab = searchParams.get(TEAM_RACE_TAB_PARAM)
-  const [activeTab, setActiveTab] = useState<TeamDetailRaceTab>(
-    initialTab && isTeamDetailRaceTab(initialTab) ? initialTab : 'rules'
-  )
+  const requestedTab = searchParams.get(TEAM_RACE_TAB_PARAM)
+  const activeTab: TeamDetailRaceTab =
+    requestedTab && isTeamDetailRaceTab(requestedTab) ? requestedTab : 'rules'
   const [previousTab, setPreviousTab] = useState<TeamPrimaryRaceTab>(
-    isTeamDetailRaceTab(initialTab ?? '') && isTeamPrimaryRaceTab(initialTab as TeamDetailRaceTab)
-      ? initialTab as TeamPrimaryRaceTab
+    isTeamDetailRaceTab(requestedTab ?? '') && isTeamPrimaryRaceTab(requestedTab as TeamDetailRaceTab)
+      ? requestedTab as TeamPrimaryRaceTab
       : 'rules',
   )
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-
-  useEffect(() => {
-    const requestedTab = searchParams.get(TEAM_RACE_TAB_PARAM)
-    if (!requestedTab || !isTeamDetailRaceTab(requestedTab)) return
-    setActiveTab(requestedTab)
-    setIsMenuOpen(requestedTab === TEAM_RACE_MENU_TAB)
-  }, [searchParams])
+  const isMenuOpen = activeTab === TEAM_RACE_MENU_TAB
 
   const setTab = (tab: TeamDetailRaceTab) => {
     setSearchParams((current) => {
@@ -47,17 +39,14 @@ export const useTeamDetailRacePage = () => {
       next.set(TEAM_RACE_TAB_PARAM, tab)
       return next
     })
-    setActiveTab(tab)
   }
 
   const openMenu = () => {
     if (isTeamPrimaryRaceTab(activeTab)) setPreviousTab(activeTab)
     setTab(TEAM_RACE_MENU_TAB)
-    setIsMenuOpen(true)
   }
 
   const closeMenu = () => {
-    setIsMenuOpen(false)
     setTab(previousTab)
   }
 
@@ -79,7 +68,6 @@ export const useTeamDetailRacePage = () => {
     },
     
     openAnnouncementHistory: () => {
-      setIsMenuOpen(false)
       setTab(TEAM_RACE_ANNOUNCEMENT_HISTORY_TAB)
     },
     openMenu,

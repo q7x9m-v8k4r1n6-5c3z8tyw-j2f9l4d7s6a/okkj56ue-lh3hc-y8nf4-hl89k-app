@@ -7,9 +7,14 @@ describe('detail-race tabs', () => {
       value: 'basic',
       label: 'Thông tin cơ bản',
     })
+    expect(detailRaceTabs[1]).toEqual({
+      value: 'map',
+      label: 'Bản đồ',
+    })
   })
 
   it('accepts configured tabs and rejects unknown values', () => {
+    expect(isDetailRaceTab('map')).toBe(true)
     expect(isDetailRaceTab('history')).toBe(true)
     expect(isDetailRaceTab('unknown')).toBe(false)
   })

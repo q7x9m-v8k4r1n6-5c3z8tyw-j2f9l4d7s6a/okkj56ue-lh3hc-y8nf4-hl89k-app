@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState } from 'react'
 import { useFilePreview } from '../../model/frontend/useFilePreview'
 import type { FileSource } from '../hooks/useSecretMissionDetailContainer'
 import { MobileScreenLayout } from '@/core/shared/ui/MobileScreenLayout'
@@ -27,10 +27,12 @@ export const SecretMissionEvidencePreview = ({
   const isVideo = file.type.startsWith('video/')
 
   const [isLongImage, setIsLongImage] = useState(false)
+  const [prevPreviewUrl, setPrevPreviewUrl] = useState(previewUrl)
 
-  useEffect(() => {
+  if (prevPreviewUrl !== previewUrl) {
+    setPrevPreviewUrl(previewUrl)
     setIsLongImage(false)
-  }, [previewUrl])
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
