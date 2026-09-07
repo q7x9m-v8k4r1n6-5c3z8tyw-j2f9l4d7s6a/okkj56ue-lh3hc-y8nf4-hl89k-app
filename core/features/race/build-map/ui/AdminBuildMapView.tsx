@@ -37,7 +37,9 @@ export const AdminBuildMapView = ({
 
   const currentStatus = raceStatus ?? status ?? 'draft'
   const isFrozen =
-    isFrozenProp !== undefined ? isFrozenProp : currentStatus !== 'draft'
+    isFrozenProp !== undefined
+      ? isFrozenProp
+      : currentStatus !== 'draft' && currentStatus !== 'ready'
 
   const {
     placedBooths,

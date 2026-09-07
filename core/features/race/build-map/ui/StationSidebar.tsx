@@ -77,6 +77,7 @@ export const StationSidebar = ({
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
+    e.stopPropagation()
     setIsDragOverReturn(false)
 
     if (!canDrag) return
@@ -87,9 +88,13 @@ export const StationSidebar = ({
 
       let boothId = plainText
       if (rawJson) {
-        const parsed = JSON.parse(rawJson)
-        if (parsed.boothId) {
-          boothId = parsed.boothId
+        try {
+          const parsed = JSON.parse(rawJson) as { boothId?: string }
+          if (parsed && typeof parsed.boothId === 'string') {
+            boothId = parsed.boothId
+          }
+        } catch {
+          // Ignore JSON parse error, fall back to plainText
         }
       }
 
@@ -162,7 +167,11 @@ export const StationSidebar = ({
       )}
 
       {/* Main station list container matching Figma node 1719:1425 */}
-      <div className="flex flex-1 flex-col overflow-hidden rounded-[10px] border border-[#e5e5e5] bg-white min-h-[380px]">
+      <div
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+        className="flex flex-1 flex-col overflow-hidden rounded-[10px] border border-[#e5e5e5] bg-white min-h-[380px]"
+      >
         {isLoading ? (
           <div className="flex flex-col p-4.5 gap-4">
             {Array.from({ length: 6 }).map((_, index) => (
@@ -189,7 +198,11 @@ export const StationSidebar = ({
             Chưa có trạm nào trong trận đấu.
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto px-4.5 py-1 divide-y divide-[#dcc0bd]/30">
+          <div
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            className="flex-1 overflow-y-auto px-4.5 py-1 divide-y divide-[#dcc0bd]/30"
+          >
             {booths.map((booth) => {
               const isPlaced = placedBoothIds.has(booth.boothId)
               const cardDraggable = canDrag && !isPlaced
@@ -200,6 +213,8 @@ export const StationSidebar = ({
                   data-testid={`booth-card-${booth.boothId}`}
                   draggable={cardDraggable}
                   onDragStart={(e) => handleDragStart(e, booth)}
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
                   className={`flex flex-col gap-1.5 py-3.5 rounded transition-all select-none ${
                     isPlaced
                       ? 'opacity-60 bg-neutral-50/60 cursor-not-allowed'
@@ -211,24 +226,40 @@ export const StationSidebar = ({
                   <div className="text-base font-normal text-[#1a1c1c] leading-snug break-words">
                     {booth.boothName}
                   </div>
-                  <div className="flex items-center gap-2">
-                    {isPlaced ? (
-                      <span
-                        data-testid={`booth-placed-badge-${booth.boothId}`}
-                        className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700"
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      {isPlaced ? (
+                        <span
+                          data-testid={`booth-placed-badge-${booth.boothId}`}
+                          className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700"
+                        >
+                          ✓ Đã đặt trên bản đồ
+                        </span>
+                      ) : (
+                        <span
+                          className={
+                            booth.isHidden
+                              ? 'inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700'
+                              : 'inline-flex items-center rounded-full bg-[#f5f5f5] px-2 py-0.5 text-[11px] font-medium text-[#5e5e5e]'
+                          }
+                        >
+                          {booth.isHidden ? 'Trạm ẩn' : 'Trạm thường'}
+                        </span>
+                      )}
+                    </div>
+                    {isPlaced && canDrag && Boolean(onUnplaceStation) && (
+                      <button
+                        type="button"
+                        data-testid={`booth-unplace-btn-${booth.boothId}`}
+                        aria-label={`Gỡ trạm ${booth.boothName}`}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onUnplaceStation?.(booth.boothId)
+                        }}
+                        className="text-xs text-red-600 hover:text-red-700 font-medium px-2 py-0.5 rounded border border-red-200 hover:bg-red-50 transition-colors cursor-pointer"
                       >
-                        ✓ Đã đặt trên bản đồ
-                      </span>
-                    ) : (
-                      <span
-                        className={
-                          booth.isHidden
-                            ? 'inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700'
-                            : 'inline-flex items-center rounded-full bg-[#f5f5f5] px-2 py-0.5 text-[11px] font-medium text-[#5e5e5e]'
-                        }
-                      >
-                        {booth.isHidden ? 'Trạm ẩn' : 'Trạm thường'}
-                      </span>
+                        Gỡ
+                      </button>
                     )}
                   </div>
                 </div>

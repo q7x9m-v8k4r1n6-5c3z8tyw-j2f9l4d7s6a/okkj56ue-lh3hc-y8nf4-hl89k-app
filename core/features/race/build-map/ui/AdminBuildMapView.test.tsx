@@ -427,6 +427,57 @@ describe('AdminBuildMapView', () => {
       expect(capturedCanvasProps!.isFrozen).toBe(false)
     })
 
+    it('does not render FrozenMapBanner and keeps isFrozen false when status is ready', () => {
+      const { mockToastContext } = setupMocks({ status: 'ready' })
+
+      const html = renderToStaticMarkup(
+        <ToastContext.Provider value={mockToastContext}>
+          <AdminBuildMapView raceId="race-1" raceStatus="ready" />
+        </ToastContext.Provider>,
+      )
+
+      expect(html).not.toContain('data-testid="frozen-map-banner"')
+      expect(capturedCanvasProps).not.toBeNull()
+      expect(capturedCanvasProps!.isFrozen).toBe(false)
+    })
+
+    it('allows toggling lock and saving coordinates when status is ready and unlocked', () => {
+      const { updateMutate, mockToastContext } = setupMocks({
+        status: 'ready',
+        booths: [
+          {
+            boothId: 'b-ready-1',
+            boothName: 'Trạm Alpha',
+            isHidden: false,
+            mapX: 40,
+            mapY: 60,
+          },
+        ],
+      })
+
+      renderToStaticMarkup(
+        <ToastContext.Provider value={mockToastContext}>
+          <AdminBuildMapView
+            raceId="race-1"
+            raceStatus="ready"
+            isLockedDefault={false}
+          />
+        </ToastContext.Provider>,
+      )
+
+      expect(capturedCanvasProps).not.toBeNull()
+      expect(capturedCanvasProps!.isFrozen).toBe(false)
+      expect(capturedCanvasProps!.isLocked).toBe(false)
+
+      capturedCanvasProps!.onToggleLock?.()
+      expect(updateMutate).toHaveBeenCalledWith(
+        {
+          coordinates: [{ boothId: 'b-ready-1', mapX: 40, mapY: 60 }],
+        },
+        expect.any(Object),
+      )
+    })
+
     it('renders FrozenMapBanner with exact warning message when raceStatus is ongoing', () => {
       const { mockToastContext } = setupMocks()
 

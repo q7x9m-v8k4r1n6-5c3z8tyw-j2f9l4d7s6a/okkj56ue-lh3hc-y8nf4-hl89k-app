@@ -109,9 +109,28 @@ export const AdminStationPin: React.FC<AdminStationPinProps> = ({
       {/* Station Name Pill Badge directly below pin tip */}
       <div
         data-testid={`admin-station-pin-pill-${booth.boothId}`}
-        className="absolute top-1 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-black/80 px-2 py-0.5 text-[11px] font-medium text-white shadow-md pointer-events-none"
+        className={`absolute top-1 left-0 -translate-x-1/2 flex items-center whitespace-nowrap rounded-full bg-black/80 px-2 py-0.5 text-[11px] font-medium text-white shadow-md ${
+          isInteractive && onUnplaceStation ? 'pointer-events-auto' : 'pointer-events-none'
+        }`}
       >
-        {booth.boothName}
+        <span>{booth.boothName}</span>
+        {isInteractive && onUnplaceStation && (
+          <button
+            type="button"
+            data-testid={`admin-station-pin-unplace-${booth.boothId}`}
+            aria-label={`Gỡ trạm ${booth.boothName}`}
+            onClick={(e) => {
+              e.stopPropagation()
+              onUnplaceStation(booth.boothId)
+            }}
+            onMouseDown={(e) => {
+              e.stopPropagation()
+            }}
+            className="ml-1 inline-flex size-3.5 items-center justify-center rounded-full text-white/70 hover:text-white hover:bg-white/20 transition-colors cursor-pointer"
+          >
+            ✕
+          </button>
+        )}
       </div>
     </div>
   )

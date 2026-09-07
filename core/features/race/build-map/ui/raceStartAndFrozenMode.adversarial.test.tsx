@@ -316,7 +316,7 @@ describe('Adversarial Test Suite 3: Race Start Modal & Frozen Map Mode Across Al
       shouldBeFrozen: boolean
     }> = [
       { status: 'draft', shouldBeFrozen: false },
-      { status: 'ready', shouldBeFrozen: true },
+      { status: 'ready', shouldBeFrozen: false },
       { status: 'ongoing', shouldBeFrozen: true },
       { status: 'paused', shouldBeFrozen: true },
       { status: 'completed', shouldBeFrozen: true },

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { AdminStationPin } from './AdminStationPin'
 import type { RaceBoothItem } from '../model/buildMap.contract'
@@ -63,5 +63,112 @@ describe('AdminStationPin', () => {
     expect(html).toContain('-translate-x-1/2')
     expect(html).toContain('-translate-y-full')
     expect(html).toContain('origin-bottom')
+  })
+
+  it('aligns station name pill coaxially with pin tip at x=0 via left-0 -translate-x-1/2', () => {
+    const html = renderToStaticMarkup(
+      <AdminStationPin booth={mockBooth} isLocked={false} />,
+    )
+
+    expect(html).toContain('data-testid="admin-station-pin-pill-b-pin-1"')
+    expect(html).toContain('left-0')
+    expect(html).toContain('-translate-x-1/2')
+    expect(html).not.toContain('left-1/2')
+  })
+
+  it('renders quick ✕ unplace button when isInteractive and onUnplaceStation is provided', () => {
+    const onUnplaceStation = vi.fn()
+    const html = renderToStaticMarkup(
+      <AdminStationPin
+        booth={mockBooth}
+        isLocked={false}
+        isFrozen={false}
+        onUnplaceStation={onUnplaceStation}
+      />,
+    )
+
+    expect(html).toContain('data-testid="admin-station-pin-unplace-b-pin-1"')
+    expect(html).toContain('✕')
+    expect(html).toContain('pointer-events-auto')
+  })
+
+  it('does not render ✕ unplace button when locked or frozen', () => {
+    const onUnplaceStation = vi.fn()
+    const lockedHtml = renderToStaticMarkup(
+      <AdminStationPin
+        booth={mockBooth}
+        isLocked={true}
+        onUnplaceStation={onUnplaceStation}
+      />,
+    )
+    expect(lockedHtml).not.toContain(
+      'data-testid="admin-station-pin-unplace-b-pin-1"',
+    )
+    expect(lockedHtml).toContain('pointer-events-none')
+
+    const frozenHtml = renderToStaticMarkup(
+      <AdminStationPin
+        booth={mockBooth}
+        isLocked={false}
+        isFrozen={true}
+        onUnplaceStation={onUnplaceStation}
+      />,
+    )
+    expect(frozenHtml).not.toContain(
+      'data-testid="admin-station-pin-unplace-b-pin-1"',
+    )
+    expect(frozenHtml).toContain('pointer-events-none')
+  })
+
+  it('triggers onUnplaceStation with boothId when ✕ unplace button is clicked', () => {
+    const onUnplaceStation = vi.fn()
+    let vdom: React.ReactElement<{
+      children: [
+        React.ReactElement,
+        React.ReactElement<{
+          children: [
+            React.ReactElement,
+            React.ReactElement<{
+              'data-testid': string
+              onClick: (e: { stopPropagation: () => void }) => void
+              onMouseDown: (e: { stopPropagation: () => void }) => void
+            }>,
+          ]
+        }>,
+      ]
+    }> | null = null
+
+    const TestWrapper = () => {
+      vdom = AdminStationPin({
+        booth: mockBooth,
+        isLocked: false,
+        isFrozen: false,
+        onUnplaceStation,
+      }) as typeof vdom
+      return vdom
+    }
+
+    renderToStaticMarkup(<TestWrapper />)
+
+    expect(vdom).not.toBeNull()
+    const pillChild = vdom!.props.children[1]
+    const buttonChild = pillChild.props.children[1]
+    expect(buttonChild).toBeDefined()
+    expect(buttonChild.props['data-testid']).toBe(
+      'admin-station-pin-unplace-b-pin-1',
+    )
+
+    const stopPropagationClick = vi.fn()
+    buttonChild.props.onClick({
+      stopPropagation: stopPropagationClick,
+    })
+    expect(stopPropagationClick).toHaveBeenCalled()
+    expect(onUnplaceStation).toHaveBeenCalledWith('b-pin-1')
+
+    const stopPropagationMouseDown = vi.fn()
+    buttonChild.props.onMouseDown({
+      stopPropagation: stopPropagationMouseDown,
+    })
+    expect(stopPropagationMouseDown).toHaveBeenCalled()
   })
 })
