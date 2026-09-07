@@ -44,6 +44,7 @@ export const cardAvailabilitySchema = z.object({
     'not_between_booths',
     'not_in_booth',
     'backend_not_ready',
+    'overclock_closed',
   ]),
   reason: z.string(),
   nextTimeAvailable: z.string().nullable(),
@@ -63,6 +64,24 @@ export const cardSchema = z.object({
 
 export const storeOverviewSchema = z.object({
   cards: z.array(cardSchema),
+})
+
+export const overclockWindowSchema = z.object({
+  status: z.enum(['not_opened', 'open', 'closed', 'resolved']),
+  openedAt: z.string().nullable(),
+  openedBy: z.string().nullable(),
+  closedAt: z.string().nullable(),
+  closedBy: z.string().nullable(),
+  resolvedAt: z.string().nullable(),
+  resolutionEventId: z.string().nullable(),
+})
+
+export const overclockResolutionSchema = z.object({
+  status: z.enum(['closed', 'resolved']),
+  predictionCount: z.number().int(),
+  correctCount: z.number().int(),
+  incorrectCount: z.number().int(),
+  notEvaluatedCount: z.number().int(),
 })
 
 export const cardTeamSchema = z.object({

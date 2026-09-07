@@ -4,10 +4,13 @@ import {
   deleteCardAssignment,
   getCardStore,
   getCardTeams,
+  getOverclockWindow,
   getRaceOptions,
   getTeamCard,
   getTeamCards,
   restockCards,
+  openOverclockWindow,
+  resolveOverclockWindow,
   updateCardConfig,
   useTeamCard as submitTeamCard,
 } from '../../api/card.api'
@@ -18,6 +21,7 @@ const keys = {
   raceOptions: (raceId: string) => ['race', 'card-options', raceId] as const,
   teamCards: (raceId: string) => ['plugin', 'cards', 'team', raceId] as const,
   teamCard: (raceId: string, cardInstanceId: string) => ['plugin', 'cards', 'team', raceId, cardInstanceId] as const,
+  overclock: (raceId: string) => ['plugin', 'cards', 'overclock', raceId] as const,
 }
 
 export const useCardStore = (raceId?: string) => useQuery({
@@ -37,6 +41,24 @@ export const useRaceOptions = (raceId?: string) => useQuery({
   queryFn: ({ signal }) => getRaceOptions(raceId!, signal),
   enabled: Boolean(raceId),
 })
+
+export const useOverclockWindow = (raceId?: string) => useQuery({
+  queryKey: keys.overclock(raceId ?? ''),
+  queryFn: ({ signal }) => getOverclockWindow(raceId!, signal),
+  enabled: Boolean(raceId),
+})
+
+export const useOverclockMutations = (raceId: string) => {
+  const queryClient = useQueryClient()
+  const invalidate = () => {
+    void queryClient.invalidateQueries({ queryKey: keys.overclock(raceId) })
+    void queryClient.invalidateQueries({ queryKey: keys.teamCards(raceId) })
+  }
+  return {
+    open: useMutation({ mutationFn: () => openOverclockWindow(raceId), onSuccess: invalidate }),
+    resolve: useMutation({ mutationFn: () => resolveOverclockWindow(raceId), onSuccess: invalidate }),
+  }
+}
 
 export const useCardStoreMutations = (raceId: string) => {
   const queryClient = useQueryClient()

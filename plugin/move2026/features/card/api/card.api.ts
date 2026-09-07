@@ -2,6 +2,8 @@ import { client } from '@/core/shared/api'
 import {
   cardTeamSchema,
   cardUseResponseSchema,
+  overclockResolutionSchema,
+  overclockWindowSchema,
   raceOptionsSchema,
   storeOverviewSchema,
   teamCardSchema,
@@ -84,6 +86,24 @@ export const deleteCardAssignment = async (
     body: { reason },
   })
 }
+
+export const getOverclockWindow = async (raceId: string, signal?: AbortSignal) =>
+  overclockWindowSchema.parse(await client.request<unknown>({
+    path: `${pluginPath}/races/${raceId}/overclock`,
+    signal,
+  }))
+
+export const openOverclockWindow = async (raceId: string) =>
+  overclockWindowSchema.parse(await client.request<unknown>({
+    path: `${pluginPath}/races/${raceId}/overclock/open`,
+    method: 'POST',
+  }))
+
+export const resolveOverclockWindow = async (raceId: string) =>
+  overclockResolutionSchema.parse(await client.request<unknown>({
+    path: `${pluginPath}/races/${raceId}/overclock/resolve`,
+    method: 'POST',
+  }))
 
 export const getTeamCards = async (
   raceId: string,
