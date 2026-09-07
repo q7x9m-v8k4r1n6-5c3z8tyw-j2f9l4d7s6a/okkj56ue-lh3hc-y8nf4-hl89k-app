@@ -35,7 +35,7 @@ export const SecretMissionInfoView = ({
           onClick={onViewEvidence}
           className="flex w-full items-center justify-center rounded-full bg-[#de3336] py-3 text-base font-semibold text-white transition-all active:scale-95"
         >
-          Xem minh chứng
+          Nộp minh chứng
         </button>
       }
     >

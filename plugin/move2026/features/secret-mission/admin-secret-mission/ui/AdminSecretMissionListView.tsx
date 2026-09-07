@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { EditIcon, TrashIcon } from '@/core/assets'
-import { Button, IconButton } from '@/core/shared'
+import { Button, IconButton, useConfirmDialog } from '@/core/shared'
 import { formatSecretMissionName } from '@/plugin/move2026/features/secret-mission/shared/formatSecretMissionName'
 import { useLeaderboardQuery } from '@/core/features/race/live-race/model/server/useLiveQueries'
 import type { TeamLeaderboardItem } from '@/core/features/race/live-race/model/liveRace.schemas'
@@ -12,6 +12,7 @@ export const AdminSecretMissionListView = () => {
   const { raceId } = useParams<{ raceId: string }>()
   const leaderboardQuery = useLeaderboardQuery(raceId)
   const view = useAdminSecretMissionListView(raceId)
+  const { confirm } = useConfirmDialog()
 
   if (!raceId) return null
 
@@ -109,7 +110,15 @@ export const AdminSecretMissionListView = () => {
                       aria-label={`Xóa ${mission.name}`}
                       className="rounded-lg p-[10px]"
                       icon={<TrashIcon className="size-5" />}
-                      onClick={() => view.handleDelete(mission.id)}
+                      onClick={async () => {
+                        const isConfirmed = await confirm({
+                          title: 'Xóa nhiệm vụ bí mật',
+                          description: `Bạn có chắc chắn muốn xóa "${mission.name}" không?`,
+                        })
+                        if (isConfirmed) {
+                          view.handleDelete(mission.id)
+                        }
+                      }}
                     />
                   </div>
                 </div>

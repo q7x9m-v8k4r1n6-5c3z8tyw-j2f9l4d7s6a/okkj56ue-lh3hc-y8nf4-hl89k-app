@@ -28,7 +28,7 @@ export const BoothInformationStep = () => {
             <div className="min-w-0 overflow-hidden rounded-xl border border-[#e5e5e5] bg-white shadow-sm">
                 <div className="max-h-[calc(100svh-360px)] min-w-0 overflow-y-auto overflow-x-hidden">
                     <div className="w-full min-w-0">
-                        <div className="sticky top-0 z-10 hidden grid-cols-[minmax(0,1fr)_minmax(0,.85fr)_minmax(0,1.2fr)_minmax(0,1.1fr)_80px_44px] gap-4 border-b border-[#eeeeee] bg-[#fbfbfb] px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#737373] md:grid"><span>Tên trạm</span><span>Địa điểm</span><span>Quản trạm</span><span>Mô tả trạm</span><span className="text-center">Trạm ẩn</span><span /></div>
+                        <div className="sticky top-0 z-10 hidden grid-cols-[minmax(0,1fr)_minmax(0,.85fr)_minmax(0,1.2fr)_minmax(0,1.1fr)_80px_44px] gap-4 border-b border-[#eeeeee] bg-[#fbfbfb] px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#737373] md:grid"><span>Tên trạm</span><span>Địa điểm</span><span>Quản trạm</span><span>Luật trạm</span><span className="text-center">Trạm ẩn</span><span /></div>
                         {rows.map((row) => {
                             const descriptionText = row.description.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 
@@ -104,7 +104,7 @@ export const BoothInformationStep = () => {
                     </div>
                 </div>
             </div>
-            <Drawer open={Boolean(selectedStation)} panelClassName="!max-w-[760px]" title={selectedStation ? `Mô tả trạm: ${selectedStation.name || 'Trạm mới'}` : 'Mô tả trạm'} onClose={closeDetails} footer={<><Button variant="secondary" onClick={closeDetails}>Hủy</Button><Button onClick={closeDetails}>Lưu</Button></>}>
+            <Drawer open={Boolean(selectedStation)} panelClassName="!max-w-[760px]" title={selectedStation ? `Luật trạm: ${selectedStation.name || 'Trạm mới'}` : 'Luật trạm'} onClose={closeDetails} footer={<><Button variant="secondary" onClick={closeDetails}>Hủy</Button><Button onClick={closeDetails}>Lưu</Button></>}>
                 {selectedStation ? <RichTextEditor value={selectedStation.description} placeholder="Nhập luật và mô tả cho trạm..." onChange={(description) => update(selectedStation.id, { description })} /> : null}
             </Drawer>
         </CreateRaceStepLayout>

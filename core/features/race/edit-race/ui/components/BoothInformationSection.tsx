@@ -33,7 +33,7 @@ export const BoothInformationSection = () => {
               <TableHeaderCell>Tên trạm</TableHeaderCell>
               <TableHeaderCell>Địa điểm</TableHeaderCell>
               <TableHeaderCell>Quản trạm</TableHeaderCell>
-              <TableHeaderCell>Mô tả trạm</TableHeaderCell>
+              <TableHeaderCell>Luật trạm</TableHeaderCell>
               <TableHeaderCell className="min-w-24 text-center">Loại trạm</TableHeaderCell>
               {section.isEditing ? <TableHeaderCell className="w-12" /> : null}
             </TableRow>
@@ -68,7 +68,7 @@ export const BoothInformationSection = () => {
                     <button
                       type="button"
                       className={`h-10 w-full rounded-lg border bg-[#fcfcfc] px-3 text-left text-sm text-[#525252] transition hover:border-[#de3336] hover:bg-white ${section.errors[booth.id]?.description ? 'border-[#de3336]' : 'border-[#eeeeee]'}`}
-                      aria-label="Mô tả trạm"
+                      aria-label="Luật trạm"
                       onClick={() => section.openDetails(booth.id)}
                     >
                       <span className="block truncate">{booth.descriptionText}</span>
@@ -160,7 +160,7 @@ export const BoothInformationSection = () => {
       <Drawer
         open={Boolean(section.selectedBooth)}
         panelClassName="!max-w-[760px]"
-        title={`Mô tả trạm: ${section.selectedBooth?.name || 'Trạm mới'}`}
+        title={`Luật trạm: ${section.selectedBooth?.name || 'Trạm mới'}`}
         onClose={section.closeDetails}
         footer={(
           <>
