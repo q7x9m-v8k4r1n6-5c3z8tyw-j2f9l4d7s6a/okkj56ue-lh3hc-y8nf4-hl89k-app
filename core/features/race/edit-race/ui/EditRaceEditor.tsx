@@ -2,6 +2,7 @@ import { BasicInformationSection } from './components/BasicInformationSection'
 import { BoothInformationSection } from './components/BoothInformationSection'
 import { OrganizerInformationSection } from './components/OrganizerInformationSection'
 import { RaceDetailRibbon } from './components/RaceDetailRibbon'
+import { RaceStartConfirmModal } from './components/RaceStartConfirmModal'
 import { SettingsSection } from './components/SettingsSection'
 import { TeamInformationSection } from './components/TeamInformationSection'
 import { useEditRaceEditor } from './hooks/useEditRaceEditor'
@@ -40,6 +41,12 @@ export const EditRaceEditor = ({ raceId }: EditRaceEditorProps) => {
       <TeamInformationSection />
       <OrganizerInformationSection />
       <SettingsSection />
+      <RaceStartConfirmModal
+        open={editor.isStartConfirmOpen}
+        onClose={editor.handleCloseStartConfirm}
+        onConfirm={editor.handleConfirmStart}
+        isSubmitting={editor.ribbon.isSaving}
+      />
     </>
   )
 }

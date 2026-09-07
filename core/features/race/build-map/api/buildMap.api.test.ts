@@ -1,6 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
 import { client } from '@/core/shared/api'
-import { getRaceBooths, getRaceMapDetail, uploadRaceMap } from './buildMap.api'
+import {
+  getRaceBooths,
+  getRaceMapDetail,
+  updateBoothCoordinates,
+  uploadRaceMap,
+} from './buildMap.api'
 
 describe('buildMap.api', () => {
   it('calls GET /Race/{raceId} for map details', async () => {
@@ -104,5 +109,33 @@ describe('buildMap.api', () => {
     await expect(getRaceBooths('   ')).rejects.toThrow('Mã trận đấu không hợp lệ.')
     await expect(uploadRaceMap('', fakeFile)).rejects.toThrow('Mã trận đấu không hợp lệ.')
     await expect(uploadRaceMap('   ', fakeFile)).rejects.toThrow('Mã trận đấu không hợp lệ.')
+    await expect(
+      updateBoothCoordinates('', { coordinates: [] }),
+    ).rejects.toThrow('Mã trận đấu không hợp lệ.')
+    await expect(
+      updateBoothCoordinates('   ', { coordinates: [] }),
+    ).rejects.toThrow('Mã trận đấu không hợp lệ.')
+  })
+
+  it('calls PUT /Race/{raceId}/booths/coordinates with payload', async () => {
+    const spy = vi.spyOn(client, 'request').mockResolvedValueOnce({ success: true })
+
+    const payload = {
+      coordinates: [
+        { boothId: 'b-1', mapX: 50, mapY: 60 },
+        { boothId: 'b-2', mapX: 10, mapY: 20 },
+      ],
+    }
+    const result = await updateBoothCoordinates('race-123', payload)
+
+    expect(spy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: '/Race/race-123/booths/coordinates',
+        method: 'PUT',
+        body: payload,
+      }),
+    )
+    expect(result).toEqual({ success: true })
+    spy.mockRestore()
   })
 })

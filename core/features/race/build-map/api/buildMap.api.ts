@@ -5,6 +5,7 @@ import {
   uploadRaceMapResponseSchema,
   type RaceBoothsResponse,
   type RaceMapDetailResponse,
+  type UpdateBoothCoordinatesPayload,
   type UploadRaceMapResponse,
 } from '../model/buildMap.contract'
 
@@ -64,4 +65,24 @@ export const uploadRaceMap = async (
     signal,
   })
   return uploadRaceMapResponseSchema.parse(response)
+}
+
+/**
+ * Updates coordinates of booths for a race via PUT /Race/{raceId}/booths/coordinates.
+ */
+export const updateBoothCoordinates = async (
+  raceId: string,
+  payload: UpdateBoothCoordinatesPayload,
+  signal?: AbortSignal,
+): Promise<{ message?: string } | boolean> => {
+  if (!raceId.trim()) {
+    throw new Error('Mã trận đấu không hợp lệ.')
+  }
+  const response = await client.request<{ message?: string } | boolean, UpdateBoothCoordinatesPayload>({
+    path: `/Race/${raceId}/booths/coordinates`,
+    method: 'PUT',
+    body: payload,
+    signal,
+  })
+  return response
 }

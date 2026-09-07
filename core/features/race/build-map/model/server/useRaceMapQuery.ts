@@ -32,6 +32,7 @@ export const useRaceMapQuery = (raceId?: string) => {
   return {
     mapDetail: mapDetailQuery.data,
     mapImageUrl: mapDetailQuery.data?.mapImageUrl ?? null,
+    status: mapDetailQuery.data?.status,
     booths: boothsQuery.data ?? [],
     isLoadingMap: mapDetailQuery.isLoading,
     isLoadingBooths: boothsQuery.isLoading,

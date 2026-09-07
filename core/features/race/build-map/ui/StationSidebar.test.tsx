@@ -70,4 +70,43 @@ describe('StationSidebar', () => {
     expect(html).toContain('Trạm Rất Dài')
     expect(html).toContain('break-words')
   })
+
+  it('renders placed badge and counter for placed stations', () => {
+    const placedSet = new Set(['b-1'])
+    const html = renderToStaticMarkup(
+      <StationSidebar
+        booths={mockBooths}
+        placedBoothIds={placedSet}
+        isLocked={false}
+      />,
+    )
+
+    expect(html).toContain('✓ Đã đặt trên bản đồ')
+    expect(html).toContain('1/2 đã đặt')
+    expect(html).toContain('opacity-60')
+  })
+
+  it('allows dragging unplaced stations when unlocked, but disables placed stations', () => {
+    const placedSet = new Set(['b-1'])
+    const html = renderToStaticMarkup(
+      <StationSidebar
+        booths={mockBooths}
+        placedBoothIds={placedSet}
+        isLocked={false}
+      />,
+    )
+
+    // b-2 is unplaced and should be draggable
+    expect(html).toContain('data-testid="booth-card-b-2"')
+    // Ghost element should be present
+    expect(html).toContain('data-testid="station-drag-ghost"')
+  })
+
+  it('disables dragging all stations when map is locked', () => {
+    const html = renderToStaticMarkup(
+      <StationSidebar booths={mockBooths} isLocked={true} />,
+    )
+
+    expect(html).not.toContain('draggable="true"')
+  })
 })

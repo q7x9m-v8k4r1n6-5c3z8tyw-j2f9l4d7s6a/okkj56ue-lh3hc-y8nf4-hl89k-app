@@ -1,28 +1,61 @@
 import { useToast } from '@/core/shared'
-import { isValidMapImageFile } from '../model/buildMap.validation'
+import { isValidMapImageFile, validateAllBoothsPlaced } from '../model/buildMap.validation'
+import { usePinPlacementState } from '../model/frontend/usePinPlacementState'
 import { useRaceMapQuery } from '../model/server/useRaceMapQuery'
 import { useUploadRaceMapMutation } from '../model/server/useUploadRaceMapMutation'
+import { useUpdateBoothCoordinatesMutation } from '../model/server/useUpdateBoothCoordinatesMutation'
+import { AdminMapCanvas } from './AdminMapCanvas'
+import { FrozenMapBanner } from './FrozenMapBanner'
 import { MapUploadCanvas } from './MapUploadCanvas'
 import { StationSidebar } from './StationSidebar'
 
 export type AdminBuildMapViewProps = {
   raceId?: string
+  raceStatus?: string
+  isFrozen?: boolean
+  isLockedDefault?: boolean
 }
 
 /**
- * Main 2-column view composing the StationSidebar and MapUploadCanvas for Admin.
- * Follows Figma node 1719:1328.
+ * Main 2-column view composing the StationSidebar and AdminMapCanvas / MapUploadCanvas for Admin.
+ * Supports station pin drag and drop, repositioning, return to sidebar, and coordinate locking.
  */
-export const AdminBuildMapView = ({ raceId }: AdminBuildMapViewProps) => {
+export const AdminBuildMapView = ({
+  raceId,
+  raceStatus,
+  isFrozen: isFrozenProp,
+  isLockedDefault = true,
+}: AdminBuildMapViewProps) => {
   const {
     booths,
     mapImageUrl,
     isLoadingBooths,
     isErrorBooths,
     refetchBooths,
+    status,
   } = useRaceMapQuery(raceId)
 
+  const currentStatus = raceStatus ?? status ?? 'draft'
+  const isFrozen =
+    isFrozenProp !== undefined ? isFrozenProp : currentStatus !== 'draft'
+
+  const {
+    placedBooths,
+    placedBoothIds,
+    placePin,
+    movePin,
+    unplacePin,
+    isLocked,
+    setIsLocked,
+    clearDraft,
+  } = usePinPlacementState({
+    raceId,
+    booths,
+    isLockedDefault,
+  })
+
   const uploadMutation = useUploadRaceMapMutation(raceId)
+  const updateCoordinatesMutation = useUpdateBoothCoordinatesMutation(raceId)
   const { toast } = useToast()
 
   const handleCanvasError = (message: string) => {
@@ -72,20 +105,102 @@ export const AdminBuildMapView = ({ raceId }: AdminBuildMapViewProps) => {
     })
   }
 
+  const handleToggleLock = () => {
+    if (isFrozen) return
+
+    // If currently locked, unlocking simply transitions isLocked to false
+    if (isLocked) {
+      setIsLocked(false)
+      return
+    }
+
+    // Attempting to lock: must validate 100% booth placement
+    const validation = validateAllBoothsPlaced(booths, placedBooths)
+    if (!validation.isValid) {
+      toast({
+        title: 'Cảnh báo',
+        description: 'Vui lòng kéo và xếp tất cả các trạm vào sơ đồ trước khi khóa!',
+        variant: 'warning',
+      })
+      return
+    }
+
+    if (!raceId || !raceId.trim()) {
+      toast({
+        title: 'Thiếu thông tin trận đấu',
+        description: 'Không tìm thấy mã trận đấu để lưu tọa độ.',
+        variant: 'danger',
+      })
+      return
+    }
+
+    const payload = {
+      coordinates: placedBooths.map((b) => ({
+        boothId: b.boothId,
+        mapX: Math.round((b.mapX ?? 0) * 100) / 100,
+        mapY: Math.round((b.mapY ?? 0) * 100) / 100,
+      })),
+    }
+
+    updateCoordinatesMutation.mutate(payload, {
+      onSuccess: () => {
+        setIsLocked(true)
+        clearDraft()
+        toast({
+          title: 'Thành công',
+          description: 'Đã khóa và lưu vị trí các trạm thành công!',
+          variant: 'success',
+        })
+      },
+      onError: (error) => {
+        toast({
+          title: 'Lưu thất bại',
+          description:
+            error instanceof Error ? error.message : 'Có lỗi xảy ra khi lưu tọa độ trạm.',
+          variant: 'danger',
+        })
+      },
+    })
+  }
+
   return (
-    <div className="flex flex-col lg:flex-row gap-2.5 h-auto lg:h-[calc(100vh-170px)] min-h-[560px] w-full">
-      <StationSidebar
-        booths={booths}
-        isLoading={isLoadingBooths}
-        isError={isErrorBooths}
-        onRetry={() => void refetchBooths()}
-      />
-      <MapUploadCanvas
-        mapImageUrl={mapImageUrl}
-        isUploading={uploadMutation.isPending}
-        onUpload={handleUpload}
-        onError={handleCanvasError}
-      />
+    <div className="flex flex-col gap-3 w-full">
+      {isFrozen && <FrozenMapBanner />}
+      <div className="flex flex-col lg:flex-row gap-2.5 h-auto lg:h-[calc(100vh-170px)] min-h-[560px] w-full">
+        <StationSidebar
+          booths={booths}
+          isLoading={isLoadingBooths}
+          isError={isErrorBooths}
+          onRetry={() => void refetchBooths()}
+          placedBoothIds={placedBoothIds}
+          isLocked={isFrozen ? true : isLocked}
+          isFrozen={isFrozen}
+          onUnplaceStation={unplacePin}
+        />
+        {mapImageUrl ? (
+          <AdminMapCanvas
+            mapImageUrl={mapImageUrl}
+            placedBooths={placedBooths}
+            isLocked={isFrozen ? true : isLocked}
+            isFrozen={isFrozen}
+            onPlacePin={placePin}
+            onMovePin={movePin}
+            onUnplacePin={unplacePin}
+            onUploadNewMap={handleUpload}
+            onError={handleCanvasError}
+            isUploading={uploadMutation.isPending}
+            onToggleLock={handleToggleLock}
+            isSaving={updateCoordinatesMutation.isPending}
+          />
+        ) : (
+          <MapUploadCanvas
+            mapImageUrl={mapImageUrl}
+            isUploading={uploadMutation.isPending}
+            onUpload={handleUpload}
+            onError={handleCanvasError}
+          />
+        )}
+      </div>
     </div>
   )
 }

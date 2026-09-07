@@ -11,15 +11,31 @@ export const ALLOWED_MAP_IMAGE_TYPES = new Set([
   'image/webp',
 ])
 
-export type ValidationResult = {
+export type MapImageValidationResult = {
   valid: boolean
   error?: string
 }
 
+export interface PlacedBoothCoordinate {
+  boothId: string
+  mapX?: number | null
+  mapY?: number | null
+}
+
+export interface StationPlacementValidationResult {
+  isValid: boolean
+  missingBoothIds: string[]
+  missingCount: number
+  totalCount: number
+}
+
+// Retain ValidationResult alias for backward compatibility and PROJECT.md contract compliance
+export type ValidationResult = StationPlacementValidationResult
+
 /**
  * Validates whether a file meets race map image upload criteria.
  */
-export const isValidMapImageFile = (file?: File | null): ValidationResult => {
+export const isValidMapImageFile = (file?: File | null): MapImageValidationResult => {
   if (!file || file.size === 0) {
     return {
       valid: false,
@@ -75,4 +91,61 @@ export const validateDroppedFiles = (
 
   const file = files[0]
   return { valid: true, file }
+}
+
+/**
+ * Validates whether 100% of all stations defined for the race are placed on the canvas with valid coordinates.
+ * - Checks if allBooths is non-empty.
+ * - Checks if every booth in allBooths is present in placedBooths with valid numeric mapX and mapY within [0.0, 100.0].
+ * - Returns { isValid, missingBoothIds, missingCount, totalCount }.
+ */
+export const validateAllBoothsPlaced = (
+  allBooths: Array<{ boothId: string }>,
+  placedBooths: PlacedBoothCoordinate[],
+): StationPlacementValidationResult => {
+  if (!allBooths || allBooths.length === 0) {
+    return {
+      isValid: false,
+      missingBoothIds: [],
+      missingCount: 0,
+      totalCount: 0,
+    }
+  }
+
+  const placedMap = new Map<string, PlacedBoothCoordinate>()
+  for (const item of placedBooths) {
+    if (item && item.boothId) {
+      placedMap.set(item.boothId, item)
+    }
+  }
+
+  const missingBoothIds: string[] = []
+  for (const booth of allBooths) {
+    const placed = placedMap.get(booth.boothId)
+    const isPlaced =
+      placed !== undefined &&
+      typeof placed.mapX === 'number' &&
+      typeof placed.mapY === 'number' &&
+      !Number.isNaN(placed.mapX) &&
+      !Number.isNaN(placed.mapY) &&
+      placed.mapX >= 0 &&
+      placed.mapX <= 100 &&
+      placed.mapY >= 0 &&
+      placed.mapY <= 100
+
+    if (!isPlaced) {
+      missingBoothIds.push(booth.boothId)
+    }
+  }
+
+  const totalCount = allBooths.length
+  const missingCount = missingBoothIds.length
+  const isValid = totalCount > 0 && missingCount === 0
+
+  return {
+    isValid,
+    missingBoothIds,
+    missingCount,
+    totalCount,
+  }
 }
