@@ -24,8 +24,32 @@ describe('AdminStationPin', () => {
     expect(html).toContain('left:45.5%')
     expect(html).toContain('top:60.2%')
     expect(html).toContain('stroke="#FFFFFF"')
+    expect(html).toContain('text-[#de3336]')
     expect(html).toContain('bg-black/80')
     expect(html).toContain('text-[11px]')
+  })
+
+  it('renders brand red pin color for normal station', () => {
+    const html = renderToStaticMarkup(
+      <AdminStationPin booth={{ ...mockBooth, isHidden: false }} isLocked={false} />,
+    )
+    expect(html).toContain('text-[#de3336]')
+    expect(html).not.toContain('text-neutral-500')
+  })
+
+  it('renders gray pin color text-neutral-500 for hidden station (booth.isHidden is true)', () => {
+    const hiddenBooth: RaceBoothItem = {
+      ...mockBooth,
+      boothId: 'b-pin-hidden',
+      boothName: 'Trạm Ẩn Bí Mật',
+      isHidden: true,
+    }
+    const html = renderToStaticMarkup(
+      <AdminStationPin booth={hiddenBooth} isLocked={false} />,
+    )
+    expect(html).toContain('text-neutral-500')
+    expect(html).not.toContain('text-[#de3336]')
+    expect(html).toContain('Trạm Ẩn Bí Mật')
   })
 
   it('sets draggable to true and cursor-grab when unlocked', () => {

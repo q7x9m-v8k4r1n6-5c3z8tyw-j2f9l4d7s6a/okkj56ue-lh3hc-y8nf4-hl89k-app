@@ -1,7 +1,28 @@
 import React, { useRef, useState } from 'react'
+import DOMPurify from 'dompurify'
 import { FormatListBulletedIcon } from '@/core/assets/icons'
 import { Button, Skeleton } from '@/core/shared'
 import type { RaceBoothItem } from '../model/buildMap.contract'
+
+/**
+ * Safely sanitizes HTML description and handles empty/blank HTML values.
+ */
+const getSanitizedDescription = (description?: string | null): string => {
+  if (!description) return ''
+  const trimmed = description.trim()
+  if (!trimmed) return ''
+
+  const sanitized =
+    typeof DOMPurify?.sanitize === 'function' ? DOMPurify.sanitize(trimmed) : trimmed
+
+  const strippedText = sanitized
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .trim()
+
+  if (strippedText.length === 0) return ''
+  return sanitized
+}
 
 export type StationSidebarProps = {
   booths: RaceBoothItem[]
@@ -12,12 +33,81 @@ export type StationSidebarProps = {
   isLocked?: boolean
   isFrozen?: boolean
   onUnplaceStation?: (boothId: string) => void
+  defaultExpandedBoothIds?: Set<string>
+}
+
+/**
+ * Helper to render Vietnamese status badge for a booth in the detail panel.
+ */
+const renderBoothStatusBadge = (booth: RaceBoothItem) => {
+  const statusKey = (booth.status || '').trim().toLowerCase()
+
+  if (statusKey === 'free') {
+    return (
+      <div
+        data-testid={`booth-status-${booth.boothId}`}
+        className="flex items-center gap-1.5 pt-0.5"
+      >
+        <span className="text-neutral-500 font-medium">Trạng thái:</span>
+        <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
+          Trống
+        </span>
+      </div>
+    )
+  }
+
+  if (statusKey === 'occupied') {
+    return (
+      <div
+        data-testid={`booth-status-${booth.boothId}`}
+        className="flex items-center gap-1.5 pt-0.5"
+      >
+        <span className="text-neutral-500 font-medium">Trạng thái:</span>
+        <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-700">
+          {booth.currentTeamName
+            ? `Đang phục vụ (${booth.currentTeamName})`
+            : 'Đang phục vụ'}
+        </span>
+      </div>
+    )
+  }
+
+  if (statusKey === 'pending') {
+    return (
+      <div
+        data-testid={`booth-status-${booth.boothId}`}
+        className="flex items-center gap-1.5 pt-0.5"
+      >
+        <span className="text-neutral-500 font-medium">Trạng thái:</span>
+        <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700">
+          Chờ duyệt
+        </span>
+      </div>
+    )
+  }
+
+  if (booth.status) {
+    return (
+      <div
+        data-testid={`booth-status-${booth.boothId}`}
+        className="flex items-center gap-1.5 pt-0.5"
+      >
+        <span className="text-neutral-500 font-medium">Trạng thái:</span>
+        <span className="inline-flex items-center rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] font-medium text-neutral-700">
+          {booth.status}
+        </span>
+      </div>
+    )
+  }
+
+  return null
 }
 
 /**
  * Left sidebar displaying the list of race stations/booths according to Figma node 1719:1420.
  * Supports HTML5 Drag and Drop with Teardrop SVG ghost preview,
  * placed station indicators with duplicate prevention,
+ * accordion dropdown for viewing station details,
  * and a return-to-sidebar dropzone to unplace pins.
  */
 export const StationSidebar = ({
@@ -29,9 +119,26 @@ export const StationSidebar = ({
   isLocked = true,
   isFrozen = false,
   onUnplaceStation,
+  defaultExpandedBoothIds,
 }: StationSidebarProps) => {
   const dragGhostRef = useRef<HTMLDivElement>(null)
+  const hiddenDragGhostRef = useRef<HTMLDivElement>(null)
   const [isDragOverReturn, setIsDragOverReturn] = useState(false)
+  const [expandedBoothIds, setExpandedBoothIds] = useState<Set<string>>(
+    () => new Set(defaultExpandedBoothIds),
+  )
+
+  const toggleExpandBooth = (boothId: string) => {
+    setExpandedBoothIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(boothId)) {
+        next.delete(boothId)
+      } else {
+        next.add(boothId)
+      }
+      return next
+    })
+  }
 
   const canDrag = !isLocked && !isFrozen
 
@@ -51,9 +158,13 @@ export const StationSidebar = ({
     e.dataTransfer.setData('text/plain', booth.boothId)
     e.dataTransfer.effectAllowed = 'copyMove'
 
-    if (dragGhostRef.current && e.dataTransfer?.setDragImage) {
+    const targetGhost = booth.isHidden
+      ? hiddenDragGhostRef.current
+      : dragGhostRef.current
+
+    if (targetGhost && e.dataTransfer?.setDragImage) {
       // Center x is 16px (half of 32px), bottom tip y is 32px
-      e.dataTransfer.setDragImage(dragGhostRef.current, 16, 32)
+      e.dataTransfer.setDragImage(targetGhost, 16, 32)
     }
   }
 
@@ -141,6 +252,32 @@ export const StationSidebar = ({
         </div>
       </div>
 
+      {/* Offscreen Drag Ghost Preview for Hidden Station (Gray Teardrop SVG Pin) */}
+      <div
+        ref={hiddenDragGhostRef}
+        style={{ position: 'fixed', top: -9999, left: -9999, pointerEvents: 'none' }}
+        className="flex flex-col items-center z-[-1]"
+        aria-hidden="true"
+        data-testid="station-drag-ghost-hidden"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="size-8 text-neutral-500 drop-shadow-lg"
+        >
+          <path
+            d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+            stroke="#FFFFFF"
+            strokeWidth="1"
+            strokeDasharray="2 1"
+          />
+        </svg>
+        <div className="mt-0.5 rounded-full bg-neutral-800/90 px-2 py-0.5 text-[10px] font-medium text-white shadow whitespace-nowrap">
+          Trạm ẩn
+        </div>
+      </div>
+
       {/* Header matching Figma node 1719:1421 */}
       <div className="flex items-center justify-between shrink-0 py-0.5">
         <div className="flex items-center gap-2.5">
@@ -206,6 +343,8 @@ export const StationSidebar = ({
             {booths.map((booth) => {
               const isPlaced = placedBoothIds.has(booth.boothId)
               const cardDraggable = canDrag && !isPlaced
+              const isExpanded = expandedBoothIds.has(booth.boothId)
+              const sanitizedDesc = getSanitizedDescription(booth.description)
 
               return (
                 <div
@@ -239,7 +378,7 @@ export const StationSidebar = ({
                         <span
                           className={
                             booth.isHidden
-                              ? 'inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700'
+                              ? 'inline-flex items-center rounded-full bg-neutral-100 text-neutral-600 border border-neutral-200 px-2 py-0.5 text-[11px] font-medium'
                               : 'inline-flex items-center rounded-full bg-[#f5f5f5] px-2 py-0.5 text-[11px] font-medium text-[#5e5e5e]'
                           }
                         >
@@ -247,21 +386,82 @@ export const StationSidebar = ({
                         </span>
                       )}
                     </div>
-                    {isPlaced && canDrag && Boolean(onUnplaceStation) && (
-                      <button
-                        type="button"
-                        data-testid={`booth-unplace-btn-${booth.boothId}`}
-                        aria-label={`Gỡ trạm ${booth.boothName}`}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          onUnplaceStation?.(booth.boothId)
-                        }}
-                        className="text-xs text-red-600 hover:text-red-700 font-medium px-2 py-0.5 rounded border border-red-200 hover:bg-red-50 transition-colors cursor-pointer"
+                    <button
+                      type="button"
+                      data-testid={`booth-expand-btn-${booth.boothId}`}
+                      aria-expanded={isExpanded}
+                      aria-label={`Chi tiết trạm ${booth.boothName}`}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        toggleExpandBooth(booth.boothId)
+                      }}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      className="p-1 text-[#5e5e5e] hover:text-[#1a1c1c] hover:bg-neutral-100 rounded transition-colors cursor-pointer"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className={`size-4 transition-transform duration-200 ${
+                          isExpanded ? 'rotate-180' : ''
+                        }`}
+                        aria-hidden="true"
                       >
-                        Gỡ
-                      </button>
-                    )}
+                        <path d="m6 9 6 6 6-6" />
+                      </svg>
+                    </button>
                   </div>
+
+                  {/* Collapsible Detail Panel */}
+                  {isExpanded && (
+                    <div
+                      data-testid={`booth-detail-panel-${booth.boothId}`}
+                      onClick={(e) => e.stopPropagation()}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onDragStart={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                      }}
+                      className="bg-neutral-50 rounded-lg border border-neutral-200/80 p-2.5 mt-2 text-xs flex flex-col gap-1.5 cursor-auto select-text"
+                    >
+                      {/* Mô tả trạm */}
+                      {sanitizedDesc ? (
+                        <div
+                          data-testid={`booth-description-${booth.boothId}`}
+                          className="text-neutral-600 break-words leading-relaxed [&_p]:mb-1 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4 [&_li]:mb-0.5"
+                          dangerouslySetInnerHTML={{ __html: sanitizedDesc }}
+                        />
+                      ) : (
+                        <p
+                          data-testid={`booth-description-${booth.boothId}`}
+                          className="text-neutral-600 break-words leading-relaxed"
+                        >
+                          Chưa có mô tả.
+                        </p>
+                      )}
+                      {Boolean(booth.boothLocation) && (
+                        <div
+                          data-testid={`booth-location-${booth.boothId}`}
+                          className="flex items-center gap-1.5 text-neutral-700 font-medium"
+                        >
+                          <span>📍 Vị trí: {booth.boothLocation}</span>
+                        </div>
+                      )}
+                      {renderBoothStatusBadge(booth)}
+                      {Boolean(booth.currentOrganizerName) && (
+                        <div
+                          data-testid={`booth-organizer-${booth.boothId}`}
+                          className="flex items-center gap-1.5 text-neutral-700"
+                        >
+                          <span>👤 Người phụ trách: {booth.currentOrganizerName}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )
             })}
