@@ -164,7 +164,7 @@ export const AdminMapCanvas: React.FC<AdminMapCanvasProps> = ({
 
       {/* Button to replace map image */}
       {onUploadNewMap && mapImageUrl && (
-        <div className="absolute top-4 right-4 z-20">
+        <div className="absolute top-4 right-4 z-10">
           <Button
             variant="secondary"
             size="sm"

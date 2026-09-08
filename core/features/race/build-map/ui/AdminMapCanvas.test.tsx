@@ -64,6 +64,7 @@ describe('AdminMapCanvas', () => {
     )
 
     expect(html).toContain('Thay đổi ảnh bản đồ')
+    expect(html).toContain('absolute top-4 right-4 z-10')
   })
 
   it('renders 4-button floating controls within canvas', () => {

@@ -6,6 +6,7 @@ export const MapFloatingControls = () => {
   return (
     <div className="absolute right-4 bottom-5 z-10 flex flex-col gap-2">
       <button
+        type="button"
         onClick={() => resetTransform()}
         className="flex size-11 items-center justify-center rounded-full bg-black/40 text-white shadow-md backdrop-blur-md transition-colors hover:bg-black/60"
         aria-label="Reset Zoom"
@@ -20,6 +21,7 @@ export const MapFloatingControls = () => {
         </svg>
       </button>
       <button
+        type="button"
         onClick={() => zoomIn()}
         className="flex size-11 items-center justify-center rounded-full bg-black/40 text-white shadow-md backdrop-blur-md transition-colors hover:bg-black/60"
         aria-label="Zoom In"
@@ -30,6 +32,7 @@ export const MapFloatingControls = () => {
         </svg>
       </button>
       <button
+        type="button"
         onClick={() => zoomOut()}
         className="flex size-11 items-center justify-center rounded-full bg-black/40 text-white shadow-md backdrop-blur-md transition-colors hover:bg-black/60"
         aria-label="Zoom Out"
