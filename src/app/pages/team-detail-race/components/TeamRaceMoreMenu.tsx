@@ -13,6 +13,10 @@ export const TeamRaceMoreMenu = () => {
     navigate(`/team/races/${raceId}/secret-missions`)
   }
 
+  const handleNavigateToCardShop = () => {
+    navigate(`/team/races/${raceId}/card-shop`)
+  }
+
   return (
     <section className="flex flex-1 flex-col justify-center gap-4 px-5 py-8">
       {/* Nút Card */}
@@ -25,6 +29,17 @@ export const TeamRaceMoreMenu = () => {
           <CardMembershipIcon className="size-6" />
         </div>
         <span className="text-base font-medium text-gray-700">Card</span>
+      </button>
+
+      <button
+        type="button"
+        onClick={handleNavigateToCardShop}
+        className="flex flex-col items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white py-10 shadow-sm transition-all hover:bg-gray-50 active:scale-95"
+      >
+        <div className="flex size-14 items-center justify-center rounded-2xl bg-red-50 text-red-500">
+          <CardMembershipIcon className="size-6" />
+        </div>
+        <span className="text-base font-medium text-gray-700">Cửa hàng Data Patch</span>
       </button>
 
       <button

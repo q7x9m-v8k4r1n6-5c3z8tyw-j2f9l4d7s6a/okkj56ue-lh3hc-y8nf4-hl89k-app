@@ -45,6 +45,7 @@ export const cardAvailabilitySchema = z.object({
     'not_in_booth',
     'backend_not_ready',
     'overclock_closed',
+    'purchase_pending',
   ]),
   reason: z.string(),
   nextTimeAvailable: z.string().nullable(),
@@ -57,6 +58,7 @@ export const cardSchema = z.object({
   description: z.string(),
   price: z.number(),
   remainingStock: z.number().int(),
+  maxStock: z.number().int().nonnegative(),
   usage: z.string(),
   inputs: z.array(cardInputSchema),
   config: jsonRecordSchema,
@@ -64,6 +66,41 @@ export const cardSchema = z.object({
 
 export const storeOverviewSchema = z.object({
   cards: z.array(cardSchema),
+})
+
+export const cardShopStateSchema = z.object({
+  storeOpen: z.boolean(),
+  maxDataPatchPerTeam: z.number().int().positive(),
+})
+
+export const cardShopItemSchema = z.object({
+  cardId: cardIdSchema,
+  cardName: z.string(),
+  description: z.string(),
+  price: z.number().int().nonnegative(),
+  remainingStock: z.number().int().nonnegative(),
+  maxStock: z.number().int().nonnegative(),
+  usage: z.string(),
+  inputs: z.array(cardInputSchema),
+})
+
+export const teamCardShopSchema = cardShopStateSchema.extend({
+  purchasedCount: z.number().int().nonnegative(),
+  remainingSlots: z.number().int().nonnegative(),
+  cards: z.array(cardShopItemSchema),
+})
+
+export const cardPurchaseSchema = z.object({
+  purchaseId: z.string().uuid(),
+  eventId: z.string().min(1),
+  cardInstanceId: z.string().uuid(),
+  cardId: cardIdSchema,
+  price: z.number().int().positive(),
+  scoreBefore: z.number().int(),
+  scoreAfter: z.number().int(),
+  remainingStock: z.number().int().nonnegative(),
+  status: z.enum(['received', 'pending_purchase']),
+  message: z.string(),
 })
 
 export const overclockWindowSchema = z.object({
@@ -94,7 +131,7 @@ export const cardTeamSchema = z.object({
   cardUseCountRemain: z.number().int(),
   receivedAt: z.string(),
   receiveReason: z.string(),
-  status: z.enum(['received', 'used', 'deleted']),
+  status: z.enum(['pending_purchase', 'received', 'used', 'deleted']),
   canDelete: z.boolean(),
   disabledAt: z.string().nullable(),
   disabledReason: z.string().nullable(),
@@ -113,7 +150,7 @@ export const teamCardSchema = z.object({
   cardUseCountRemain: z.number().int(),
   receivedAt: z.string(),
   receiveReason: z.string(),
-  status: z.enum(['received', 'used', 'deleted']),
+  status: z.enum(['pending_purchase', 'received', 'used', 'deleted']),
   availability: cardAvailabilitySchema,
   cardUses: z.array(cardUseHistorySchema),
 })
@@ -144,6 +181,10 @@ export const raceOptionsSchema = z.object({
 })
 
 export type Card = z.infer<typeof cardSchema>
+export type CardShopItem = z.infer<typeof cardShopItemSchema>
+export type CardShopState = z.infer<typeof cardShopStateSchema>
+export type TeamCardShop = z.infer<typeof teamCardShopSchema>
+export type CardPurchase = z.infer<typeof cardPurchaseSchema>
 export type CardTeam = z.infer<typeof cardTeamSchema>
 export type TeamCard = z.infer<typeof teamCardSchema>
 export type CardUseResponse = z.infer<typeof cardUseResponseSchema>

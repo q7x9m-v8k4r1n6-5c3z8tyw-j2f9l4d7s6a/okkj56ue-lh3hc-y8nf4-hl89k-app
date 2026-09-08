@@ -46,6 +46,14 @@ export const router = createBrowserRouter([
             },
           },
           {
+            path: 'team/races/:raceId/card-shop',
+            handle: { title: 'Cửa hàng Data Patch' },
+            lazy: async () => {
+              const { TeamCardShopPage } = await import('@/src/app/pages/team-card-shop')
+              return { Component: TeamCardShopPage }
+            },
+          },
+          {
             path: 'team/races/:raceId/cards/:cardInstanceId',
             handle: { title: 'Thông tin card' },
             lazy: async () => {

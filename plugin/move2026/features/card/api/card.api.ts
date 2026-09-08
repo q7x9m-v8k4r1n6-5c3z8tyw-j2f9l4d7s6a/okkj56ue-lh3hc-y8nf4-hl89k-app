@@ -1,11 +1,15 @@
 import { client } from '@/core/shared/api'
 import {
+  cardPurchaseSchema,
+  cardSchema,
+  cardShopStateSchema,
   cardTeamSchema,
   cardUseResponseSchema,
   overclockResolutionSchema,
   overclockWindowSchema,
   raceOptionsSchema,
   storeOverviewSchema,
+  teamCardShopSchema,
   teamCardSchema,
   type CardTeam,
   type TeamCard,
@@ -17,6 +21,32 @@ export const getCardStore = async (raceId: string, signal?: AbortSignal) =>
   storeOverviewSchema.parse(await client.request<unknown>({
     path: `${pluginPath}/races/${raceId}`,
     signal,
+  }))
+
+export const getCardShopState = async (raceId: string, signal?: AbortSignal) =>
+  cardShopStateSchema.parse(await client.request<unknown>({
+    path: `${pluginPath}/races/${raceId}/shop`,
+    signal,
+  }))
+
+export const setCardShopOpen = async (raceId: string, open: boolean) =>
+  cardShopStateSchema.parse(await client.request<unknown>({
+    path: `${pluginPath}/races/${raceId}/shop/${open ? 'open' : 'close'}`,
+    method: 'POST',
+  }))
+
+export const updateCardShopPolicy = async (raceId: string, maxDataPatchPerTeam: number) =>
+  cardShopStateSchema.parse(await client.request<unknown>({
+    path: `${pluginPath}/races/${raceId}/shop/policy`,
+    method: 'PUT',
+    body: { maxDataPatchPerTeam },
+  }))
+
+export const updateCardPrice = async (raceId: string, cardId: string, price: number) =>
+  cardSchema.parse(await client.request<unknown>({
+    path: `${pluginPath}/races/${raceId}/cards/${cardId}/price`,
+    method: 'PUT',
+    body: { price },
   }))
 
 export const getCardTeams = async (
@@ -67,7 +97,7 @@ export const updateCardConfig = async (
 export const assignCard = async (
   raceId: string,
   cardId: string,
-  request: { teamId: string; teamName: string; reason: string },
+  request: { teamId: string; reason: string },
 ) => cardTeamSchema.parse(await client.request<unknown>({
   path: `${pluginPath}/races/${raceId}/cards/${cardId}/teams`,
   method: 'POST',
@@ -111,6 +141,22 @@ export const getTeamCards = async (
 ): Promise<TeamCard[]> => teamCardSchema.array().parse(await client.request<unknown>({
   path: `${pluginPath}/team/races/${raceId}/cards`,
   signal,
+}))
+
+export const getTeamCardShop = async (raceId: string, signal?: AbortSignal) =>
+  teamCardShopSchema.parse(await client.request<unknown>({
+    path: `${pluginPath}/team/races/${raceId}/shop`,
+    signal,
+  }))
+
+export const purchaseTeamCard = async (
+  raceId: string,
+  cardId: string,
+  purchaseId: string,
+) => cardPurchaseSchema.parse(await client.request<unknown>({
+  path: `${pluginPath}/team/races/${raceId}/shop/cards/${cardId}/purchase`,
+  method: 'POST',
+  body: { purchaseId },
 }))
 
 export const getTeamCard = async (
