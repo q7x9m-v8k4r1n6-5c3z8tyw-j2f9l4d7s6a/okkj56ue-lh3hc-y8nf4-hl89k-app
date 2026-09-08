@@ -2,7 +2,9 @@ import { ModalOptionChoice } from '@/core/shared/ui'
 import { useSecretMissionDetailContainer } from './hooks/useSecretMissionDetailContainer'
 import { SecretMissionInfoView } from './components/SecretMissionInfoView'
 import { SecretMissionEvidenceView } from './components/SecretMissionEvidenceView'
-import { SecretMissionEvidencePreview } from './components/SecretMissionEvidencePreview' // Thêm dòng này
+import { SecretMissionEvidencePreview } from './components/SecretMissionEvidencePreview'
+import { TechCacheCodeEntryView } from './components/TechCacheCodeEntryView'
+import { TechCacheResultPreview } from './components/TechCacheResultPreview'
 
 export const SecretMissionDetailContainer = () => {
   const container = useSecretMissionDetailContainer()
@@ -26,16 +28,52 @@ export const SecretMissionDetailContainer = () => {
     return <SecretMissionInfoView missionData={missionData} onBack={container.handleClose} onViewEvidence={container.handleOpenEvidence} />
   }
 
+  // ==================== [Tech Cache Flow] START ====================
+  if (container.viewMode === 'techcache-code') {
+    return (
+      <TechCacheCodeEntryView
+        missionName={missionData.name}
+        onBack={container.handleClose}
+        onVerify={container.handleVerifyTechCacheCode}
+        isVerifying={container.isVerifyingCode}
+        errorMessage={container.codeErrorMessage}
+      />
+    )
+  }
+
+  // Tái sử dụng UI của NVBM thay cho màn hình đen
+  if (container.viewMode === 'techcache-camera') {
+    return (
+      <SecretMissionEvidenceView
+        missionData={missionData}
+        onBack={container.handleOpenInfo}
+        onFileSelected={(file) => container.handleTechCacheVideoSelected(file)}
+      />
+    )
+  }
+
+  if (container.viewMode === 'techcache-preview' && container.techCacheVideo) {
+    return (
+      <TechCacheResultPreview
+        video={container.techCacheVideo}
+        onRetake={container.handleRetakeTechCacheVideo}
+        onSubmitResult={container.handleSubmitTechCacheResult}
+        isSubmitting={container.isSubmittingTechCacheResult}
+      />
+    )
+  }
+  // ==================== [Tech Cache Flow] END ======================
+
   if (container.viewMode === 'preview' && container.tempFile) {
     return (
       <SecretMissionEvidencePreview
-        missionName={missionData.name}
+        missionName={missionNameData(missionData)}
         file={container.tempFile.file}
         source={container.tempFile.source}
         onCancel={container.handleCancelPreview}
         onUpdateFile={(newFile) => container.setTempFile({ file: newFile, source: container.tempFile!.source })}
-        onConfirmUpload={container.handleSubmitEvidence} 
-        isSubmitting={container.isSubmitting} 
+        onConfirmUpload={container.handleSubmitEvidence}
+        isSubmitting={container.isSubmitting}
       />
     )
   }
@@ -45,7 +83,7 @@ export const SecretMissionDetailContainer = () => {
       <SecretMissionEvidenceView
         missionData={missionData}
         onBack={container.handleClose}
-        onFileSelected={container.handlePreviewFile} 
+        onFileSelected={container.handlePreviewFile}
       />
     )
   }
@@ -62,4 +100,8 @@ export const SecretMissionDetailContainer = () => {
       ]}
     />
   )
+}
+
+function missionNameData(data: { name: string }) {
+  return data.name
 }
