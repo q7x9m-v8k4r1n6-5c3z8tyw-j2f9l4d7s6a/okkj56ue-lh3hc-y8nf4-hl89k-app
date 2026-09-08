@@ -1,11 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   assignCard,
+  confirmRevive,
   deleteCardAssignment,
   getCardShopState,
   getCardStore,
   getCardTeams,
   getOverclockWindow,
+  getPendingRevive,
   getRaceOptions,
   getTeamCard,
   getTeamCardShop,
@@ -30,6 +32,8 @@ const keys = {
   teamShop: (raceId: string) => ['plugin', 'cards', 'team-shop', raceId] as const,
   teamCard: (raceId: string, cardInstanceId: string) => ['plugin', 'cards', 'team', raceId, cardInstanceId] as const,
   overclock: (raceId: string) => ['plugin', 'cards', 'overclock', raceId] as const,
+  pendingRevive: (raceId: string, boothId: string) =>
+    ['plugin', 'cards', 'pending-revive', raceId, boothId] as const,
 }
 
 export const useCardStore = (raceId?: string) => useQuery({
@@ -72,6 +76,24 @@ export const useOverclockMutations = (raceId: string) => {
     open: useMutation({ mutationFn: () => openOverclockWindow(raceId), onSuccess: invalidate }),
     resolve: useMutation({ mutationFn: () => resolveOverclockWindow(raceId), onSuccess: invalidate }),
   }
+}
+
+export const usePendingRevive = (raceId?: string, boothId?: string) => useQuery({
+  queryKey: keys.pendingRevive(raceId ?? '', boothId ?? ''),
+  queryFn: ({ signal }) => getPendingRevive(raceId!, boothId!, signal),
+  enabled: Boolean(raceId && boothId),
+  refetchInterval: 2_000,
+})
+
+export const useConfirmRevive = (raceId: string, boothId: string) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (effectId: string) => confirmRevive(raceId, effectId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: keys.pendingRevive(raceId, boothId) })
+      void queryClient.invalidateQueries({ queryKey: keys.teamCards(raceId) })
+    },
+  })
 }
 
 export const useCardStoreMutations = (raceId: string) => {

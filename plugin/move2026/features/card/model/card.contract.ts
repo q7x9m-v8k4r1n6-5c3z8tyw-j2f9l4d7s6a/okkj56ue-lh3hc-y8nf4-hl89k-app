@@ -167,6 +167,14 @@ export const cardUseResponseSchema = z.object({
   message: z.string(),
 })
 
+export const pendingReviveSchema = z.object({
+  effectId: z.string().min(1),
+  cardUseId: z.string().uuid(),
+  teamId: z.string().uuid(),
+  boothId: z.string().uuid(),
+  requestedAt: z.string(),
+})
+
 export const raceOptionsSchema = z.object({
   raceTeam: z.array(z.object({
     teamID: z.string().uuid(),
@@ -188,4 +196,5 @@ export type CardPurchase = z.infer<typeof cardPurchaseSchema>
 export type CardTeam = z.infer<typeof cardTeamSchema>
 export type TeamCard = z.infer<typeof teamCardSchema>
 export type CardUseResponse = z.infer<typeof cardUseResponseSchema>
+export type PendingRevive = z.infer<typeof pendingReviveSchema>
 export type RaceOptions = z.infer<typeof raceOptionsSchema>

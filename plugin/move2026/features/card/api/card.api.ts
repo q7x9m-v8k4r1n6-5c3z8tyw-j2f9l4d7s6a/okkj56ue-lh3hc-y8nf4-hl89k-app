@@ -7,6 +7,7 @@ import {
   cardUseResponseSchema,
   overclockResolutionSchema,
   overclockWindowSchema,
+  pendingReviveSchema,
   raceOptionsSchema,
   storeOverviewSchema,
   teamCardShopSchema,
@@ -134,6 +135,22 @@ export const resolveOverclockWindow = async (raceId: string) =>
     path: `${pluginPath}/races/${raceId}/overclock/resolve`,
     method: 'POST',
   }))
+
+export const getPendingRevive = async (
+  raceId: string,
+  boothId: string,
+  signal?: AbortSignal,
+) => pendingReviveSchema.nullable().parse(await client.request<unknown>({
+  path: `${pluginPath}/races/${raceId}/booths/${boothId}/revive-effect/pending`,
+  signal,
+}))
+
+export const confirmRevive = async (raceId: string, effectId: string) => {
+  await client.request<boolean>({
+    path: `${pluginPath}/races/${raceId}/revive-effects/${effectId}/confirm`,
+    method: 'POST',
+  })
+}
 
 export const getTeamCards = async (
   raceId: string,

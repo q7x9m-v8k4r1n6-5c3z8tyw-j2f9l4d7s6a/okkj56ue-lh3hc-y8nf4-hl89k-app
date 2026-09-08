@@ -62,7 +62,9 @@ export const TeamCardDetailView = () => {
     if (!card) return
     const accepted = await confirm({
       title: `Sử dụng ${card.cardName}?`,
-      description: 'Hành động này sẽ được ghi nhận và có thể trừ lượt dùng của card.',
+      description: card.cardId === 'REVIVE'
+        ? 'Bạn chắc chắn muốn gửi yêu cầu Revive? Sau khi gửi, quản trạm sẽ xác nhận việc sử dụng; khi được xác nhận, thẻ sẽ bị tiêu thụ.'
+        : 'Hành động này sẽ được ghi nhận và có thể trừ lượt dùng của card.',
     })
     if (!accepted) return
     cardUseIdRef.current ??= crypto.randomUUID()
