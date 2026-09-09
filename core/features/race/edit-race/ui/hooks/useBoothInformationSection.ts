@@ -25,7 +25,9 @@ const hasBoothContent = (booth: EditRaceBooth) => (
     booth.place.trim() ||
     booth.managers.length ||
     booth.description.replace(/<[^>]*>/g, '').trim() ||
-    booth.isHidden,
+    booth.isHidden ||
+    booth.type && booth.type !== 'other' ||
+    booth.maximumScore != null,
   )
 )
 
@@ -121,6 +123,9 @@ export const useBoothInformationSection = () => {
       if (selectedBooth) {
         editor.updateBooth(selectedBooth.id, { description })
       }
+    },
+    updateSelectedMetadata: (changes: Pick<EditRaceBooth, 'type' | 'maximumScore'>) => {
+      if (selectedBooth) editor.updateBooth(selectedBooth.id, changes)
     },
   }
 }

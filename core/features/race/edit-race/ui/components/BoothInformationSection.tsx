@@ -33,8 +33,8 @@ export const BoothInformationSection = () => {
               <TableHeaderCell>Tên trạm</TableHeaderCell>
               <TableHeaderCell>Địa điểm</TableHeaderCell>
               <TableHeaderCell>Quản trạm</TableHeaderCell>
-              <TableHeaderCell>Luật trạm</TableHeaderCell>
-              <TableHeaderCell className="min-w-24 text-center">Loại trạm</TableHeaderCell>
+              <TableHeaderCell>Mô tả / phân loại</TableHeaderCell>
+              <TableHeaderCell className="min-w-24 text-center">Trạm ẩn</TableHeaderCell>
               {section.isEditing ? <TableHeaderCell className="w-12" /> : null}
             </TableRow>
           </TableHead>
@@ -72,8 +72,9 @@ export const BoothInformationSection = () => {
                       onClick={() => section.openDetails(booth.id)}
                     >
                       <span className="block truncate">{booth.descriptionText}</span>
+                      <span className="block truncate text-[11px] text-[#8a8a8a]">{booth.type === 'physical' ? `Thể chất · tối đa ${booth.maximumScore ?? '—'} điểm` : booth.type === 'intellectual' ? 'Trí óc' : 'Khác'}</span>
                     </button>
-                  ) : booth.descriptionText}
+                  ) : <span>{booth.descriptionText}<span className="mt-1 block text-xs text-[#8a8a8a]">{booth.type === 'physical' ? `Thể chất · tối đa ${booth.maximumScore ?? '—'} điểm` : booth.type === 'intellectual' ? 'Trí óc' : 'Khác'}</span></span>}
                 </TableCell>
                 <TableCell className="min-w-24 text-center">
                   {section.isEditing && !booth.isPersisted ? (
@@ -170,11 +171,7 @@ export const BoothInformationSection = () => {
         )}
       >
         {section.selectedBooth ? (
-          <RichTextEditor
-            value={section.selectedBooth.description}
-            placeholder="Nhập luật và mô tả cho trạm..."
-            onChange={section.updateSelectedDescription}
-          />
+          <div className="space-y-5"><div className="grid gap-4 sm:grid-cols-2"><label className="block"><span className="mb-1.5 block text-xs font-semibold uppercase text-[#525252]">Loại trạm</span><select disabled={!section.isEditing} className="h-10 w-full rounded-lg border border-[#e2e2e2] bg-white px-3 text-sm disabled:bg-[#f5f5f5]" value={section.selectedBooth.type ?? 'other'} onChange={(event) => section.updateSelectedMetadata({ type: event.target.value as 'other' | 'intellectual' | 'physical', maximumScore: event.target.value === 'physical' ? section.selectedBooth?.maximumScore ?? null : null })}><option value="other">Khác</option><option value="intellectual">Trí óc</option><option value="physical">Thể chất</option></select></label>{section.selectedBooth.type === 'physical' ? <Input label="Điểm tối đa" type="number" min="1" max="100" requiredMark disabled={!section.isEditing} error={section.errors[section.selectedBooth.id]?.maximumScore} value={section.selectedBooth.maximumScore ?? ''} onChange={(event) => section.updateSelectedMetadata({ type: 'physical', maximumScore: event.target.value ? Number(event.target.value) : null })} /> : null}</div><RichTextEditor value={section.selectedBooth.description} placeholder="Nhập luật và mô tả cho trạm..." onChange={section.updateSelectedDescription} /></div>
         ) : null}
       </Drawer>
     </SectionCard>

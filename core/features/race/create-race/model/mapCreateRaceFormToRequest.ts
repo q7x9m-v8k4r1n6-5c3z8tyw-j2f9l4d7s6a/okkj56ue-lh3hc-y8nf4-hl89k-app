@@ -26,6 +26,8 @@ export const mapCreateRaceFormToRequest = (
     description: station.description || undefined,
     organizerIds: station.managers.map((manager) => manager.id),
     isHidden: station.isHidden,
+    type: station.type ?? 'other',
+    maximumScore: station.maximumScore ?? null,
   })),
   raceSettings: {
     isToggledLeaderboard: form.settings.showLeaderboard,

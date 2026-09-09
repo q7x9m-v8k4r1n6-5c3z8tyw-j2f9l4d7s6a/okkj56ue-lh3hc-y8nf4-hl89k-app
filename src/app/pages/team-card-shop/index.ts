@@ -1,0 +1,1 @@
+export { TeamCardShopPage } from './TeamCardShopPage'

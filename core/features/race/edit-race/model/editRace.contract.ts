@@ -46,6 +46,8 @@ export const editRaceRequestSchema = z.object({
       place: z.string().min(1).max(255),
       description: z.string().max(500).optional(),
       isHidden: z.boolean(),
+      type: z.enum(['other', 'intellectual', 'physical']),
+      maximumScore: z.number().int().min(0).max(100).nullable(),
       organizerIds: z.array(z.string().uuid()),
     })).optional(),
     update: z.array(z.object({
@@ -54,6 +56,8 @@ export const editRaceRequestSchema = z.object({
       place: z.string().min(1).max(255).optional(),
       description: z.string().max(500).optional(),
       isHidden: z.boolean().optional(),
+      type: z.enum(['other', 'intellectual', 'physical']).optional(),
+      maximumScore: z.number().int().min(0).max(100).nullable().optional(),
       organizerIds: z.array(z.string().uuid()).optional(),
     })).optional(),
     remove: z.array(z.string().uuid()).optional(),
@@ -80,6 +84,8 @@ const editRaceBoothSchema = z.object({
   description: z.string().nullable().optional(),
   organizerID: z.string().nullable().optional(),
   isHidden: z.boolean().default(false),
+  type: z.enum(['other', 'intellectual', 'physical']).catch('other'),
+  maximumScore: z.number().int().nullable().optional(),
 })
 
 /** Runtime-validated contract returned by the race detail API. */

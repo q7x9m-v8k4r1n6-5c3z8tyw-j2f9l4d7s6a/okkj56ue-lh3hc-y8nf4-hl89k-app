@@ -6,6 +6,7 @@ import { OrganizerRaceUnavailableView } from '@/core/features/organizer/organize
 import { OrganizerRaceRulesView } from '@/core/features/organizer/race-rules'
 import { RaceMessageNotificationBanner } from '@/core/features/race/race-message-notification'
 import { OrganizerRouteLayout } from '@/core/widgets/organizer-layout'
+import { OrganizerReviveConfirmation } from '@/plugin/move2026/features/card'
 import { useOrganizerRacePage } from './model/useOrganizerRacePage'
 
 /**
@@ -57,7 +58,10 @@ export const OrganizerRacePage = () => {
         />
       ) : null}
       {canShowRaceTabs && page.activeTab === 'rules' ? <OrganizerRaceRulesView /> : null}
-      {canShowRaceTabs && page.activeTab === 'requests' ? <OrganizerJoinRequestsView /> : null}
+      {canShowRaceTabs && page.activeTab === 'requests' ? <>
+        <OrganizerReviveConfirmation />
+        <OrganizerJoinRequestsView />
+      </> : null}
       {canShowRaceTabs && page.activeTab === 'history' ? <OrganizerHistoryView /> : null}
       {canShowRaceTabs && page.activeTab === 'announcement-history' ? (
         <OrganizerAnnouncementHistoryView />

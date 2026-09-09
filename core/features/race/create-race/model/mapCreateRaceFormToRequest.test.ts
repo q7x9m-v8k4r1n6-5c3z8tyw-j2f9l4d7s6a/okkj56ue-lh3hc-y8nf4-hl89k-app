@@ -44,6 +44,8 @@ describe('mapCreateRaceFormToRequest', () => {
       description: '<p>Secret mission</p>',
       organizerIds: [form.organizers[0].id],
       isHidden: true,
+      type: 'other',
+      maximumScore: null,
     }])
     expect(request.raceSettings).toEqual({
       isToggledLeaderboard: true,

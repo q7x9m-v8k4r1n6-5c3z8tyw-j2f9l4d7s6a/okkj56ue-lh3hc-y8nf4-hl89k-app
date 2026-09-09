@@ -44,6 +44,8 @@ const mapChangedBooth = (
       ? { description: booth.description }
       : {}),
     ...(booth.isHidden !== original.isHidden ? { isHidden: booth.isHidden } : {}),
+    ...((booth.type ?? 'other') !== (original.type ?? 'other') ? { type: booth.type ?? 'other' } : {}),
+    ...((booth.maximumScore ?? null) !== (original.maximumScore ?? null) ? { maximumScore: booth.maximumScore ?? null } : {}),
     ...(!haveSameIds(managerIds, originalManagerIds)
       ? { organizerIds: [...new Set(managerIds)] }
       : {}),
@@ -73,6 +75,8 @@ export const mapEditRaceFormToRequest = (
       place: booth.place.trim(),
       description: booth.description,
       isHidden: booth.isHidden,
+      type: booth.type ?? 'other',
+      maximumScore: booth.maximumScore ?? null,
       organizerIds: [...new Set(booth.managers.map((manager) => manager.id))],
     }))
   const boothUpdate = form.booths
