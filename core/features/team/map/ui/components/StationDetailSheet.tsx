@@ -1,7 +1,29 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import DOMPurify from 'dompurify'
 import { TEAM_RACE_TAB_PARAM } from '@/core/shared/utils'
 import type { StationPin } from '../../model/teamMap.types'
+
+/**
+ * Safely sanitizes HTML description and handles empty/blank HTML values.
+ */
+const getSanitizedDescription = (description?: string | null): string => {
+  if (!description) return ''
+  const trimmed = description.trim()
+  if (!trimmed) return ''
+
+  const sanitized =
+    typeof DOMPurify?.sanitize === 'function' ? DOMPurify.sanitize(trimmed) : trimmed
+
+  const strippedText = sanitized
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .trim()
+
+  if (strippedText.length === 0) return ''
+  return sanitized
+}
+
 
 interface StationDetailSheetProps {
   pin: StationPin | null
@@ -35,7 +57,9 @@ export const StationDetailSheet = ({
   const isOpen = Boolean(pin)
   const displayPin = pin ?? activePin
   const isOccupied = displayPin?.status === 'occupied'
-  const isLongDescription = displayPin ? displayPin.description.length > 100 : false
+  const sanitizedDesc = getSanitizedDescription(displayPin?.description)
+  const strippedText = sanitizedDesc.replace(/<[^>]*>/g, '').trim()
+  const isLongDescription = strippedText.length > 100
 
   useEffect(() => {
     if (!isOpen) return
@@ -87,7 +111,7 @@ export const StationDetailSheet = ({
           <>
             <div className="mb-2 flex items-center justify-between shrink-0">
               <h3 id="station-detail-title" className="text-xl font-bold text-[#111111]">
-                {displayPin.name.trim() || 'Trạm thử thách'}
+                {displayPin.name?.trim() || 'Trạm thử thách'}
               </h3>
               <button 
                 type="button"
@@ -100,7 +124,7 @@ export const StationDetailSheet = ({
             </div>
 
             <p className="mb-3 text-sm text-[#6b7280] shrink-0">
-              📍 {displayPin.place || 'Chưa cập nhật địa điểm'}
+              📍 Địa điểm: {displayPin.place?.trim() || 'Chưa cập nhật'}
             </p>
             
             <div className="mb-4 flex flex-wrap items-center gap-2 shrink-0">
@@ -118,9 +142,16 @@ export const StationDetailSheet = ({
                 isExpanded ? 'max-h-[50vh] overflow-y-auto' : 'max-h-[4.5rem]'
               }`}
             >
-              <p className="text-sm leading-relaxed text-[#4b5563]">
-                {displayPin.description || 'Chưa có mô tả thử thách.'}
-              </p>
+              {sanitizedDesc ? (
+                <div
+                  className="text-sm leading-relaxed text-[#4b5563] break-words [&_p]:mb-1 [&_p:last-child]:mb-0 [&_b]:font-bold [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4"
+                  dangerouslySetInnerHTML={{ __html: sanitizedDesc }}
+                />
+              ) : (
+                <p className="text-sm leading-relaxed text-[#4b5563]">
+                  Chưa có mô tả thử thách.
+                </p>
+              )}
             </div>
 
             {isLongDescription && (
@@ -131,12 +162,6 @@ export const StationDetailSheet = ({
               >
                 {isExpanded ? 'Thu gọn' : 'Xem thêm'}
               </button>
-            )}
-
-            {isOccupied && (
-              <p role="alert" className="mb-2 text-center text-xs font-medium text-[#de3336]">
-                Trạm đang bận, vui lòng chờ đội trước hoàn thành!
-              </p>
             )}
 
             <button 

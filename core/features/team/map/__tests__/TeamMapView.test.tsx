@@ -3,7 +3,12 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { TeamMapView } from '../ui/TeamMapView'
 import * as queryModule from '../model/server/useTeamMapQuery'
+import * as signalRModule from '../model/server/useTeamMapSignalR'
 import type { TeamMapDetailResponse } from '../model/teamMap.contract'
+
+vi.mock('../model/server/useTeamMapSignalR', () => ({
+  useTeamMapSignalR: vi.fn(),
+}))
 
 describe('TeamMapView', () => {
   afterEach(() => {
@@ -197,5 +202,23 @@ describe('TeamMapView', () => {
     )
 
     expect(querySpy).toHaveBeenCalledWith('explicit-prop-id')
+  })
+
+  it('subscribes to realtime station status via useTeamMapSignalR', () => {
+    vi.spyOn(queryModule, 'useTeamMapQuery').mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      isError: false,
+    } as ReturnType<typeof queryModule.useTeamMapQuery>)
+
+    renderToStaticMarkup(
+      <MemoryRouter initialEntries={['/team/race/race-signalr-test?tab=map']}>
+        <Routes>
+          <Route path="/team/race/:raceId" element={<TeamMapView />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    expect(signalRModule.useTeamMapSignalR).toHaveBeenCalledWith('race-signalr-test')
   })
 })

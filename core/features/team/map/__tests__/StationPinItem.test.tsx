@@ -46,14 +46,27 @@ describe('StationPinItem', () => {
     expect(html).not.toContain('text-[#9ca3af]')
   })
 
-  it('renders station name in pill badge below pin tip, horizontally centered', () => {
+  it('renders compact size-8 pin with 48px touch target for mobile and size-8 SVG', () => {
+    const html = renderToStaticMarkup(
+      <StationPinItem pin={freePin} isSelected={false} onClick={() => {}} />,
+    )
+
+    expect(html).toContain('size-8')
+    expect(html).toContain('before:absolute before:-inset-2')
+    expect(html).toContain('-translate-x-1/2 -translate-y-full origin-bottom')
+    expect(html).toContain('size-8 drop-shadow-md')
+    expect(html).not.toContain('size-10')
+  })
+
+  it('renders station name in compact pill badge with text-[11px] below pin tip', () => {
     const html = renderToStaticMarkup(
       <StationPinItem pin={freePin} isSelected={false} onClick={() => {}} />,
     )
 
     expect(html).toContain('Trạm Rảnh 1')
     expect(html).toContain('absolute top-full left-1/2 -translate-x-1/2')
-    expect(html).toContain('rounded-full bg-black/80')
+    expect(html).toContain('rounded-full bg-black/80 text-white shadow-md cursor-pointer')
+    expect(html).toContain('text-[11px] font-medium px-2 py-0.5 mt-0.5')
   })
 
   it('renders positioning styles corresponding to x and y coordinates', () => {

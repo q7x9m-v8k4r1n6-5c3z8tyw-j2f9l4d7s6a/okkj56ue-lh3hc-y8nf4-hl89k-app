@@ -5,6 +5,7 @@ import { Spinner } from '@/core/shared/ui/Spinner'
 import { useTeamMap } from '../model/frontend/useTeamMap'
 import { mapRaceDetailToMapData } from '../model/teamMap.mapper'
 import { useTeamMapQuery } from '../model/server/useTeamMapQuery'
+import { useTeamMapSignalR } from '../model/server/useTeamMapSignalR'
 import { MapFloatingControls } from './components/MapFloatingControls'
 import { StationPinItem } from './components/StationPinItem'
 import { StationDetailSheet } from './components/StationDetailSheet'
@@ -16,6 +17,7 @@ export interface TeamMapViewProps {
 export const TeamMapView = ({ raceId: propRaceId }: TeamMapViewProps = {}) => {
   const params = useParams<{ raceId: string }>()
   const raceId = propRaceId ?? params.raceId
+  useTeamMapSignalR(raceId)
   const { data, isLoading, isError } = useTeamMapQuery(raceId)
   const { selectedStationId, selectStation, clearSelection } = useTeamMap()
   const [failedImageUrl, setFailedImageUrl] = useState<string | null>(null)
@@ -76,17 +78,20 @@ export const TeamMapView = ({ raceId: propRaceId }: TeamMapViewProps = {}) => {
         limitToBounds={false}
       >
         <MapFloatingControls />
-        <TransformComponent wrapperClass="!w-full !h-full" contentClass="!w-full !h-full">
+        <TransformComponent
+          wrapperClass="!w-full !h-full flex items-center justify-center"
+          contentClass="flex items-center justify-center min-w-full min-h-full"
+        >
           {/* Vùng Map có thể tương tác */}
           <div 
-            className="relative h-full w-full"
+            className="relative inline-block max-w-full max-h-full select-none"
             onClick={clearSelection}
           >
             <img 
               src={mapData.backgroundImageUrl} 
               alt="Bản đồ" 
               onError={() => setFailedImageUrl(mapData.backgroundImageUrl)}
-              className="pointer-events-none h-full w-full object-cover"
+              className="pointer-events-none block max-w-full max-h-[calc(100svh-137px)] w-auto h-auto object-contain select-none"
             />
             
             {/* Pins Overlay */}
