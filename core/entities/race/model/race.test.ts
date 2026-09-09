@@ -16,6 +16,20 @@ describe('race entity schemas', () => {
     expect(raceSummarySchema.parse(validRace)).toEqual(validRace)
   })
 
+  it('accepts a canonical race summary with mapImageUrl', () => {
+    const withMap = {
+      ...validRace,
+      mapImageUrl: 'https://example.com/map.png',
+    }
+    expect(raceSummarySchema.parse(withMap)).toEqual(withMap)
+
+    const withNullMap = {
+      ...validRace,
+      mapImageUrl: null,
+    }
+    expect(raceSummarySchema.parse(withNullMap)).toEqual(withNullMap)
+  })
+
   it('rejects an unsupported lifecycle status', () => {
     expect(() => raceStatusSchema.parse('upcoming')).toThrow()
   })

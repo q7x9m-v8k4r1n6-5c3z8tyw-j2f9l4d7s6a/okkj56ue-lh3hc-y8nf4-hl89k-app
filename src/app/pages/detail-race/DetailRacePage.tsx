@@ -1,3 +1,5 @@
+import { useParams } from 'react-router-dom'
+import { AdminBuildMapView } from '@/core/features/race/build-map'
 import { EditRaceView } from '@/core/features/race/edit-race'
 import { LiveRaceView } from '@/core/features/race/live-race'
 import { ScoringLogHistoryView } from '@/core/features/race/scoring-log-history'
@@ -14,6 +16,7 @@ import { useDetailRacePage } from './model/useDetailRacePage'
  * Composes race-detail sections while domain state stays in each feature.
  */
 export const DetailRacePage = () => {
+  const { raceId } = useParams<{ raceId: string }>()
   const {
     activeTab,
     activeTabLabel,
@@ -27,12 +30,13 @@ export const DetailRacePage = () => {
         <Tabs items={tabs} value={activeTab} onChange={onTabChange} />
         <div className="min-h-0 flex-1 overflow-y-auto pb-8">
           {activeTab === 'basic' && <EditRaceView />}
+          {activeTab === 'map' && <AdminBuildMapView raceId={raceId} />}
           {activeTab === 'live' && <LiveRaceView />}
           {activeTab === 'history' && <ScoringLogHistoryView />}
           {activeTab === 'message' && <SendMessageView />}
           {activeTab === 'cards' && <CardStoreManagementView />}
           {activeTab === 'secret' && <AdminSecretMissionListView />}
-          {activeTab !== 'basic' && activeTab !== 'live' && activeTab !== 'history' && activeTab !== 'message' && activeTab !== 'cards' && activeTab !== 'secret' && (
+          {activeTab !== 'basic' && activeTab !== 'map' && activeTab !== 'live' && activeTab !== 'history' && activeTab !== 'message' && activeTab !== 'cards' && activeTab !== 'secret' && (
             <div className="flex h-full items-center justify-center text-gray-400">
               {activeTabLabel}
             </div>

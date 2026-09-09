@@ -24,6 +24,7 @@ export const raceSummarySchema = z.object({
   timeStart: z.string().optional(),
   timeEnd: z.string().optional(),
   coverUrl: z.string().url().max(500).nullable().optional(),
+  mapImageUrl: z.string().nullable().optional(),
   status: raceStatusSchema,
 })
 

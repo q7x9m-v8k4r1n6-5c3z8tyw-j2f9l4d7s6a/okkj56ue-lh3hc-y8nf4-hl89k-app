@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Button, Drawer, Input } from '@/core/shared'
 import { Dropdown, type DropdownOption } from '@/core/shared/ui/Dropdown'
 import type { AdminSecretMissionOverviewItem } from '../../model/adminSecretMission.contract'
@@ -26,13 +26,18 @@ export const SecretMissionFormDrawer = ({
   const [teamId, setTeamId] = useState('')
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
+  const [prevOpen, setPrevOpen] = useState(open)
+  const [prevEditingMission, setPrevEditingMission] = useState(editingMission)
 
-  useEffect(() => {
-    if (!open) return
-    setTeamId(editingMission?.teamId ?? '')
-    setName(editingMission?.name ?? '')
-    setDescription(editingMission?.description ??'')
-  }, [open, editingMission])
+  if (open !== prevOpen || editingMission !== prevEditingMission) {
+    setPrevOpen(open)
+    setPrevEditingMission(editingMission)
+    if (open) {
+      setTeamId(editingMission?.teamId ?? '')
+      setName(editingMission?.name ?? '')
+      setDescription(editingMission?.description ?? '')
+    }
+  }
 
   const teamOptions: DropdownOption[] = teams.map((team) => ({
     value: team.id,
