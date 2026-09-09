@@ -30,7 +30,7 @@ export const CardTeamDrawer = ({ card, editable, open, pending, shopOpen, onClos
   const raceOptionsQuery = useRaceOptions(raceId)
   const { toast } = useToast()
   const [configValues, setConfigValues] = useState<Record<string, string>>(() => Object.fromEntries(
-    Object.entries(card?.config ?? {}).map(([key, value]) => [key, String(value)]),
+    Object.entries(card?.config ?? {}).map(([key, value]) => [key, typeof value === 'object' ? JSON.stringify(value) : String(value)]),
   ))
   const [price, setPrice] = useState(String(card?.price ?? 0))
   const [draft, setDraft] = useState<{ teamId: string; teamName: string; reason: string } | null>(null)
@@ -57,6 +57,7 @@ export const CardTeamDrawer = ({ card, editable, open, pending, shopOpen, onClos
         const original = card.config[key]
         if (typeof original === 'number') return [key, Number(value)]
         if (typeof original === 'boolean') return [key, value === 'true']
+        if (typeof original === 'object') return [key, original]
         return [key, value]
       }))
       await onSaveConfig(card.cardId, config)
@@ -97,7 +98,7 @@ export const CardTeamDrawer = ({ card, editable, open, pending, shopOpen, onClos
             {card.cardType === 'data_patch' ? <div className="mb-3 flex items-end gap-2"><Input label="Giá Data Patch (CD)" type="number" min="1" max="1000000" disabled={!editable || shopOpen} value={price} onChange={(event) => setPrice(event.target.value)} />{editable ? <Button size="sm" className="mb-px shrink-0" disabled={pending || shopOpen || Number(price) < 1} onClick={() => void savePrice()}>Lưu giá</Button> : null}</div> : null}
             <div className="grid gap-3 md:grid-cols-2">{Object.entries(configValues).map(([key, value]) => {
               const numeric = typeof card.config[key] === 'number'
-              const invariant = ['requiredBoothType', 'qualificationMode', 'consumeWhen'].includes(key)
+              const invariant = ['requiredBoothType', 'qualificationMode', 'consumeWhen', 'blockedCardIds'].includes(key)
                 || key === 'card_use_count_max' && teams.length > 0
               return <Input key={key} label={key} type={numeric ? 'number' : 'text'} min={numeric ? '0' : undefined} disabled={!editable || shopOpen || invariant} value={value} onChange={(event) => setConfigValues((current) => ({ ...current, [key]: event.target.value }))} />
             })}</div>

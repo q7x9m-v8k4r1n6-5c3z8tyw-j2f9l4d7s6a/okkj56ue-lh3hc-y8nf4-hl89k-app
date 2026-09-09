@@ -1,11 +1,17 @@
 import { z } from 'zod'
 
 export const cardIdSchema = z.enum([
+  'BLACKOUT',
+  'TAXMAN',
+  'FIREWALL',
   'OVERCLOCK',
   'CUPID',
+  'SHIELD',
   'ENGINEER',
   'ATHLETE',
   'REVIVE',
+  'SCOUT',
+  'INSIGHT',
   'SWAP',
   'TRAP',
 ])
@@ -13,7 +19,7 @@ export const cardIdSchema = z.enum([
 export const cardInputSchema = z.object({
   key: z.string(),
   label: z.string(),
-  type: z.enum(['opponent_team', 'booth', 'overclock_predictions']),
+  type: z.enum(['opponent_team', 'booth', 'overclock_predictions', 'score_group']),
   required: z.boolean(),
   description: z.string(),
 })
@@ -46,6 +52,7 @@ export const cardAvailabilitySchema = z.object({
     'backend_not_ready',
     'overclock_closed',
     'purchase_pending',
+    'awaiting_threat',
   ]),
   reason: z.string(),
   nextTimeAvailable: z.string().nullable(),
