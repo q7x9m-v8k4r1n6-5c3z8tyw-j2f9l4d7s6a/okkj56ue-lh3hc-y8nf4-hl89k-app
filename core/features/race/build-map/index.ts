@@ -16,6 +16,12 @@ export type { CoordinateLockControlsProps } from './ui/CoordinateLockControls'
 export { FrozenMapBanner } from './ui/FrozenMapBanner'
 export type { FrozenMapBannerProps } from './ui/FrozenMapBanner'
 
+export { MapSettingsSection } from './ui/MapSettingsSection'
+export type {
+  MapSettingsSectionProps,
+  MapSettingsValues,
+} from './ui/MapSettingsSection'
+
 export {
   calculatePinCoordinates,
   isDropOutsideCanvas,
@@ -45,6 +51,8 @@ export {
   raceMapDetailResponseSchema,
   raceBoothsResponseSchema,
   uploadRaceMapResponseSchema,
+  raceMapSettingsSchema,
+  updateRaceMapSettingsPayloadSchema,
 } from './model/buildMap.contract'
 export type {
   RaceBoothItem,
@@ -53,6 +61,8 @@ export type {
   RaceMapDetailResponse,
   RaceBoothsResponse,
   UploadRaceMapResponse,
+  RaceMapSettings,
+  UpdateRaceMapSettingsPayload,
 } from './model/buildMap.contract'
 
 export {
@@ -76,7 +86,13 @@ export {
 } from './model/server/useUpdateBoothCoordinatesMutation'
 
 export {
+  useUpdateRaceMapSettingsMutation,
+  getUpdateRaceMapSettingsMutationOptions,
+} from './model/server/useUpdateRaceMapSettingsMutation'
+
+export {
   updateBoothCoordinates,
+  updateRaceMapSettings,
   getRaceMapDetail,
   getRaceBooths,
   uploadRaceMap,

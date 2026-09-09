@@ -13,8 +13,9 @@ const isSecretBooth = (isHidden: unknown): boolean => {
 
 /**
  * Pure mapper converting race detail API response to client MapData.
- * Strictly filters out 100% of secret booths (isHidden === true) and booths lacking coordinates.
- * Strictly maps booth status to only two states: 'occupied' or 'free'.
+ * Respects isShowHiddenBooths (includes secret booths when true, filters them out when false).
+ * Filters out booths lacking coordinates.
+ * Respects isDisabledBoothStatus (forces all station pins to 'occupied' when true).
  */
 export const mapRaceDetailToMapData = (
   response: TeamMapDetailResponse | null | undefined,
@@ -23,16 +24,21 @@ export const mapRaceDetailToMapData = (
     return {
       backgroundImageUrl: '',
       stations: [],
+      isHideBoothDescription: false,
+      isDisabledBoothStatus: false,
     }
   }
 
   const backgroundImageUrl = response.mapImageUrl?.trim() || ''
   const booths = response.booth ?? []
+  const isShowHiddenBooths = Boolean(response.isShowHiddenBooths)
+  const isHideBoothDescription = Boolean(response.isHideBoothDescription)
+  const isDisabledBoothStatus = Boolean(response.isDisabledBoothStatus)
 
   const stations: StationPin[] = booths
     .filter(
       (booth) =>
-        !isSecretBooth(booth.isHidden) &&
+        (isShowHiddenBooths || !isSecretBooth(booth.isHidden)) &&
         booth.mapX != null &&
         booth.mapY != null &&
         Number.isFinite(booth.mapX) &&
@@ -45,11 +51,17 @@ export const mapRaceDetailToMapData = (
       description: booth.description,
       x: Math.max(0, Math.min(100, booth.mapX!)),
       y: Math.max(0, Math.min(100, booth.mapY!)),
-      status: booth.status?.trim().toLowerCase() === 'occupied' ? 'occupied' : 'free',
+      status: isDisabledBoothStatus
+        ? 'occupied'
+        : booth.status?.trim().toLowerCase() === 'occupied'
+          ? 'occupied'
+          : 'free',
     }))
 
   return {
     backgroundImageUrl,
     stations,
+    isHideBoothDescription,
+    isDisabledBoothStatus,
   }
 }

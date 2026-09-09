@@ -3,9 +3,11 @@ import {
   raceBoothsResponseSchema,
   raceMapDetailResponseSchema,
   uploadRaceMapResponseSchema,
+  updateRaceMapSettingsPayloadSchema,
   type RaceBoothsResponse,
   type RaceMapDetailResponse,
   type UpdateBoothCoordinatesPayload,
+  type UpdateRaceMapSettingsPayload,
   type UploadRaceMapResponse,
 } from '../model/buildMap.contract'
 
@@ -85,4 +87,28 @@ export const updateBoothCoordinates = async (
     signal,
   })
   return response
+}
+
+/**
+ * Updates race map settings via PATCH /Race/{raceId}.
+ */
+export const updateRaceMapSettings = async (
+  raceId: string,
+  payload: UpdateRaceMapSettingsPayload,
+  signal?: AbortSignal,
+): Promise<RaceMapDetailResponse> => {
+  if (!raceId.trim()) {
+    throw new Error('Mã trận đấu không hợp lệ.')
+  }
+  const validatedPayload = updateRaceMapSettingsPayloadSchema.parse(payload)
+  const formData = new FormData()
+  formData.append('payload', JSON.stringify(validatedPayload))
+
+  const response = await client.request<unknown, FormData>({
+    path: `/Race/${raceId}`,
+    method: 'PATCH',
+    body: formData,
+    signal,
+  })
+  return raceMapDetailResponseSchema.parse(response)
 }

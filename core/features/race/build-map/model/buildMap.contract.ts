@@ -1,5 +1,24 @@
 import { z } from 'zod'
 
+export const raceMapSettingsSchema = z.object({
+  isShowHiddenBooths: z.boolean().default(false),
+  isHideBoothDescription: z.boolean().default(false),
+  isDisabledBoothStatus: z.boolean().default(false),
+})
+
+export type RaceMapSettings = z.infer<typeof raceMapSettingsSchema>
+
+export const updateRaceMapSettingsPayloadSchema = z.object({
+  expectedModifiedAt: z.string().min(1),
+  raceSettings: z.object({
+    isShowHiddenBooths: z.boolean().optional(),
+    isHideBoothDescription: z.boolean().optional(),
+    isDisabledBoothStatus: z.boolean().optional(),
+  }),
+})
+
+export type UpdateRaceMapSettingsPayload = z.infer<typeof updateRaceMapSettingsPayloadSchema>
+
 /**
  * Runtime schema validating race map details returned by GET /Race/{raceId}.
  */
@@ -9,6 +28,10 @@ export const raceMapDetailResponseSchema = z.object({
   raceName: z.string().optional(),
   mapImageUrl: z.string().nullable().optional(),
   status: z.enum(['draft', 'ready', 'ongoing', 'paused', 'completed']).optional(),
+  modifiedAt: z.string().optional(),
+  isShowHiddenBooths: z.boolean().optional(),
+  isHideBoothDescription: z.boolean().optional(),
+  isDisabledBoothStatus: z.boolean().optional(),
 }).passthrough()
 
 export type RaceMapDetailResponse = z.infer<typeof raceMapDetailResponseSchema>

@@ -7,10 +7,14 @@ describe('mapRaceDetailToMapData', () => {
     expect(mapRaceDetailToMapData(null)).toEqual({
       backgroundImageUrl: '',
       stations: [],
+      isHideBoothDescription: false,
+      isDisabledBoothStatus: false,
     })
     expect(mapRaceDetailToMapData(undefined)).toEqual({
       backgroundImageUrl: '',
       stations: [],
+      isHideBoothDescription: false,
+      isDisabledBoothStatus: false,
     })
   })
 
@@ -415,5 +419,154 @@ describe('mapRaceDetailToMapData', () => {
     expect(result.stations).toHaveLength(2)
     expect(result.stations[0].id).toBe('station-1')
     expect(result.stations[1].id).toBe('station-2')
+  })
+
+  describe('map settings synchronization', () => {
+    const mixedBooths = [
+      {
+        id: 'b-public-free',
+        name: 'Trạm Công Khai Rảnh',
+        place: 'Khu A',
+        description: 'Mô tả A',
+        isHidden: false,
+        status: 'free',
+        mapX: 20,
+        mapY: 30,
+      },
+      {
+        id: 'b-public-occupied',
+        name: 'Trạm Công Khai Bận',
+        place: 'Khu B',
+        description: 'Mô tả B',
+        isHidden: false,
+        status: 'occupied',
+        mapX: 40,
+        mapY: 50,
+      },
+      {
+        id: 'b-hidden-free',
+        name: 'Trạm Ẩn Rảnh',
+        place: 'Hầm bí mật',
+        description: 'Mô tả ẩn 1',
+        isHidden: true,
+        status: 'free',
+        mapX: 60,
+        mapY: 70,
+      },
+      {
+        id: 'b-hidden-occupied',
+        name: 'Trạm Ẩn Bận',
+        place: 'Gác xép',
+        description: 'Mô tả ẩn 2',
+        isHidden: true,
+        status: 'occupied',
+        mapX: 80,
+        mapY: 90,
+      },
+    ]
+
+    it('shows hidden stations like normal stations when isShowHiddenBooths is true', () => {
+      const response: TeamMapDetailResponse = {
+        mapImageUrl: 'https://example.com/map.png',
+        isShowHiddenBooths: true,
+        booth: mixedBooths,
+      }
+
+      const result = mapRaceDetailToMapData(response)
+
+      // All 4 stations must be included (both public and hidden)
+      expect(result.stations).toHaveLength(4)
+      expect(result.stations.map((s) => s.id)).toEqual([
+        'b-public-free',
+        'b-public-occupied',
+        'b-hidden-free',
+        'b-hidden-occupied',
+      ])
+
+      // Hidden stations display their actual status (free/occupied)
+      const hiddenFree = result.stations.find((s) => s.id === 'b-hidden-free')
+      const hiddenOccupied = result.stations.find((s) => s.id === 'b-hidden-occupied')
+      expect(hiddenFree?.status).toBe('free')
+      expect(hiddenOccupied?.status).toBe('occupied')
+    })
+
+    it('filters out hidden stations when isShowHiddenBooths is false or omitted', () => {
+      const response: TeamMapDetailResponse = {
+        mapImageUrl: 'https://example.com/map.png',
+        isShowHiddenBooths: false,
+        booth: mixedBooths,
+      }
+
+      const result = mapRaceDetailToMapData(response)
+
+      // Only 2 public stations must be returned
+      expect(result.stations).toHaveLength(2)
+      expect(result.stations.map((s) => s.id)).toEqual([
+        'b-public-free',
+        'b-public-occupied',
+      ])
+    })
+
+    it('forces all station pins to occupied (Red) when isDisabledBoothStatus is true', () => {
+      const response: TeamMapDetailResponse = {
+        mapImageUrl: 'https://example.com/map.png',
+        isDisabledBoothStatus: true,
+        booth: mixedBooths,
+      }
+
+      const result = mapRaceDetailToMapData(response)
+
+      expect(result.stations.length).toBeGreaterThan(0)
+      for (const station of result.stations) {
+        expect(station.status).toBe('occupied')
+      }
+    })
+
+    it('preserves normal free/occupied status when isDisabledBoothStatus is false', () => {
+      const response: TeamMapDetailResponse = {
+        mapImageUrl: 'https://example.com/map.png',
+        isDisabledBoothStatus: false,
+        booth: mixedBooths,
+      }
+
+      const result = mapRaceDetailToMapData(response)
+
+      const freeStation = result.stations.find((s) => s.id === 'b-public-free')
+      const occupiedStation = result.stations.find((s) => s.id === 'b-public-occupied')
+      expect(freeStation?.status).toBe('free')
+      expect(occupiedStation?.status).toBe('occupied')
+    })
+
+    it('propagates isHideBoothDescription flag into returned MapData', () => {
+      const withHideDesc = mapRaceDetailToMapData({
+        mapImageUrl: 'https://example.com/map.png',
+        isHideBoothDescription: true,
+        booth: [],
+      })
+      expect(withHideDesc.isHideBoothDescription).toBe(true)
+
+      const withoutHideDesc = mapRaceDetailToMapData({
+        mapImageUrl: 'https://example.com/map.png',
+        isHideBoothDescription: false,
+        booth: [],
+      })
+      expect(withoutHideDesc.isHideBoothDescription).toBe(false)
+    })
+
+    it('propagates isDisabledBoothStatus flag into returned MapData', () => {
+      const withDisabled = mapRaceDetailToMapData({
+        mapImageUrl: 'https://example.com/map.png',
+        isDisabledBoothStatus: true,
+        booth: [],
+      })
+      expect(withDisabled.isDisabledBoothStatus).toBe(true)
+
+      const withoutDisabled = mapRaceDetailToMapData({
+        mapImageUrl: 'https://example.com/map.png',
+        isDisabledBoothStatus: false,
+        booth: [],
+      })
+      expect(withoutDisabled.isDisabledBoothStatus).toBe(false)
+    })
   })
 })

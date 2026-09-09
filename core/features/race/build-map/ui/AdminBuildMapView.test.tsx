@@ -8,7 +8,6 @@ import * as updateCoordinatesMutationModule from '../model/server/useUpdateBooth
 import type { MapUploadCanvasProps } from './MapUploadCanvas'
 import type { AdminMapCanvasProps } from './AdminMapCanvas'
 
-// Mock canvas components to capture callbacks passed from AdminBuildMapView
 let capturedCanvasProps: {
   onUpload: (file: File) => void
   onError?: (message: string) => void
@@ -18,6 +17,37 @@ let capturedCanvasProps: {
   isSaving?: boolean
   isFrozen?: boolean
 } | null = null
+
+let capturedMapSettingsProps: {
+  raceId?: string
+  isFrozen?: boolean
+  settings?: {
+    isShowHiddenBooths?: boolean
+    isHideBoothDescription?: boolean
+    isDisabledBoothStatus?: boolean
+    modifiedAt?: string
+  }
+} | null = null
+
+vi.mock('./MapSettingsSection', () => ({
+  MapSettingsSection: (props: {
+    raceId?: string
+    isFrozen?: boolean
+    settings?: {
+      isShowHiddenBooths?: boolean
+      isHideBoothDescription?: boolean
+      isDisabledBoothStatus?: boolean
+      modifiedAt?: string
+    }
+  }) => {
+    capturedMapSettingsProps = props
+    return (
+      <div data-testid="mock-map-settings-section">
+        Cài đặt bản đồ
+      </div>
+    )
+  },
+}))
 
 vi.mock('./AdminMapCanvas', () => ({
   AdminMapCanvas: (props: AdminMapCanvasProps) => {
@@ -54,6 +84,7 @@ vi.mock('./MapUploadCanvas', () => ({
 describe('AdminBuildMapView', () => {
   beforeEach(() => {
     capturedCanvasProps = null
+    capturedMapSettingsProps = null
   })
 
   afterEach(() => {
@@ -548,6 +579,27 @@ describe('AdminBuildMapView', () => {
 
       expect(updateMutate).not.toHaveBeenCalled()
       expect(mockToastContext.toast).not.toHaveBeenCalled()
+    })
+
+    it('renders MapSettingsSection and passes raceId, isFrozen and settings', () => {
+      const { mockToastContext } = setupMocks()
+
+      const html = renderToStaticMarkup(
+        <ToastContext.Provider value={mockToastContext}>
+          <AdminBuildMapView raceId="race-test-settings" raceStatus="draft" />
+        </ToastContext.Provider>,
+      )
+
+      expect(html).toContain('data-testid="mock-map-settings-section"')
+      expect(capturedMapSettingsProps).not.toBeNull()
+      expect(capturedMapSettingsProps!.raceId).toBe('race-test-settings')
+      expect(capturedMapSettingsProps!.isFrozen).toBe(false)
+      expect(capturedMapSettingsProps!.settings).toEqual({
+        isShowHiddenBooths: false,
+        isHideBoothDescription: false,
+        isDisabledBoothStatus: false,
+        modifiedAt: undefined,
+      })
     })
   })
 })

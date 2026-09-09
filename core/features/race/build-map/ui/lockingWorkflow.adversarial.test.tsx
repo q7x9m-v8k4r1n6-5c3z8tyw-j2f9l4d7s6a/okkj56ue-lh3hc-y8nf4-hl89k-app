@@ -31,6 +31,10 @@ vi.mock('./MapUploadCanvas', () => ({
   MapUploadCanvas: () => <div data-testid="mock-map-upload-canvas" />,
 }))
 
+vi.mock('./MapSettingsSection', () => ({
+  MapSettingsSection: () => <div data-testid="mock-map-settings-section" />,
+}))
+
 describe('Adversarial Test Suite 2: Coordinate Locking & Validation Workflow', () => {
   let mockStore: Record<string, string> = {}
   const mockToast = vi.fn().mockReturnValue('toast-1')

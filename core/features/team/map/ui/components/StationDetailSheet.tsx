@@ -25,16 +25,20 @@ const getSanitizedDescription = (description?: string | null): string => {
 }
 
 
-interface StationDetailSheetProps {
+export interface StationDetailSheetProps {
   pin: StationPin | null
   onClose: () => void
   onNavigateToScan?: () => void
+  isHideBoothDescription?: boolean
+  isDisabledBoothStatus?: boolean
 }
 
 export const StationDetailSheet = ({
   pin,
   onClose,
   onNavigateToScan,
+  isHideBoothDescription = false,
+  isDisabledBoothStatus = false,
 }: StationDetailSheetProps) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [activePin, setActivePin] = useState<StationPin | null>(pin)
@@ -73,7 +77,7 @@ export const StationDetailSheet = ({
   }, [isOpen, onClose])
 
   const handleScanClick = () => {
-    if (isOccupied) return
+    if (!isDisabledBoothStatus && isOccupied) return
 
     onClose()
     if (onNavigateToScan) {
@@ -127,47 +131,47 @@ export const StationDetailSheet = ({
               📍 Địa điểm: {displayPin.place?.trim() || 'Chưa cập nhật'}
             </p>
             
-            <div className="mb-4 flex flex-wrap items-center gap-2 shrink-0">
-              <span
-                className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold text-white ${
-                  isOccupied ? 'bg-[#de3336]' : 'bg-[#168944]'
-                }`}
-              >
-                {isOccupied ? 'Đang có đội tham gia' : 'Trống / Sẵn sàng'}
-              </span>
-            </div>
+            {!isDisabledBoothStatus && (
+              <div className="mb-4 flex flex-wrap items-center gap-2 shrink-0">
+                <span
+                  className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold text-white ${
+                    isOccupied ? 'bg-[#de3336]' : 'bg-[#168944]'
+                  }`}
+                >
+                  {isOccupied ? 'Đang có đội tham gia' : 'Trống / Sẵn sàng'}
+                </span>
+              </div>
+            )}
 
-            <div
-              className={`mb-6 overflow-hidden transition-all duration-300 ease-out ${
-                isExpanded ? 'max-h-[50vh] overflow-y-auto' : 'max-h-[4.5rem]'
-              }`}
-            >
-              {sanitizedDesc ? (
+            {!isHideBoothDescription && Boolean(sanitizedDesc) && (
+              <>
                 <div
-                  className="text-sm leading-relaxed text-[#4b5563] break-words [&_p]:mb-1 [&_p:last-child]:mb-0 [&_b]:font-bold [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4"
-                  dangerouslySetInnerHTML={{ __html: sanitizedDesc }}
-                />
-              ) : (
-                <p className="text-sm leading-relaxed text-[#4b5563]">
-                  Chưa có mô tả thử thách.
-                </p>
-              )}
-            </div>
+                  className={`mb-6 overflow-hidden transition-all duration-300 ease-out ${
+                    isExpanded ? 'max-h-[50vh] overflow-y-auto' : 'max-h-[4.5rem]'
+                  }`}
+                >
+                  <div
+                    className="text-sm leading-relaxed text-[#4b5563] break-words [&_p]:mb-1 [&_p:last-child]:mb-0 [&_b]:font-bold [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4"
+                    dangerouslySetInnerHTML={{ __html: sanitizedDesc }}
+                  />
+                </div>
 
-            {isLongDescription && (
-              <button
-                type="button"
-                className="mb-6 -mt-4 text-left text-sm font-medium text-[#de3336] underline underline-offset-4 decoration-[1px] [text-decoration-skip-ink:none] hover:text-[#b91c1c] transition-colors shrink-0"
-                onClick={() => setIsExpanded((prev) => !prev)}
-              >
-                {isExpanded ? 'Thu gọn' : 'Xem thêm'}
-              </button>
+                {isLongDescription && (
+                  <button
+                    type="button"
+                    className="mb-6 -mt-4 text-left text-sm font-medium text-[#de3336] underline underline-offset-4 decoration-[1px] [text-decoration-skip-ink:none] hover:text-[#b91c1c] transition-colors shrink-0"
+                    onClick={() => setIsExpanded((prev) => !prev)}
+                  >
+                    {isExpanded ? 'Thu gọn' : 'Xem thêm'}
+                  </button>
+                )}
+              </>
             )}
 
             <button 
               type="button"
               onClick={handleScanClick}
-              disabled={isOccupied}
+              disabled={!isDisabledBoothStatus && isOccupied}
               className="mt-auto shrink-0 w-full rounded-xl bg-[#de3336] py-3.5 font-bold text-white transition-colors hover:bg-[#b91c1c] disabled:bg-[#9ca3af] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Chuyển sang Quét QR

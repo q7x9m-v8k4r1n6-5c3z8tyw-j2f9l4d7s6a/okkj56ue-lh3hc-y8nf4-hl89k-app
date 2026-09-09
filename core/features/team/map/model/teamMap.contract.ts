@@ -52,6 +52,13 @@ export const teamMapBoothSchema = z
 
 export type TeamMapBoothResponse = z.infer<typeof teamMapBoothSchema>
 
+const booleanFlagSchema = z.preprocess((val) => {
+  if (val == null) return undefined
+  if (typeof val === 'string') return val.trim().toLowerCase() === 'true' || val.trim() === '1'
+  if (typeof val === 'number') return val === 1
+  return Boolean(val)
+}, z.boolean().optional())
+
 /**
  * Runtime schema validating race map details and booths returned by GET /Race/{raceId}.
  */
@@ -61,6 +68,9 @@ export const teamMapDetailResponseSchema = z.object({
   raceName: z.string().optional(),
   mapImageUrl: z.string().nullable().optional().transform((val) => val?.trim() || null),
   status: z.string().optional(),
+  isShowHiddenBooths: booleanFlagSchema,
+  isHideBoothDescription: booleanFlagSchema,
+  isDisabledBoothStatus: booleanFlagSchema,
   booth: z.array(teamMapBoothSchema).nullish().transform((val) => val ?? []).default([]),
   booths: z.array(teamMapBoothSchema).nullish(),
 }).passthrough().transform((data) => ({

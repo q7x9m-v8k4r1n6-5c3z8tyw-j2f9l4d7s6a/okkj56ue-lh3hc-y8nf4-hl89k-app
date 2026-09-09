@@ -111,6 +111,8 @@ export const TeamMapView = ({ raceId: propRaceId }: TeamMapViewProps = {}) => {
       <StationDetailSheet 
         pin={selectedStation || null} 
         onClose={clearSelection} 
+        isHideBoothDescription={mapData.isHideBoothDescription}
+        isDisabledBoothStatus={mapData.isDisabledBoothStatus}
       />
     </section>
   )

@@ -419,7 +419,7 @@ describe('StationDetailSheet', () => {
     expect(html).not.toContain('Xem thêm')
   })
 
-  it('renders fallback text when description is empty or only whitespace tags', () => {
+  it('completely removes description container and does not render fallback text when description is empty or only whitespace tags', () => {
     const emptyDescPin: StationPin = {
       ...freePin,
       description: '   <p>&nbsp;</p>   ',
@@ -431,7 +431,8 @@ describe('StationDetailSheet', () => {
       </MemoryRouter>,
     )
 
-    expect(html).toContain('Chưa có mô tả thử thách.')
+    expect(html).not.toContain('Chưa có mô tả thử thách.')
+    expect(html).not.toContain('max-h-[4.5rem]')
   })
 
   describe('title formatting behavior', () => {
@@ -492,22 +493,24 @@ describe('StationDetailSheet', () => {
   })
 
   describe('description sanitization behavior', () => {
-    it('returns fallback text for whitespace descriptions', () => {
+    it('does not render description container or fallback text for whitespace descriptions', () => {
       const html = renderToStaticMarkup(
         <MemoryRouter>
           <StationDetailSheet pin={{ ...freePin, description: '   ' }} onClose={() => {}} />
         </MemoryRouter>,
       )
-      expect(html).toContain('Chưa có mô tả thử thách.')
+      expect(html).not.toContain('Chưa có mô tả thử thách.')
+      expect(html).not.toContain('max-h-[4.5rem]')
     })
 
-    it('returns fallback text when description contains only empty HTML tags or &nbsp;', () => {
+    it('does not render description container or fallback text when description contains only empty HTML tags or &nbsp;', () => {
       const html = renderToStaticMarkup(
         <MemoryRouter>
           <StationDetailSheet pin={{ ...freePin, description: '<p><br></p>' }} onClose={() => {}} />
         </MemoryRouter>,
       )
-      expect(html).toContain('Chưa có mô tả thử thách.')
+      expect(html).not.toContain('Chưa có mô tả thử thách.')
+      expect(html).not.toContain('max-h-[4.5rem]')
     })
 
     it('renders valid rich text when content is provided', () => {
@@ -517,6 +520,164 @@ describe('StationDetailSheet', () => {
         </MemoryRouter>,
       )
       expect(html).toContain('<p>Thử thách 1</p>')
+    })
+  })
+
+  describe('isHideBoothDescription behavior', () => {
+    it('completely removes description container from DOM and does not render fallback message when isHideBoothDescription is true', () => {
+      const html = renderToStaticMarkup(
+        <MemoryRouter>
+          <StationDetailSheet
+            pin={freePin}
+            onClose={() => {}}
+            isHideBoothDescription={true}
+          />
+        </MemoryRouter>,
+      )
+
+      expect(html).not.toContain('Ban tổ chức không công bố mô tả thử thách cho trạm này.')
+      expect(html).not.toContain('Chưa có mô tả thử thách.')
+      expect(html).not.toContain('Vượt qua tường lốp và cầu khỉ.')
+      expect(html).not.toContain('max-h-[4.5rem]')
+    })
+
+    it('suppresses "Xem thêm" expand button when isHideBoothDescription is true even for very long descriptions', () => {
+      const longDescPin: StationPin = {
+        ...freePin,
+        description: 'Đây là một mô tả rất dài vượt quá 100 ký tự để kiểm tra nút Xem thêm bị ẩn khi bật cài đặt ẩn mô tả thử thách từ phía admin ban tổ chức.',
+      }
+
+      const html = renderToStaticMarkup(
+        <MemoryRouter>
+          <StationDetailSheet
+            pin={longDescPin}
+            onClose={() => {}}
+            isHideBoothDescription={true}
+          />
+        </MemoryRouter>,
+      )
+
+      expect(html).not.toContain('Ban tổ chức không công bố mô tả thử thách cho trạm này.')
+      expect(html).not.toContain('Xem thêm')
+      expect(html).not.toContain('Thu gọn')
+      expect(html).not.toContain('max-h-[4.5rem]')
+    })
+
+    it('displays normal challenge description when isHideBoothDescription is false and description exists', () => {
+      const html = renderToStaticMarkup(
+        <MemoryRouter>
+          <StationDetailSheet
+            pin={freePin}
+            onClose={() => {}}
+            isHideBoothDescription={false}
+          />
+        </MemoryRouter>,
+      )
+
+      expect(html).not.toContain('Ban tổ chức không công bố mô tả thử thách cho trạm này.')
+      expect(html).toContain('Vượt qua tường lốp và cầu khỉ.')
+    })
+  })
+
+  describe('isDisabledBoothStatus behavior', () => {
+    it('completely removes station status badge container from DOM when isDisabledBoothStatus is true', () => {
+      const htmlFree = renderToStaticMarkup(
+        <MemoryRouter>
+          <StationDetailSheet
+            pin={freePin}
+            onClose={() => {}}
+            isDisabledBoothStatus={true}
+          />
+        </MemoryRouter>,
+      )
+      expect(htmlFree).not.toContain('Trống / Sẵn sàng')
+      expect(htmlFree).not.toContain('Đang có đội tham gia')
+      expect(htmlFree).not.toContain('bg-[#168944]')
+
+      const htmlOccupied = renderToStaticMarkup(
+        <MemoryRouter>
+          <StationDetailSheet
+            pin={occupiedPin}
+            onClose={() => {}}
+            isDisabledBoothStatus={true}
+          />
+        </MemoryRouter>,
+      )
+      expect(htmlOccupied).not.toContain('Trống / Sẵn sàng')
+      expect(htmlOccupied).not.toContain('Đang có đội tham gia')
+      expect(htmlOccupied).not.toContain('bg-[#168944]')
+    })
+
+    it('renders enabled "Chuyển sang Quét QR" button even when station is occupied if isDisabledBoothStatus is true', () => {
+      const html = renderToStaticMarkup(
+        <MemoryRouter>
+          <StationDetailSheet
+            pin={occupiedPin}
+            onClose={() => {}}
+            isDisabledBoothStatus={true}
+          />
+        </MemoryRouter>,
+      )
+
+      expect(html).toContain('Chuyển sang Quét QR')
+      expect(html).not.toContain('disabled=""')
+    })
+
+    it('allows scanning navigation when clicked on occupied station if isDisabledBoothStatus is true', () => {
+      const onNavigateToScan = vi.fn()
+      let capturedButton: React.ReactElement<{ onClick: () => void; disabled: boolean }> | null = null
+
+      const TestWrapper = () => {
+        const element = StationDetailSheet({
+          pin: occupiedPin,
+          onClose: () => {},
+          onNavigateToScan,
+          isDisabledBoothStatus: true,
+        })
+        const fragments = element.props.children
+        const sheetContainer = fragments[1]
+        const sheetContent = sheetContainer.props.children
+        capturedButton = sheetContent.props.children[sheetContent.props.children.length - 1]
+        return element
+      }
+
+      renderToStaticMarkup(
+        <MemoryRouter>
+          <TestWrapper />
+        </MemoryRouter>,
+      )
+
+      expect(capturedButton).not.toBeNull()
+      expect(capturedButton!.props.disabled).toBe(false)
+      capturedButton!.props.onClick()
+
+      expect(onNavigateToScan).toHaveBeenCalledTimes(1)
+    })
+
+    it('renders normal status badges and disables button for occupied pin when isDisabledBoothStatus is false', () => {
+      const htmlFree = renderToStaticMarkup(
+        <MemoryRouter>
+          <StationDetailSheet
+            pin={freePin}
+            onClose={() => {}}
+            isDisabledBoothStatus={false}
+          />
+        </MemoryRouter>,
+      )
+      expect(htmlFree).toContain('Trống / Sẵn sàng')
+      expect(htmlFree).not.toContain('disabled=""')
+
+      const htmlOccupied = renderToStaticMarkup(
+        <MemoryRouter>
+          <StationDetailSheet
+            pin={occupiedPin}
+            onClose={() => {}}
+            isDisabledBoothStatus={false}
+          />
+        </MemoryRouter>,
+      )
+      expect(htmlOccupied).toContain('Đang có đội tham gia')
+      expect(htmlOccupied).toContain('disabled=""')
     })
   })
 })

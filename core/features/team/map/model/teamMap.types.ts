@@ -13,4 +13,6 @@ export interface StationPin {
 export interface MapData {
   backgroundImageUrl: string
   stations: StationPin[]
+  isHideBoothDescription?: boolean
+  isDisabledBoothStatus?: boolean
 }

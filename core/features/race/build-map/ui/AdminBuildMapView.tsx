@@ -6,6 +6,7 @@ import { useUploadRaceMapMutation } from '../model/server/useUploadRaceMapMutati
 import { useUpdateBoothCoordinatesMutation } from '../model/server/useUpdateBoothCoordinatesMutation'
 import { AdminMapCanvas } from './AdminMapCanvas'
 import { FrozenMapBanner } from './FrozenMapBanner'
+import { MapSettingsSection } from './MapSettingsSection'
 import { MapUploadCanvas } from './MapUploadCanvas'
 import { StationSidebar } from './StationSidebar'
 
@@ -33,6 +34,7 @@ export const AdminBuildMapView = ({
     isErrorBooths,
     refetchBooths,
     status,
+    mapDetail,
   } = useRaceMapQuery(raceId)
 
   const currentStatus = raceStatus ?? status ?? 'draft'
@@ -203,6 +205,16 @@ export const AdminBuildMapView = ({
           />
         )}
       </div>
+      <MapSettingsSection
+        raceId={raceId}
+        isFrozen={isFrozen}
+        settings={{
+          isShowHiddenBooths: mapDetail?.isShowHiddenBooths ?? false,
+          isHideBoothDescription: mapDetail?.isHideBoothDescription ?? false,
+          isDisabledBoothStatus: mapDetail?.isDisabledBoothStatus ?? false,
+          modifiedAt: mapDetail?.modifiedAt,
+        }}
+      />
     </div>
   )
 }
