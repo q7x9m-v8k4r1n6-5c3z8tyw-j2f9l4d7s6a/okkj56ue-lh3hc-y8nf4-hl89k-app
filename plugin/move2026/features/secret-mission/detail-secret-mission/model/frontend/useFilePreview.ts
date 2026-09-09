@@ -4,20 +4,24 @@ import { useState, useEffect } from 'react'
  * Owns a selected file and revokes its object URL when no longer needed.
  */
 export const useFilePreview = (file: File | null) => {
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(() => (file ? URL.createObjectURL(file) : null))
+  const [prevFile, setPrevFile] = useState<File | null>(file)
+
+  if (file !== prevFile) {
+    setPrevFile(file)
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl)
+    }
+    setPreviewUrl(file ? URL.createObjectURL(file) : null)
+  }
 
   useEffect(() => {
-    if (!file) {
-      setPreviewUrl(null)
-      return
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+      }
     }
-
-    const objectUrl = URL.createObjectURL(file)
-    setPreviewUrl(objectUrl)
-
-    // Cleanup: Chống memory leak khi đổi file hoặc tắt màn hình
-    return () => URL.revokeObjectURL(objectUrl)
-  }, [file])
+  }, [previewUrl])
 
   return previewUrl
 }

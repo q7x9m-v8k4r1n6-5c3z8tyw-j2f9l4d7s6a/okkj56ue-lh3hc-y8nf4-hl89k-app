@@ -181,16 +181,18 @@ export const useRaceMessageNotification = () => {
 
     if (!incomingMessages.length) return
 
-    setMessagesByStorageKey((currentByKey) => {
-      const current = currentByKey[storageKey]
-        ?? parseStoredMessages(window.localStorage.getItem(storageKey))
-      const nextMessages = mergeMessages(current, incomingMessages)
-      window.localStorage.setItem(storageKey, JSON.stringify(nextMessages))
+    queueMicrotask(() => {
+      setMessagesByStorageKey((currentByKey) => {
+        const current = currentByKey[storageKey]
+          ?? parseStoredMessages(window.localStorage.getItem(storageKey))
+        const nextMessages = mergeMessages(current, incomingMessages)
+        window.localStorage.setItem(storageKey, JSON.stringify(nextMessages))
 
-      return {
-        ...currentByKey,
-        [storageKey]: nextMessages,
-      }
+        return {
+          ...currentByKey,
+          [storageKey]: nextMessages,
+        }
+      })
     })
   }, [
     auth.user?.id,

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useToast } from '@/core/shared'
 import {
@@ -65,6 +66,15 @@ export const useEditRaceEditor = (raceId?: string) => {
 
   const conflict = isEditRaceConflict(patchMutation.error)
 
+  const [isStartConfirmOpen, setIsStartConfirmOpen] = useState(false)
+
+  const handleOpenStartConfirm = () => setIsStartConfirmOpen(true)
+  const handleCloseStartConfirm = () => setIsStartConfirmOpen(false)
+  const handleConfirmStart = () => {
+    setIsStartConfirmOpen(false)
+    submit('ongoing', false)
+  }
+
   return {
     errorMessage: patchMutation.error
       ? getEditRaceErrorMessage(
@@ -74,6 +84,10 @@ export const useEditRaceEditor = (raceId?: string) => {
       : '',
     isConflict: conflict,
     reloadLatestVersion,
+    isStartConfirmOpen,
+    handleCloseStartConfirm,
+    handleConfirmStart,
+    handleOpenStartConfirm,
     ribbon: {
       actionsDisabled: !raceId,
       isEditing: editor.isEditing,
@@ -86,7 +100,7 @@ export const useEditRaceEditor = (raceId?: string) => {
       onPublish: () => submit('ready', false),
       onResume: () => submit('ongoing', false),
       onSave: () => submit(),
-      onStart: () => submit('ongoing', false),
+      onStart: handleOpenStartConfirm,
       saveDisabled: !editor.isDirty,
       status: editor.form.status,
     },

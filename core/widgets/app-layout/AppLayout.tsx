@@ -85,7 +85,7 @@ export const AppLayout = ({ children }: PropsWithChildren) => {
       </aside>
 
       <div className={`min-h-svh transition-all duration-300 ${isPanelCollapsed ? 'md:pl-[80px]' : 'md:pl-[292px]'}`}>
-        <header className="sticky top-0 z-10 flex h-[61px] items-center justify-between bg-white px-[13px] shadow-[0_1px_1.4px_rgba(0,0,0,0.13)]">
+        <header className="sticky top-0 z-30 flex h-[61px] items-center justify-between bg-white px-[13px] shadow-[0_1px_1.4px_rgba(0,0,0,0.13)]">
           <div className='flex flex-row items-center gap-3'>
             <IconButton 
               icon={isPanelCollapsed ? <PanelOpen className="size-6" /> : <PanelClose className="size-6" />}
@@ -109,7 +109,7 @@ export const AppLayout = ({ children }: PropsWithChildren) => {
             </button>
 
             {isProfileOpen ? (
-              <section className="absolute right-0 top-[52px] flex w-[245px] flex-col gap-1 rounded-lg bg-white p-[10px] shadow-[0_4px_2.8px_rgba(0,0,0,0.08)]" aria-label="Thông tin tài khoản">
+              <section className="absolute right-0 top-[52px] z-50 flex w-[245px] flex-col gap-1 rounded-lg bg-white p-[10px] shadow-[0_4px_16px_rgba(0,0,0,0.12)]" aria-label="Thông tin tài khoản">
                 <div className="flex items-start gap-[10px] py-[5px]">
                   <span className="size-8 shrink-0 overflow-hidden rounded-full border border-[#e2e2e2] p-px">
                     <ProfileAvatar name={displayName} src={user?.avatarUrl} />
