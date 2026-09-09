@@ -48,10 +48,12 @@ export const useSecretMissionDetailContainer = () => {
       (query.data.evidenceImageUrls?.length ?? 0) > 0
 
     if (alreadySubmitted) {
-      toast({
-        title: 'Nhiệm vụ này đã được nộp minh chứng!',
-        variant: 'success',
-      })
+      toast({ title: 'Nhiệm vụ này đã được nộp minh chứng!', variant: 'success' })
+      return
+    }
+
+    if (techCacheCode) {
+      navigate(`?view=techcache-camera`, { replace: true })
       return
     }
 
